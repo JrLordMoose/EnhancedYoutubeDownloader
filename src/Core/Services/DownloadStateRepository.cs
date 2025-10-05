@@ -52,7 +52,7 @@ public class DownloadStateRepository : IDisposable
                 VALUES (@downloadId, @videoId, @filePath, @partialFilePath, @bytesDownloaded, @totalBytes, @status, @lastUpdated)";
 
             command.Parameters.AddWithValue("@downloadId", downloadItem.Id);
-            command.Parameters.AddWithValue("@videoId", downloadItem.Video?.Id ?? "");
+            command.Parameters.AddWithValue("@videoId", downloadItem.Video?.Id.Value ?? "");
             command.Parameters.AddWithValue("@filePath", downloadItem.FilePath ?? "");
             command.Parameters.AddWithValue("@partialFilePath", downloadItem.PartialFilePath ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@bytesDownloaded", downloadItem.BytesDownloaded);

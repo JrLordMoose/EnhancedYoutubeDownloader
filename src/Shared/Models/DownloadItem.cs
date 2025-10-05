@@ -29,6 +29,7 @@ public partial class DownloadItem : ObservableObject
     [NotifyPropertyChangedFor(nameof(CanRestart))]
     [NotifyPropertyChangedFor(nameof(CanOpen))]
     [NotifyPropertyChangedFor(nameof(IsCompleted))]
+    [NotifyPropertyChangedFor(nameof(FormattedProgressInfo))]
     private DownloadStatus _status = DownloadStatus.Queued;
 
     [ObservableProperty]
@@ -103,7 +104,12 @@ public partial class DownloadItem : ObservableObject
     public string FormattedSpeed => DownloadSpeed > 0 ? $"{FormatBytes((long)DownloadSpeed)}/s" : "--";
     public string FormattedEta => EstimatedTimeRemaining.HasValue ? FormatDuration(EstimatedTimeRemaining.Value) : "--";
     public string FormattedBytes => TotalBytes > 0 ? $"{FormatBytes(BytesDownloaded)} / {FormatBytes(TotalBytes)}" : "--";
-    public string FormattedProgressInfo => $"{Progress:F1}% • {FormattedSpeed} • {FormattedEta} • {FormattedBytes}";
+    public string FormattedProgressInfo =>
+        Status == DownloadStatus.Paused
+            ? "Paused"
+            : Status == DownloadStatus.Started && Progress <= 0 && TotalBytes == 0
+                ? "Loading..."
+                : $"{Progress:F1}% • {FormattedSpeed} • {FormattedEta} • {FormattedBytes}";
 
     // Helper methods
     public static string FormatBytes(long bytes)

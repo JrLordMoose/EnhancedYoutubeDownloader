@@ -73,10 +73,12 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBox Grid.Column="0"
+                             x:Name="QueryTextBox"
                              Text="{Binding Dashboard.Query}"
                              Watermark="Enter YouTube URL, playlist, channel, or search query..."
                              Classes="Outline"
-                             Margin="0,0,8,0"/>
+                             Margin="0,0,8,0"
+                             KeyDown="OnQueryTextBoxKeyDown"/>
 
                     <Button Grid.Column="1"
                             Content="Download"
@@ -95,123 +97,122 @@
                                 <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
                                         BorderBrush="{DynamicResource MaterialDividerBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="4"
-                                        Margin="0,0,0,8"
-                                        Padding="12">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="120"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                                        CornerRadius="8"
+                                        Margin="0,0,0,12"
+                                        Padding="16">
+                                    <Grid RowDefinitions="Auto,Auto,Auto">
 
-                                        <!-- Thumbnail (Column 0) -->
-                                        <Border Grid.Column="0"
-                                                Width="120"
-                                                Height="90"
-                                                CornerRadius="4"
-                                                ClipToBounds="True"
-                                                Margin="0,0,12,0"
-                                                Background="{DynamicResource MaterialDividerBrush}">
-                                            <Panel>
-                                                <!-- Thumbnail Image with AsyncImageLoader -->
-                                                <Image asyncImageLoader:ImageLoader.Source="{Binding ThumbnailUrl}"
-                                                       Stretch="UniformToFill"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
-
-                                                <!-- Fallback for Missing Thumbnail -->
-                                                <TextBlock Text="No Image"
-                                                          FontSize="12"
-                                                          Opacity="0.5"
-                                                          HorizontalAlignment="Center"
-                                                          VerticalAlignment="Center"
-                                                          IsVisible="{Binding ThumbnailUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
-                                            </Panel>
-                                        </Border>
-
-                                        <!-- Content (Column 1) -->
-                                        <Grid Grid.Column="1">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
+                                        <!-- Row 0: Thumbnail, Title, Author -->
+                                        <Grid Grid.Row="0" ColumnDefinitions="100,*">
+                                            <!-- Thumbnail -->
+                                            <Border Grid.Column="0"
+                                                    Width="100"
+                                                    Height="75"
+                                                    CornerRadius="6"
+                                                    ClipToBounds="True"
+                                                    Margin="0,0,12,0"
+                                                    Background="{DynamicResource MaterialDividerBrush}">
+                                                <Panel>
+                                                    <!-- Thumbnail Image -->
+                                                    <Image asyncImageLoader:ImageLoader.Source="{Binding ThumbnailUrl}"
+                                                           Stretch="UniformToFill"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                                    <!-- Fallback -->
+                                                    <TextBlock Text="No Image"
+                                                              FontSize="11"
+                                                              Opacity="0.5"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"
+                                                              IsVisible="{Binding ThumbnailUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                                                </Panel>
+                                            </Border>
 
                                             <!-- Title and Author -->
-                                            <StackPanel Grid.Row="0">
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
                                                 <TextBlock Text="{Binding Title}"
-                                                          FontSize="16"
+                                                          FontSize="15"
                                                           FontWeight="SemiBold"
                                                           TextWrapping="Wrap"
                                                           MaxLines="2"/>
                                                 <TextBlock Text="{Binding Author}"
-                                                          FontSize="14"
-                                                          Opacity="0.7"
-                                                          Margin="0,2,0,0"/>
+                                                          FontSize="13"
+                                                          Opacity="0.65"
+                                                          TextWrapping="NoWrap"
+                                                          TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
+                                        </Grid>
 
-                                            <!-- Progress -->
-                                            <ProgressBar Grid.Row="1"
+                                        <!-- Row 1: Progress Bar and Info -->
+                                        <Grid Grid.Row="1" Margin="0,12,0,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <ProgressBar Grid.Row="0"
                                                         Value="{Binding Progress}"
                                                         Maximum="100"
-                                                        Margin="0,8,0,0"/>
+                                                        Height="6"
+                                                        CornerRadius="3"/>
 
-                                            <!-- Enhanced Progress Info -->
-                                            <TextBlock Grid.Row="2"
+                                            <TextBlock Grid.Row="1"
                                                       Text="{Binding FormattedProgressInfo}"
                                                       FontSize="12"
                                                       Opacity="0.6"
-                                                      Margin="0,4,0,0"/>
+                                                      Margin="0,6,0,0"/>
                                         </Grid>
 
-                                        <!-- Action Buttons (Column 2) - Wrapped in ScrollViewer for overflow -->
-                                        <ScrollViewer Grid.Column="2"
-                                                     HorizontalScrollBarVisibility="Auto"
-                                                     VerticalScrollBarVisibility="Disabled"
-                                                     MinWidth="200"
-                                                     MaxWidth="400"
-                                                     Margin="12,0,0,0">
+                                        <!-- Row 2: Action Buttons -->
+                                        <Border Grid.Row="2"
+                                                Margin="0,12,0,0"
+                                                Padding="0">
                                             <StackPanel Orientation="Horizontal"
-                                                       Spacing="4"
-                                                       VerticalAlignment="Top">
-                                                <!-- Download/Resume Button (Queued/Paused) -->
+                                                       Spacing="8"
+                                                       HorizontalAlignment="Right">
+                                                <!-- Start/Resume Button -->
                                                 <Button Content="Start"
                                                         Classes="Outline"
+                                                        MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.ResumeDownloadCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding CanResume}"/>
-                                                <!-- Pause Button (Started) -->
+                                                <!-- Pause Button -->
                                                 <Button Content="Pause"
                                                         Classes="Outline"
+                                                        MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.PauseDownloadCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding CanPause}"/>
                                                 <!-- Cancel Button -->
                                                 <Button Content="Cancel"
                                                         Classes="Outline"
+                                                        MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.CancelDownloadCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding CanCancel}"/>
-                                                <!-- Open Folder Button (Completed) - Uses CanOpen flag -->
+                                                <!-- Open Button -->
                                                 <Button Content="Open"
                                                         Classes="Outline"
+                                                        MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.OpenDownloadFolderCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding CanOpen}"/>
-                                                <!-- Restart Button (Failed/Canceled/Completed) -->
+                                                <!-- Restart Button -->
                                                 <Button Content="Restart"
                                                         Classes="Outline"
+                                                        MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.RestartDownloadCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding CanRestart}"/>
-                                                <!-- Delete Button (Always visible) -->
+                                                <!-- Delete Button -->
                                                 <Button Content="Delete"
                                                         Classes="Outline"
+                                                        MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.DeleteDownloadCommand}"
                                                         CommandParameter="{Binding}"/>
                                             </StackPanel>
-                                        </ScrollViewer>
+                                        </Border>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

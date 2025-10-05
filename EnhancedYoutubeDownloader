@@ -6,7 +6,7 @@
   "ShouldInjectLanguageSpecificAudioStreams": true,
   "LastAuthCookies": "",
   "IsUkraineSupportMessageEnabled": false,
-  "AutoStartDownload": false,
-  "OpenFolderAfterDownload": false,
+  "AutoStartDownload": true,
+  "OpenFolderAfterDownload": true,
   "DefaultDownloadPath": ""
 }

@@ -139,7 +139,7 @@ public class App : Application, IDisposable
 
         this.LocateMaterialTheme<MaterialThemeBase>().CurrentTheme =
             actualTheme == PlatformThemeVariant.Light
-                ? Theme.Create(Theme.Light, Color.Parse("#343838"), Color.Parse("#F9A825"))
+                ? Theme.Create(Theme.Light, Color.Parse("#FAFAFA"), Color.Parse("#F9A825"))
                 : Theme.Create(Theme.Dark, Color.Parse("#E8E8E8"), Color.Parse("#F9A825"));
     }
 

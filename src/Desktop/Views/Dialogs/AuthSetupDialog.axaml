@@ -3,10 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="750"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="650"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.AuthSetupDialog"
              x:DataType="vm:AuthSetupViewModel"
-             MinWidth="650" MaxWidth="900" MinHeight="700">
+             Width="700" Height="650">
 
     <Design.DataContext>
         <vm:AuthSetupViewModel />
@@ -24,9 +24,9 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,0,0,1"
-                    Padding="24,20">
+                    Padding="20,16">
                 <TextBlock Text="Google Authentication"
-                          FontSize="19"
+                          FontSize="18"
                           FontWeight="SemiBold"/>
             </Border>
 
@@ -35,7 +35,7 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,0,0,1"
-                    Padding="24,16">
+                    Padding="20,14">
                 <StackPanel Spacing="12">
                     <TextBlock Text="Sign in with your Google account"
                               FontSize="16"
@@ -111,17 +111,17 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,1,0,0"
-                    Padding="24,12">
+                    Padding="20,10">
                 <Grid ColumnDefinitions="Auto,*">
                     <TextBlock Grid.Column="0"
                               Text="Status:"
-                              FontSize="13"
+                              FontSize="12"
                               Foreground="{DynamicResource MaterialDesignBodyLight}"
                               VerticalAlignment="Center"
                               Margin="0,0,8,0"/>
                     <TextBlock Grid.Column="1"
                               Text="{Binding Status}"
-                              FontSize="13"
+                              FontSize="12"
                               FontWeight="Medium"
                               VerticalAlignment="Center"/>
                 </Grid>
@@ -132,7 +132,7 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,1,0,0"
-                    Padding="24,16">
+                    Padding="20,14">
                 <Grid ColumnDefinitions="*,Auto">
                     <!-- Help Text -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">

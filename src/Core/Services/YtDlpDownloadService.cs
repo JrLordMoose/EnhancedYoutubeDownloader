@@ -285,9 +285,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             var options = new OptionSet
             {
                 Format = formatString,
-                Output = downloadItem.FilePath, // Use final path since NoPart=true
+                Output = downloadItem.PartialFilePath, // Use .part path for progress reporting
                 NoPlaylist = true,
-                NoPart = true, // Don't use .part files (yt-dlp downloads directly to final location)
+                NoPart = false, // Use .part files to enable progress reporting
 
                 // Subtitle options
                 WriteSubs = profile.IncludeSubtitles,

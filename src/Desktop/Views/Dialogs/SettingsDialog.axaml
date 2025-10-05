@@ -3,10 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="650"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.SettingsDialog"
              x:DataType="vm:SettingsViewModel"
-             MinWidth="550" MaxWidth="700">
+             Width="600" Height="700">
 
     <Design.DataContext>
         <vm:SettingsViewModel />
@@ -24,19 +24,22 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,0,0,1"
-                    Padding="24,20">
+                    Padding="20,16">
                 <TextBlock Text="Settings"
-                          FontSize="19"
+                          FontSize="18"
                           FontWeight="SemiBold"/>
             </Border>
 
             <!-- Content -->
-            <TabControl Grid.Row="1" Margin="0" Padding="0">
+            <ScrollViewer Grid.Row="1"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Disabled">
+                <TabControl Margin="0" Padding="0">
 
                 <!-- General Tab -->
                 <TabItem Header="General">
-                    <ScrollViewer Padding="24,20">
-                        <StackPanel Spacing="24">
+                    <Border Padding="20,16">
+                        <StackPanel Spacing="20">
 
                             <!-- Theme Setting -->
                             <StackPanel Spacing="8">
@@ -80,13 +83,13 @@
                             </Grid>
 
                         </StackPanel>
-                    </ScrollViewer>
+                    </Border>
                 </TabItem>
 
                 <!-- Downloads Tab -->
                 <TabItem Header="Downloads">
-                    <ScrollViewer Padding="24,20">
-                        <StackPanel Spacing="24">
+                    <Border Padding="20,16">
+                        <StackPanel Spacing="16">
 
                             <!-- Parallel Downloads -->
                             <StackPanel Spacing="8">
@@ -256,6 +259,7 @@
                                         <Button Grid.Column="1"
                                                x:Name="BrowseLocationButton"
                                                Content="Browse"
+                                               Command="{Binding BrowseDefaultLocationCommand}"
                                                Theme="{DynamicResource MaterialOutlineButton}"
                                                VerticalAlignment="Stretch"/>
                                     </Grid>
@@ -263,13 +267,13 @@
                             </StackPanel>
 
                         </StackPanel>
-                    </ScrollViewer>
+                    </Border>
                 </TabItem>
 
                 <!-- Advanced Tab -->
                 <TabItem Header="Advanced">
-                    <ScrollViewer Padding="24,20">
-                        <StackPanel Spacing="24">
+                    <Border Padding="20,16">
+                        <StackPanel Spacing="16">
 
                             <!-- Language Specific Audio -->
                             <Grid ColumnDefinitions="*,Auto">
@@ -342,17 +346,18 @@
                             </StackPanel>
 
                         </StackPanel>
-                    </ScrollViewer>
+                    </Border>
                 </TabItem>
 
             </TabControl>
+            </ScrollViewer>
 
             <!-- Action Buttons -->
             <Border Grid.Row="2"
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,1,0,0"
-                    Padding="24,16">
+                    Padding="20,14">
                 <StackPanel Orientation="Horizontal"
                            HorizontalAlignment="Right"
                            Spacing="12">

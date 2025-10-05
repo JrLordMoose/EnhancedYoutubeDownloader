@@ -74,6 +74,72 @@ public class DialogManager : IDisposable
     }
 
     /// <summary>
+    /// Prompts the user to select a folder using the native folder picker.
+    /// </summary>
+    /// <param name="title">Title of the folder picker dialog</param>
+    /// <param name="suggestedStartPath">Optional starting path for the picker</param>
+    /// <returns>Selected folder path, or null if cancelled</returns>
+    public async Task<string?> PromptFolderPathAsync(
+        string? title = null,
+        string? suggestedStartPath = null
+    )
+    {
+        // Get the main window
+        if (!AvaloniaExtensions.TryGetMainWindow(out var mainWindow))
+        {
+            return null;
+        }
+
+        // Get the storage provider from the main window
+        var storageProvider = mainWindow.StorageProvider;
+        if (storageProvider == null)
+        {
+            return null;
+        }
+
+        // Configure folder picker options
+        var options = new FolderPickerOpenOptions
+        {
+            Title = title ?? "Select Folder",
+            AllowMultiple = false,
+        };
+
+        // Set suggested start location if provided
+        if (!string.IsNullOrWhiteSpace(suggestedStartPath) && Directory.Exists(suggestedStartPath))
+        {
+            var suggestedFolder = await storageProvider.TryGetFolderFromPathAsync(
+                suggestedStartPath
+            );
+            if (suggestedFolder != null)
+            {
+                options.SuggestedStartLocation = suggestedFolder;
+            }
+        }
+        // Otherwise, try default suggested folder
+        else if (await TryGetSuggestedFolderAsync(storageProvider) is { } defaultFolder)
+        {
+            options.SuggestedStartLocation = defaultFolder;
+        }
+
+        // Show the folder picker
+        var results = await storageProvider.OpenFolderPickerAsync(options);
+
+        // Return the first selected folder's local path
+        if (results.Count > 0)
+        {
+            var selectedFolder = results[0];
+            // For folders, we need to convert the URI to a local path
+            var uri = selectedFolder.Path;
+            if (uri.IsAbsoluteUri && uri.IsFile)
+            {
+                return uri.LocalPath;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Prompts the user to select a file save location using the native file picker.
     /// </summary>
     /// <param name="defaultFileName">Default file name with extension</param>
