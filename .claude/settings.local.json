@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh:*)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" build --no-restore)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" run --project src/Desktop/EnhancedYoutubeDownloader.csproj --no-build)",
+      "Bash(git commit:*)",
+      "Bash(gh release create:*)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1)",
+      "Bash(gh release upload:*)",
+      "Bash(gh release edit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

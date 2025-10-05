@@ -33,14 +33,15 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}
 ; Create uninstaller in the installation directory for easy access
 CreateUninstallRegKey=yes
-; Show uninstaller in Add/Remove Programs
-UninstallFilesDir={app}\Uninstall
+; Show uninstaller in Add/Remove Programs - place in root directory
+UninstallFilesDir={app}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
+Name: "desktopuninstall"; Description: "Create desktop uninstaller shortcut"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "launchafterinstall"; Description: "Launch {#MyAppName} after installation"; GroupDescription: "Post-installation:"; Flags: checkedonce
 
 [Files]
@@ -51,8 +52,9 @@ Source: "src\Desktop\bin\Release\net9.0\win-x64\publish\*"; DestDir: "{app}"; Fl
 ; Start Menu shortcuts
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch {#MyAppName}"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"; Comment: "Uninstall {#MyAppName}"
-; Desktop shortcut
+; Desktop shortcuts
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; Comment: "Launch {#MyAppName}"
+Name: "{autodesktop}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"; Tasks: desktopuninstall; Comment: "Uninstall {#MyAppName}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent; Tasks: launchafterinstall
