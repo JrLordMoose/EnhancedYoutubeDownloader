@@ -114,4 +114,29 @@ public partial class DownloadSingleSetupViewModel : DialogViewModelBase
 
         return fileName;
     }
+
+    /// <summary>
+    /// Generates a unique file path by appending (1), (2), etc. if the file already exists
+    /// </summary>
+    public static string GetUniqueFilePath(string filePath)
+    {
+        if (!File.Exists(filePath))
+            return filePath;
+
+        var directory = Path.GetDirectoryName(filePath) ?? string.Empty;
+        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+        var extension = Path.GetExtension(filePath);
+
+        var counter = 1;
+        string newFilePath;
+
+        do
+        {
+            var newFileName = $"{fileNameWithoutExtension} ({counter}){extension}";
+            newFilePath = Path.Combine(directory, newFileName);
+            counter++;
+        } while (File.Exists(newFilePath));
+
+        return newFilePath;
+    }
 }

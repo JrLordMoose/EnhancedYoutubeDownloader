@@ -8,12 +8,15 @@ public class DownloadStateRepository : IDisposable
     private readonly SqliteConnection _connection;
     private readonly string _connectionString;
 
-    public DownloadStateRepository()
+    public DownloadStateRepository(string? cacheDirectory = null)
     {
-        var cacheDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "EnhancedYoutubeDownloader"
-        );
+        var cacheDir = string.IsNullOrWhiteSpace(cacheDirectory)
+            ? Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "EnhancedYoutubeDownloader"
+            )
+            : cacheDirectory;
+
         Directory.CreateDirectory(cacheDir);
 
         _connectionString = $"Data Source={Path.Combine(cacheDir, "download_state.db")}";

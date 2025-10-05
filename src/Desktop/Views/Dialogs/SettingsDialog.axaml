@@ -78,7 +78,7 @@
                                               Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                                 </StackPanel>
                                 <ToggleSwitch Grid.Column="1"
-                                             IsChecked="True"
+                                             IsChecked="{Binding Settings.IsAutoUpdateEnabled, Mode=TwoWay}"
                                              VerticalAlignment="Center"/>
                             </Grid>
 
@@ -135,7 +135,7 @@
                                                   Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                                     </StackPanel>
                                     <ComboBox Grid.Row="0" Grid.Column="1"
-                                             SelectedIndex="0"
+                                             SelectedIndex="{Binding Settings.DefaultQuality, Mode=TwoWay}"
                                              HorizontalAlignment="Stretch"
                                              VerticalAlignment="Center"
                                              Theme="{DynamicResource MaterialFilledComboBox}">
@@ -154,7 +154,7 @@
                                                   Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                                     </StackPanel>
                                     <ComboBox Grid.Row="1" Grid.Column="1"
-                                             SelectedIndex="0"
+                                             SelectedIndex="{Binding Settings.DefaultFormat, Mode=TwoWay}"
                                              HorizontalAlignment="Stretch"
                                              VerticalAlignment="Center"
                                              Theme="{DynamicResource MaterialFilledComboBox}">
@@ -263,6 +263,47 @@
                                                Theme="{DynamicResource MaterialOutlineButton}"
                                                VerticalAlignment="Stretch"/>
                                     </Grid>
+                                    <TextBlock Text="{Binding ActualDownloadPath, StringFormat='Current: {0}'}"
+                                              FontSize="11"
+                                              Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                              TextWrapping="Wrap"
+                                              Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="4" Margin="0,8,0,0">
+                                    <TextBlock Text="Cache Location"
+                                              FontSize="14"/>
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <TextBox Grid.Column="0"
+                                                x:Name="CacheLocationTextBox"
+                                                Text="{Binding Settings.DefaultCachePath, Mode=TwoWay}"
+                                                Watermark="Select cache folder (empty = default)..."
+                                                Theme="{DynamicResource MaterialFilledTextBox}"
+                                                Margin="0,0,8,0"/>
+                                        <Button Grid.Column="1"
+                                               x:Name="BrowseCacheLocationButton"
+                                               Content="Browse"
+                                               Command="{Binding BrowseCacheLocationCommand}"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               VerticalAlignment="Stretch"
+                                               Margin="0,0,8,0"/>
+                                        <Button Grid.Column="2"
+                                               x:Name="ResetCacheLocationButton"
+                                               Content="Reset"
+                                               Command="{Binding ResetCacheLocationCommand}"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               VerticalAlignment="Stretch"/>
+                                    </Grid>
+                                    <TextBlock Text="{Binding ActualCachePath, StringFormat='Current: {0}'}"
+                                              FontSize="11"
+                                              Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                              TextWrapping="Wrap"
+                                              Margin="0,4,0,0"/>
+                                    <TextBlock Text="⚠️ Application restart required for cache location changes to take effect"
+                                              FontSize="11"
+                                              Foreground="#F9A825"
+                                              TextWrapping="Wrap"
+                                              Margin="0,4,0,0"/>
                                 </StackPanel>
                             </StackPanel>
 
@@ -303,7 +344,7 @@
                                         Padding="16">
                                     <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
                                         <TextBlock Grid.Row="0"
-                                                  Text="Cache Size: Unknown"
+                                                  Text="{Binding CacheSize, StringFormat='Cache Size: {0}'}"
                                                   FontSize="14"/>
                                         <TextBlock Grid.Row="1"
                                                   Text="Cached video metadata helps improve performance"
@@ -313,9 +354,36 @@
                                         <Button Grid.Row="2"
                                                x:Name="ClearCacheButton"
                                                Content="Clear Cache"
+                                               Command="{Binding ClearCacheCommand}"
                                                Theme="{DynamicResource MaterialOutlineButton}"
                                                HorizontalAlignment="Left"/>
                                     </Grid>
+                                </Border>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Reset Settings Section -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Reset"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Border Background="{DynamicResource MaterialDesignCardBackground}"
+                                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="16">
+                                    <StackPanel Spacing="12">
+                                        <TextBlock Text="Reset all settings to their default values"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                  TextWrapping="Wrap"/>
+                                        <Button x:Name="ResetAllSettingsButton"
+                                               Content="Reset All Settings to Default"
+                                               Command="{Binding ResetAllSettingsCommand}"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               HorizontalAlignment="Left"/>
+                                    </StackPanel>
                                 </Border>
                             </StackPanel>
 

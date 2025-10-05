@@ -37,11 +37,50 @@ public partial class ErrorDialogViewModel : DialogViewModelBase
     private async Task CopyErrorDetailsAsync()
     {
         if (ErrorInfo == null)
+        {
+            Console.WriteLine("[ERROR_DIALOG] CopyErrorDetails called but ErrorInfo is null.");
             return;
+        }
 
-        // Note: In a real implementation, you would get the clipboard from the current window/TopLevel
-        // This is a simplified version that just returns without error
-        await Task.CompletedTask;
+        try
+        {
+            Console.WriteLine("[ERROR_DIALOG] Attempting to copy error details to clipboard.");
+
+            // Get the main window from Application
+            var mainWindow = Application.Current?.ApplicationLifetime
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow
+                : null;
+
+            if (mainWindow == null)
+            {
+                Console.WriteLine("[ERROR_DIALOG] Main window is not available.");
+                return;
+            }
+
+            var clipboard = mainWindow.Clipboard;
+            if (clipboard == null)
+            {
+                Console.WriteLine("[ERROR_DIALOG] Clipboard is not available.");
+                return;
+            }
+
+            // Format error details for clipboard
+            var errorText = $"Error: {ErrorInfo.Message}\n";
+            if (!string.IsNullOrWhiteSpace(ErrorInfo.Details))
+            {
+                errorText += $"\nDetails:\n{ErrorInfo.Details}";
+            }
+            errorText += $"\nCategory: {ErrorInfo.Category}";
+
+            // Copy to clipboard
+            await clipboard.SetTextAsync(errorText);
+            Console.WriteLine("[ERROR_DIALOG] Error details copied to clipboard successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR_DIALOG] Failed to copy to clipboard: {ex.Message}");
+        }
     }
 
     [RelayCommand]

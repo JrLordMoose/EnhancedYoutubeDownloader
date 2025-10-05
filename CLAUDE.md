@@ -11,6 +11,40 @@ Always analyze and keep in mind all files within the "guides-and-instructions" f
 @guides-andinstructions/AI Agent Instruction Prompt_ Clone and Enhance YoutubeDownloader.md
 @guides-andinstructions/Comprehensive Analysis of YoutubeDownloader Application.md
 
+### Create Subagents
+When Task becomes too long always breakdown the tasks and then create and deploy subagents that will talk to one another to limit bugs, and stay on task and then report back to you with their updates and then you summarize and share with me the changes made or updates made   
+
+1. Task Decomposition
+
+Break complex projects into manageable subtasks
+Identify dependencies between tasks
+Establish clear priorities and sequencing
+
+2. Subagent Coordination
+
+Deploy specialized agents for specific task types
+Manage parallel workflows
+Integrate outputs from multiple agents
+
+3. Progress Tracking
+
+Monitor completion status
+Identify bottlenecks
+Adjust plans dynamically
+
+4. Quality Assurance
+
+Verify subtask completion
+Ensure consistency across outputs
+Validate final deliverables
+
+Analyze the complexity and requirements
+Break it into logical subtasks
+Identify which specialized agents to deploy
+Create an execution plan
+Coordinate the work and integrate results
+
+## Chats & Sessions
 The latest exported chat file located within the folder "@guides-andinstructions/chats", identified by the highest number at the end of its filename, indicating it's the most recent. These documents provide essential guidance and context for your tasks.
 
 ## Building and Running

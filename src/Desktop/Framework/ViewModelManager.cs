@@ -39,6 +39,9 @@ public class ViewModelManager
     public SettingsViewModel CreateSettingsViewModel() =>
         _serviceProvider.GetRequiredService<SettingsViewModel>();
 
+    public TutorialViewModel CreateTutorialViewModel() =>
+        _serviceProvider.GetRequiredService<TutorialViewModel>();
+
     public ErrorDialogViewModel CreateErrorDialogViewModel() =>
         _serviceProvider.GetRequiredService<ErrorDialogViewModel>();
 }

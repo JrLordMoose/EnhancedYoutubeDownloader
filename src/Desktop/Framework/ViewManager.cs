@@ -20,6 +20,7 @@ public partial class ViewManager
             DownloadSingleSetupViewModel => new DownloadSingleSetupDialog(),
             MessageBoxViewModel => new MessageBoxDialog(),
             SettingsViewModel => new SettingsDialog(),
+            TutorialViewModel => new TutorialDialog(),
             ErrorDialogViewModel => new ErrorDialog(),
             _ => null,
         };

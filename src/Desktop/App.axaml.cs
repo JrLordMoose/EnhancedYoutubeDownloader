@@ -87,14 +87,31 @@ public class App : Application, IDisposable
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ViewModelManager>();
 
-        // Core Services
-        services.AddSingleton<ICacheService, CacheService>();
+        // Application Services (must be registered first for cache path resolution)
+        services.AddSingleton<SettingsService>();
+
+        // Core Services (with cache path from settings)
+        services.AddSingleton<ICacheService>(sp =>
+        {
+            var settings = sp.GetRequiredService<SettingsService>();
+            var cachePath = string.IsNullOrWhiteSpace(settings.DefaultCachePath)
+                ? null
+                : settings.DefaultCachePath;
+            return new CacheService(cachePath);
+        });
+
+        services.AddSingleton<DownloadStateRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<SettingsService>();
+            var cachePath = string.IsNullOrWhiteSpace(settings.DefaultCachePath)
+                ? null
+                : settings.DefaultCachePath;
+            return new DownloadStateRepository(cachePath);
+        });
+
         services.AddSingleton<IDownloadService, YtDlpDownloadService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IQueryResolver, QueryResolver>();
-
-        // Application Services
-        services.AddSingleton<SettingsService>();
 
         // UpdateService is Windows-only
         if (OperatingSystem.IsWindows())
@@ -111,6 +128,7 @@ public class App : Application, IDisposable
         services.AddTransient<DownloadSingleSetupViewModel>();
         services.AddTransient<MessageBoxViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<TutorialViewModel>();
         services.AddTransient<ErrorDialogViewModel>();
     }
 

@@ -13,6 +13,7 @@ using EnhancedYoutubeDownloader.Shared.Interfaces;
 using EnhancedYoutubeDownloader.Shared.Models;
 using EnhancedYoutubeDownloader.Utils;
 using EnhancedYoutubeDownloader.Utils.Extensions;
+using EnhancedYoutubeDownloader.ViewModels.Dialogs;
 
 namespace EnhancedYoutubeDownloader.ViewModels.Components;
 
@@ -66,6 +67,18 @@ public partial class DashboardViewModel : ViewModelBase
                 );
                 // No need to trigger collection change - DownloadItem already implements INotifyPropertyChanged
                 // and individual property changes will automatically update the UI
+
+                // Check if download completed and auto-open folder is enabled
+                if (
+                    downloadItem.Status == DownloadStatus.Completed
+                    && _settingsService.OpenFolderAfterDownload
+                )
+                {
+                    Console.WriteLine(
+                        $"[DASHBOARD] Download completed, auto-opening folder (setting enabled)"
+                    );
+                    OpenDownloadFolder(downloadItem);
+                }
             })
         );
     }
@@ -73,6 +86,7 @@ public partial class DashboardViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsProgressIndeterminate))]
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ShowTutorialCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowAuthSetupCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowSettingsCommand))]
     public partial bool IsBusy { get; set; }
@@ -85,6 +99,12 @@ public partial class DashboardViewModel : ViewModelBase
     public partial string? Query { get; set; }
 
     public ObservableCollection<DownloadItem> Downloads { get; } = [];
+
+    private bool CanShowTutorial() => !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanShowTutorial))]
+    private async Task ShowTutorialAsync() =>
+        await _dialogManager.ShowDialogAsync(_viewModelManager.CreateTutorialViewModel());
 
     private bool CanShowAuthSetup() => !IsBusy;
 
@@ -194,6 +214,17 @@ public partial class DashboardViewModel : ViewModelBase
 
             Console.WriteLine($"[DEBUG] Download path: {setupDialog.FilePath}");
 
+            // Ensure unique file path to prevent overwriting existing files
+            var uniqueFilePath = DownloadSingleSetupViewModel.GetUniqueFilePath(
+                setupDialog.FilePath
+            );
+            if (uniqueFilePath != setupDialog.FilePath)
+            {
+                Console.WriteLine(
+                    $"[DEBUG] File already exists, using unique path: {uniqueFilePath}"
+                );
+            }
+
             // Create FormatProfile from dialog settings
             var formatProfile = CreateFormatProfile(
                 setupDialog.SelectedQuality,
@@ -209,7 +240,7 @@ public partial class DashboardViewModel : ViewModelBase
             Console.WriteLine("[DEBUG] Creating download item");
             var downloadItem = await _downloadService.CreateDownloadAsync(
                 result.Video,
-                setupDialog.FilePath,
+                uniqueFilePath,
                 formatProfile
             );
             Console.WriteLine($"[DEBUG] Download item created: {downloadItem.Id}");
@@ -328,6 +359,12 @@ public partial class DashboardViewModel : ViewModelBase
     private async Task PauseDownloadAsync(DownloadItem download)
     {
         await _downloadService.PauseDownloadAsync(download);
+    }
+
+    [RelayCommand]
+    private async Task StartDownloadAsync(DownloadItem download)
+    {
+        await _downloadService.StartDownloadAsync(download);
     }
 
     [RelayCommand]

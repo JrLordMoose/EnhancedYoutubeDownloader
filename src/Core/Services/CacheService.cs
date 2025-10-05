@@ -11,9 +11,12 @@ public class CacheService : ICacheService, IDisposable
     private readonly string _connectionString;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    public CacheService()
+    public CacheService(string? cacheDirectory = null)
     {
-        var cacheDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EnhancedYoutubeDownloader");
+        var cacheDir = string.IsNullOrWhiteSpace(cacheDirectory)
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EnhancedYoutubeDownloader")
+            : cacheDirectory;
+
         Directory.CreateDirectory(cacheDir);
 
         _connectionString = $"Data Source={Path.Combine(cacheDir, "cache.db")}";
@@ -120,16 +123,9 @@ public class CacheService : ICacheService, IDisposable
 
     public async Task ClearCacheAsync()
     {
-        try
-        {
-            using var command = _connection.CreateCommand();
-            command.CommandText = "DELETE FROM VideoMetadata";
-            await command.ExecuteNonQueryAsync();
-        }
-        catch
-        {
-            // Log error
-        }
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM VideoMetadata";
+        await command.ExecuteNonQueryAsync();
     }
 
     public async Task ClearExpiredCacheAsync()

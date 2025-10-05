@@ -68,6 +68,7 @@
                     <!-- Secondary Button (optional) -->
                     <Button x:Name="SecondaryButton"
                            Content="{Binding SecondaryButtonText}"
+                           Command="{Binding ClickSecondaryCommand}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"
                            IsVisible="{Binding SecondaryButtonText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
@@ -75,6 +76,7 @@
                     <!-- Primary Button -->
                     <Button x:Name="PrimaryButton"
                            Content="{Binding PrimaryButtonText}"
+                           Command="{Binding ClickPrimaryCommand}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>
                 </StackPanel>

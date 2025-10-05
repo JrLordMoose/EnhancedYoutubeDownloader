@@ -43,6 +43,9 @@
                           VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Tutorial"
+                            Classes="Outline"
+                            Command="{Binding Dashboard.ShowTutorialCommand}"/>
                     <Button Content="Settings"
                             Classes="Outline"
                             Command="{Binding Dashboard.ShowSettingsCommand}"/>
@@ -170,8 +173,15 @@
                                             <StackPanel Orientation="Horizontal"
                                                        Spacing="8"
                                                        HorizontalAlignment="Right">
-                                                <!-- Start/Resume Button -->
+                                                <!-- Start Button (for queued downloads) -->
                                                 <Button Content="Start"
+                                                        Classes="Outline"
+                                                        MinWidth="80"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.StartDownloadCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding CanStart}"/>
+                                                <!-- Resume Button (for paused downloads) -->
+                                                <Button Content="Resume"
                                                         Classes="Outline"
                                                         MinWidth="80"
                                                         Command="{Binding $parent[ItemsControl].DataContext.Dashboard.ResumeDownloadCommand}"

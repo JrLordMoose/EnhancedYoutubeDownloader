@@ -53,7 +53,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             FilePath = filePath,
             FormatProfile = profile ?? GetDefaultProfile(),
             Status = DownloadStatus.Queued,
-            PartialFilePath = filePath + ".part"
+            PartialFilePath = filePath + ".part",
+            CanStart = true,
+            CanPause = false,
+            CanResume = false,
+            CanCancel = true,
+            CanRestart = false
         };
 
         _downloads[downloadItem.Id] = downloadItem;
@@ -75,6 +80,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
         downloadItem.Status = DownloadStatus.Started;
         downloadItem.StartedAt = DateTime.UtcNow;
+        downloadItem.CanStart = false;
         downloadItem.CanPause = true;
         downloadItem.CanCancel = true;
         downloadItem.CanResume = false;
@@ -98,12 +104,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
         Console.WriteLine($"[YTDLP] Pausing download: {downloadItem.Id}");
 
-        // Cancel the download operation
-        if (_cancellationTokens.TryGetValue(downloadItem.Id, out var cts))
-        {
-            cts.Cancel();
-        }
-
+        // Set status BEFORE canceling to avoid race condition
         downloadItem.Status = DownloadStatus.Paused;
         downloadItem.CanPause = false;
         downloadItem.CanResume = true;
@@ -114,10 +115,19 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         // Reset speed and ETA tracking
         downloadItem.ResetTracking();
 
-        // Save state to repository
-        await _stateRepository.SaveStateAsync(downloadItem);
-
+        // Notify status change BEFORE cancellation
         _downloadStatusChanged.OnNext(downloadItem);
+
+        // Cancel the download operation AFTER status is set
+        if (_cancellationTokens.TryGetValue(downloadItem.Id, out var cts))
+        {
+            Console.WriteLine($"[YTDLP] Canceling download token for {downloadItem.Id}");
+            cts.Cancel();
+        }
+
+        // Save state to repository
+        Console.WriteLine($"[YTDLP] Saving pause state for {downloadItem.Id}");
+        await _stateRepository.SaveStateAsync(downloadItem);
     }
 
     public async Task ResumeDownloadAsync(DownloadItem downloadItem)
@@ -214,9 +224,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         downloadItem.ErrorMessage = null;
         downloadItem.StartedAt = null;
         downloadItem.CompletedAt = null;
+        downloadItem.CanStart = true;
         downloadItem.CanPause = false;
         downloadItem.CanResume = false;
-        downloadItem.CanCancel = false;
+        downloadItem.CanCancel = true;
         downloadItem.CanRestart = false;
         downloadItem.CanOpen = false;
 
@@ -266,15 +277,44 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     private async Task ProcessDownloadAsync(DownloadItem downloadItem, CancellationToken cancellationToken)
     {
         Console.WriteLine($"[YTDLP] ProcessDownloadAsync started for {downloadItem.Id}");
-        await _downloadSemaphore.WaitAsync(cancellationToken);
-        Console.WriteLine($"[YTDLP] Semaphore acquired for {downloadItem.Id}");
 
         try
         {
+            // Move WaitAsync inside try block to ensure semaphore is released even on early cancellation
+            await _downloadSemaphore.WaitAsync(cancellationToken);
+            Console.WriteLine($"[YTDLP] Semaphore acquired for {downloadItem.Id}");
+
             if (cancellationToken.IsCancellationRequested)
             {
                 Console.WriteLine($"[YTDLP] Cancellation requested before start for {downloadItem.Id}");
                 return;
+            }
+
+            // Validate download item
+            if (downloadItem.Video == null)
+            {
+                Console.WriteLine($"[YTDLP] ERROR: Video is null for download {downloadItem.Id}");
+                throw new InvalidOperationException($"Cannot download: Video is null for download {downloadItem.Id}");
+            }
+
+            if (string.IsNullOrWhiteSpace(downloadItem.FilePath))
+            {
+                Console.WriteLine($"[YTDLP] ERROR: FilePath is null or empty for download {downloadItem.Id}");
+                throw new InvalidOperationException($"Cannot download: FilePath is required for download {downloadItem.Id}");
+            }
+
+            // Validate and create directory if needed
+            var directory = Path.GetDirectoryName(downloadItem.FilePath);
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                Console.WriteLine($"[YTDLP] ERROR: Invalid directory path for {downloadItem.Id}");
+                throw new InvalidOperationException($"Cannot download: Invalid directory path for {downloadItem.FilePath}");
+            }
+
+            if (!Directory.Exists(directory))
+            {
+                Console.WriteLine($"[YTDLP] Creating directory: {directory}");
+                Directory.CreateDirectory(directory);
             }
 
             // Build yt-dlp options from FormatProfile
@@ -410,16 +450,16 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 // Check if yt-dlp added extension to the FilePath (e.g., .mp4.part.mp4)
                 else
                 {
-                    var directory = Path.GetDirectoryName(downloadItem.FilePath) ?? "";
+                    var searchDir = Path.GetDirectoryName(downloadItem.FilePath) ?? "";
                     var baseFileName = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
 
                     // Search for files matching the base name
-                    var possibleFiles = Directory.GetFiles(directory, $"{baseFileName}*")
+                    var possibleFiles = Directory.GetFiles(searchDir, $"{baseFileName}*")
                         .Where(f => !string.IsNullOrEmpty(baseFileName) && f.Contains(baseFileName))
                         .OrderByDescending(f => new FileInfo(f).LastWriteTime)
                         .ToList();
 
-                    Console.WriteLine($"[YTDLP] Searching directory: {directory}");
+                    Console.WriteLine($"[YTDLP] Searching directory: {searchDir}");
                     Console.WriteLine($"[YTDLP] Base filename: {baseFileName}");
                     Console.WriteLine($"[YTDLP] Found {possibleFiles.Count} possible files");
 
