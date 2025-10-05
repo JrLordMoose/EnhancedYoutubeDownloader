@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:EnhancedYoutubeDownloader.Controls"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
+             x:Class="EnhancedYoutubeDownloader.Controls.LoadingIndicator"
+             x:DataType="controls:LoadingIndicator"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    <Design.DataContext>
+        <!-- Design-time view model for preview -->
+    </Design.DataContext>
+
+    <Grid>
+        <!-- Overlay Background -->
+        <Border Background="{DynamicResource MaterialPaperBrush}"
+                Opacity="0.95"
+                IsVisible="{Binding IsLoading}"/>
+
+        <!-- Loading Content -->
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Spacing="16"
+                    IsVisible="{Binding IsLoading}">
+
+            <!-- Material Circular Progress Indicator -->
+            <ProgressBar IsIndeterminate="True"
+                        Width="48"
+                        Height="48"
+                        Theme="{DynamicResource MaterialCircularProgressBar}"
+                        Foreground="{DynamicResource SecondaryHueMidBrush}"/>
+
+            <!-- Loading Message -->
+            <TextBlock Text="{Binding LoadingMessage, FallbackValue='Loading...'}"
+                      TextAlignment="Center"
+                      HorizontalAlignment="Center"/>
+
+            <!-- Optional subtext -->
+            <TextBlock Text="{Binding LoadingSubtext}"
+                      TextAlignment="Center"
+                      HorizontalAlignment="Center"
+                      FontSize="12"
+                      Opacity="0.7"
+                      IsVisible="{Binding LoadingSubtext, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+        </StackPanel>
+    </Grid>
+
+</UserControl>

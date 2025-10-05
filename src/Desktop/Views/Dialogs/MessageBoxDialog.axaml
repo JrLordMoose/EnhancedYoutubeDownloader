@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="300"
+             x:Class="EnhancedYoutubeDownloader.Views.Dialogs.MessageBoxDialog"
+             x:DataType="vm:MessageBoxViewModel"
+             MinWidth="300" MaxWidth="600">
+
+    <Design.DataContext>
+        <vm:MessageBoxViewModel />
+    </Design.DataContext>
+
+    <Border Background="{DynamicResource MaterialDesignPaper}"
+            CornerRadius="8"
+            Padding="0"
+            BoxShadow="0 8 16 0 #40000000">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- Header with Icon -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,0,0,1"
+                    Padding="24,20">
+                <Grid ColumnDefinitions="Auto,*">
+                    <!-- Icon placeholder - Material.Icons.Avalonia would be used here -->
+                    <Viewbox Grid.Column="0"
+                            Width="32" Height="32"
+                            Margin="0,0,16,0"
+                            x:Name="IconViewbox">
+                        <Canvas Width="24" Height="24">
+                            <!-- Info Icon SVG Path -->
+                            <Path Fill="{DynamicResource MaterialDesignBody}"
+                                  Data="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,17C11.45,17 11,16.55 11,16L11,12C11,11.45 11.45,11 12,11C12.55,11 13,11.45 13,12L13,16C13,16.55 12.55,17 12,17M13,9L11,9L11,7L13,7"/>
+                        </Canvas>
+                    </Viewbox>
+
+                    <TextBlock Grid.Column="1"
+                              Text="{Binding Title}"
+                              FontSize="19"
+                              FontWeight="SemiBold"
+                              VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- Message Content -->
+            <ScrollViewer Grid.Row="1"
+                         MaxHeight="400"
+                         Padding="24,20">
+                <TextBlock Text="{Binding Message}"
+                          FontSize="14"
+                          TextWrapping="Wrap"
+                          LineHeight="24"/>
+            </ScrollViewer>
+
+            <!-- Action Buttons -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,1,0,0"
+                    Padding="24,16">
+                <StackPanel Orientation="Horizontal"
+                           HorizontalAlignment="Right"
+                           Spacing="12">
+                    <!-- Secondary Button (optional) -->
+                    <Button x:Name="SecondaryButton"
+                           Content="{Binding SecondaryButtonText}"
+                           Theme="{DynamicResource MaterialOutlineButton}"
+                           MinWidth="100"
+                           IsVisible="{Binding SecondaryButtonText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                    <!-- Primary Button -->
+                    <Button x:Name="PrimaryButton"
+                           Content="{Binding PrimaryButtonText}"
+                           Theme="{DynamicResource MaterialOutlineButton}"
+                           MinWidth="100"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </Border>
+
+</UserControl>

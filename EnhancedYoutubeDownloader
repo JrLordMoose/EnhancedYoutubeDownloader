@@ -1,0 +1,12 @@
+{
+  "Theme": 0,
+  "ParallelLimit": 3,
+  "ShouldInjectSubtitles": true,
+  "ShouldInjectTags": true,
+  "ShouldInjectLanguageSpecificAudioStreams": true,
+  "LastAuthCookies": "",
+  "IsUkraineSupportMessageEnabled": false,
+  "AutoStartDownload": false,
+  "OpenFolderAfterDownload": false,
+  "DefaultDownloadPath": ""
+}

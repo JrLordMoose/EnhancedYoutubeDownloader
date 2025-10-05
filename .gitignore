@@ -1,0 +1,63 @@
+# General
+*.log
+*.tmp
+*.temp
+*.cache
+*.bak
+*.orig
+*.rej
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor
+.vscode/
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET build output
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+TestResult*/
+*.VisualState.xml
+*.nuget.props
+*.nuget.targets
+
+# Packages
+*.nupkg
+*.snupkg
+packages/
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# ReSharper/Rider
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# Temporary
+~$*
+*.tmp/*
+
+# Node
+node_modules/
+
+# Project-specific exclusions
+src/Desktop/ffmpeg.exe
+original-youtubedownloader/
+src/**/bin/
+src/**/obj/
+scripts/
+
+# Misc
+*.swp
+*.swo

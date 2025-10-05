@@ -1,0 +1,373 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="650"
+             x:Class="EnhancedYoutubeDownloader.Views.Dialogs.SettingsDialog"
+             x:DataType="vm:SettingsViewModel"
+             MinWidth="550" MaxWidth="700">
+
+    <Design.DataContext>
+        <vm:SettingsViewModel />
+    </Design.DataContext>
+
+    <Border Background="{DynamicResource MaterialDesignPaper}"
+            CornerRadius="8"
+            Padding="0"
+            BoxShadow="0 8 16 0 #40000000">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,0,0,1"
+                    Padding="24,20">
+                <TextBlock Text="Settings"
+                          FontSize="19"
+                          FontWeight="SemiBold"/>
+            </Border>
+
+            <!-- Content -->
+            <TabControl Grid.Row="1" Margin="0" Padding="0">
+
+                <!-- General Tab -->
+                <TabItem Header="General">
+                    <ScrollViewer Padding="24,20">
+                        <StackPanel Spacing="24">
+
+                            <!-- Theme Setting -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Appearance"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Grid ColumnDefinitions="*,200">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Theme"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Choose your preferred color scheme"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1"
+                                             SelectedIndex="{Binding Settings.Theme, Mode=TwoWay}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Theme="{DynamicResource MaterialFilledComboBox}">
+                                        <ComboBoxItem Content="Auto (System)"/>
+                                        <ComboBoxItem Content="Light"/>
+                                        <ComboBoxItem Content="Dark"/>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Auto-update Setting -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="Automatic Updates"
+                                              FontSize="14"/>
+                                    <TextBlock Text="Check for updates on startup"
+                                              FontSize="12"
+                                              Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1"
+                                             IsChecked="True"
+                                             VerticalAlignment="Center"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Downloads Tab -->
+                <TabItem Header="Downloads">
+                    <ScrollViewer Padding="24,20">
+                        <StackPanel Spacing="24">
+
+                            <!-- Parallel Downloads -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Performance"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Parallel Downloads"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Maximum number of simultaneous downloads"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                              Text="{Binding Settings.ParallelLimit}"
+                                              FontSize="19"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,16,0"/>
+                                </Grid>
+                                <Slider Value="{Binding Settings.ParallelLimit, Mode=TwoWay}"
+                                       Minimum="1"
+                                       Maximum="10"
+                                       TickFrequency="1"
+                                       IsSnapToTickEnabled="True"
+                                       Margin="0,8,0,0"/>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Default Quality -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Default Settings"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Grid ColumnDefinitions="*,200" RowDefinitions="Auto,Auto" RowSpacing="16">
+                                    <!-- Quality -->
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Default Quality"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Preferred video quality"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ComboBox Grid.Row="0" Grid.Column="1"
+                                             SelectedIndex="0"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Theme="{DynamicResource MaterialFilledComboBox}">
+                                        <ComboBoxItem Content="Best Quality"/>
+                                        <ComboBoxItem Content="1080p"/>
+                                        <ComboBoxItem Content="720p"/>
+                                        <ComboBoxItem Content="480p"/>
+                                    </ComboBox>
+
+                                    <!-- Format -->
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Default Format"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Preferred video format"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ComboBox Grid.Row="1" Grid.Column="1"
+                                             SelectedIndex="0"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Theme="{DynamicResource MaterialFilledComboBox}">
+                                        <ComboBoxItem Content="MP4"/>
+                                        <ComboBoxItem Content="WebM"/>
+                                        <ComboBoxItem Content="MP3"/>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Injection Settings -->
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Content Options"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+
+                                <!-- Subtitles -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Download Subtitles"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Include subtitle tracks by default"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.ShouldInjectSubtitles, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Tags -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Inject Metadata Tags"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Add title, author, and thumbnail to files"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.ShouldInjectTags, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Behavior Settings -->
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Behavior"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+
+                                <!-- Auto-start Downloads -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Auto-start Downloads"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Start downloads immediately after adding to queue"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.AutoStartDownload, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Open Folder After Download -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Open Folder After Download"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Open containing folder when download completes"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.OpenFolderAfterDownload, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Download Location -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Storage"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Default Download Location"
+                                              FontSize="14"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Grid.Column="0"
+                                                x:Name="DownloadLocationTextBox"
+                                                Text="{Binding Settings.DefaultDownloadPath, Mode=TwoWay}"
+                                                Watermark="Select default download folder..."
+                                                Theme="{DynamicResource MaterialFilledTextBox}"
+                                                Margin="0,0,8,0"/>
+                                        <Button Grid.Column="1"
+                                               x:Name="BrowseLocationButton"
+                                               Content="Browse"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               VerticalAlignment="Stretch"/>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Advanced Tab -->
+                <TabItem Header="Advanced">
+                    <ScrollViewer Padding="24,20">
+                        <StackPanel Spacing="24">
+
+                            <!-- Language Specific Audio -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="Language-Specific Audio Streams"
+                                              FontSize="14"/>
+                                    <TextBlock Text="Download audio in specific languages when available"
+                                              FontSize="12"
+                                              Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1"
+                                             IsChecked="{Binding Settings.ShouldInjectLanguageSpecificAudioStreams, Mode=TwoWay}"
+                                             VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- Cache Management -->
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Cache Management"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Border Background="{DynamicResource MaterialDesignCardBackground}"
+                                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="16">
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
+                                        <TextBlock Grid.Row="0"
+                                                  Text="Cache Size: Unknown"
+                                                  FontSize="14"/>
+                                        <TextBlock Grid.Row="1"
+                                                  Text="Cached video metadata helps improve performance"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                  TextWrapping="Wrap"/>
+                                        <Button Grid.Row="2"
+                                               x:Name="ClearCacheButton"
+                                               Content="Clear Cache"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               HorizontalAlignment="Left"/>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                            <!-- About Section -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="About"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Border Background="{DynamicResource MaterialDesignCardBackground}"
+                                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="16">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Enhanced YouTube Downloader"
+                                                  FontSize="14"
+                                                  FontWeight="Medium"/>
+                                        <TextBlock Text="Version 2.0.0"
+                                                  FontSize="13"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        <TextBlock Text="Built with .NET 9.0 and Avalonia UI"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+            </TabControl>
+
+            <!-- Action Buttons -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,1,0,0"
+                    Padding="24,16">
+                <StackPanel Orientation="Horizontal"
+                           HorizontalAlignment="Right"
+                           Spacing="12">
+                    <Button Content="Cancel"
+                           Command="{Binding CancelCommand}"
+                           Theme="{DynamicResource MaterialOutlineButton}"
+                           MinWidth="100"/>
+                    <Button Content="Save"
+                           Command="{Binding SaveCommand}"
+                           Theme="{DynamicResource MaterialOutlineButton}"
+                           MinWidth="100"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </Border>
+
+</UserControl>

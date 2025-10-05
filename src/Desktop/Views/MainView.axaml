@@ -1,0 +1,233 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels"
+        xmlns:components="using:EnhancedYoutubeDownloader.ViewModels.Components"
+        xmlns:controls="using:EnhancedYoutubeDownloader.Controls"
+        xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+        xmlns:models="using:EnhancedYoutubeDownloader.Shared.Models"
+        xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="EnhancedYoutubeDownloader.Views.MainView"
+        x:DataType="vm:MainViewModel"
+        Title="{Binding Title}"
+        Icon="/favicon.ico"
+        MinWidth="800" MinHeight="600">
+
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <dialogHostAvalonia:DialogHost Identifier="RootDialog">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{DynamicResource MaterialPaperBrush}"
+                BorderBrush="{DynamicResource MaterialDividerBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid Margin="16,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                          Text="Enhanced YouTube Downloader"
+                          FontSize="24"
+                          FontWeight="SemiBold"
+                          VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Settings"
+                            Classes="Outline"
+                            Command="{Binding Dashboard.ShowSettingsCommand}"/>
+                    <Button Content="Auth"
+                            Classes="Outline"
+                            Command="{Binding Dashboard.ShowAuthSetupCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Query Input -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialPaperBrush}"
+                    BorderBrush="{DynamicResource MaterialDividerBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="16,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0"
+                             Text="{Binding Dashboard.Query}"
+                             Watermark="Enter YouTube URL, playlist, channel, or search query..."
+                             Classes="Outline"
+                             Margin="0,0,8,0"/>
+
+                    <Button Grid.Column="1"
+                            Content="Download"
+                            Classes="Flat"
+                            Command="{Binding Dashboard.ProcessQueryCommand}"
+                            IsEnabled="{Binding Dashboard.ProcessQueryCommand.CanExecute}"/>
+                </Grid>
+            </Border>
+
+            <!-- Downloads List -->
+            <Grid Grid.Row="1">
+                <ScrollViewer Padding="16">
+                    <ItemsControl ItemsSource="{Binding Dashboard.Downloads}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="models:DownloadItem">
+                                <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
+                                        BorderBrush="{DynamicResource MaterialDividerBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Margin="0,0,0,8"
+                                        Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Thumbnail (Column 0) -->
+                                        <Border Grid.Column="0"
+                                                Width="120"
+                                                Height="90"
+                                                CornerRadius="4"
+                                                ClipToBounds="True"
+                                                Margin="0,0,12,0"
+                                                Background="{DynamicResource MaterialDividerBrush}">
+                                            <Panel>
+                                                <!-- Thumbnail Image with AsyncImageLoader -->
+                                                <Image asyncImageLoader:ImageLoader.Source="{Binding ThumbnailUrl}"
+                                                       Stretch="UniformToFill"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+
+                                                <!-- Fallback for Missing Thumbnail -->
+                                                <TextBlock Text="No Image"
+                                                          FontSize="12"
+                                                          Opacity="0.5"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"
+                                                          IsVisible="{Binding ThumbnailUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                                            </Panel>
+                                        </Border>
+
+                                        <!-- Content (Column 1) -->
+                                        <Grid Grid.Column="1">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Title and Author -->
+                                            <StackPanel Grid.Row="0">
+                                                <TextBlock Text="{Binding Title}"
+                                                          FontSize="16"
+                                                          FontWeight="SemiBold"
+                                                          TextWrapping="Wrap"
+                                                          MaxLines="2"/>
+                                                <TextBlock Text="{Binding Author}"
+                                                          FontSize="14"
+                                                          Opacity="0.7"
+                                                          Margin="0,2,0,0"/>
+                                            </StackPanel>
+
+                                            <!-- Progress -->
+                                            <ProgressBar Grid.Row="1"
+                                                        Value="{Binding Progress}"
+                                                        Maximum="100"
+                                                        Margin="0,8,0,0"/>
+
+                                            <!-- Enhanced Progress Info -->
+                                            <TextBlock Grid.Row="2"
+                                                      Text="{Binding FormattedProgressInfo}"
+                                                      FontSize="12"
+                                                      Opacity="0.6"
+                                                      Margin="0,4,0,0"/>
+                                        </Grid>
+
+                                        <!-- Action Buttons (Column 2) -->
+                                        <StackPanel Grid.Column="2"
+                                                   Orientation="Horizontal"
+                                                   Spacing="4"
+                                                   VerticalAlignment="Top"
+                                                   Margin="12,0,0,0">
+                                            <!-- Download/Resume Button (Queued/Paused) -->
+                                            <Button Content="Start"
+                                                    Classes="Outline"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.ResumeDownloadCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding CanResume}"/>
+                                            <!-- Pause Button (Started) -->
+                                            <Button Content="Pause"
+                                                    Classes="Outline"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.PauseDownloadCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding CanPause}"/>
+                                            <!-- Cancel Button -->
+                                            <Button Content="Cancel"
+                                                    Classes="Outline"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.CancelDownloadCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding CanCancel}"/>
+                                            <!-- Open Folder Button (Completed) -->
+                                            <Button Content="Open"
+                                                    Classes="Outline"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.OpenDownloadFolderCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static models:DownloadStatus.Completed}}"/>
+                                            <!-- Restart Button (Failed/Canceled/Completed) -->
+                                            <Button Content="Restart"
+                                                    Classes="Outline"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.RestartDownloadCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding CanRestart}"/>
+                                            <!-- Delete Button (Always visible) -->
+                                            <Button Content="Delete"
+                                                    Classes="Outline"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.DeleteDownloadCommand}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Loading Indicator Overlay -->
+                <controls:LoadingIndicator IsLoading="{Binding Dashboard.IsBusy}"
+                                          LoadingMessage="Resolving query..."
+                                          LoadingSubtext="Please wait while we fetch video information"/>
+            </Grid>
+        </Grid>
+
+        <!-- Snackbar Host (Bottom Center) -->
+        <controls:SnackbarHost Grid.Row="0"
+                              Grid.RowSpan="2"
+                              DataContext="{Binding SnackbarManager}"
+                              VerticalAlignment="Bottom"
+                              HorizontalAlignment="Stretch"
+                              IsHitTestVisible="False"/>
+    </Grid>
+    </dialogHostAvalonia:DialogHost>
+</Window>

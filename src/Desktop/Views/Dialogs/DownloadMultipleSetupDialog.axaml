@@ -1,0 +1,233 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="800"
+             x:Class="EnhancedYoutubeDownloader.Views.Dialogs.DownloadMultipleSetupDialog"
+             x:DataType="vm:DownloadMultipleSetupViewModel"
+             MinWidth="600" MaxWidth="800">
+
+    <Design.DataContext>
+        <vm:DownloadMultipleSetupViewModel />
+    </Design.DataContext>
+
+    <Border Background="{DynamicResource MaterialDesignPaper}"
+            CornerRadius="8"
+            Padding="0"
+            BoxShadow="0 8 16 0 #40000000">
+
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,0,0,1"
+                    Padding="24,20">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{Binding Title}"
+                              FontSize="19"
+                              FontWeight="SemiBold"/>
+                    <TextBlock Text="Select videos to download"
+                              FontSize="13"
+                              Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Content -->
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*,Auto">
+
+                <!-- Selection Controls -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource MaterialDesignCardBackground}"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="0,0,0,1"
+                        Padding="24,16">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                        <TextBlock Grid.Column="0"
+                                  x:Name="SelectionCountText"
+                                  Text="0 of 0 videos selected"
+                                  FontSize="14"
+                                  VerticalAlignment="Center"
+                                  FontWeight="Medium"/>
+                        <Button Grid.Column="1"
+                               x:Name="SelectAllButton"
+                               Content="Select All"
+                               Theme="{DynamicResource MaterialOutlineButton}"
+                               Margin="0,0,8,0"/>
+                        <Button Grid.Column="2"
+                               x:Name="SelectNoneButton"
+                               Content="Select None"
+                               Theme="{DynamicResource MaterialOutlineButton}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Video List Header -->
+                <Border Grid.Row="1"
+                        Background="{DynamicResource MaterialDesignPaper}"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="0,0,0,1"
+                        Padding="24,12">
+                    <Grid ColumnDefinitions="Auto,*,120,80">
+                        <TextBlock Grid.Column="0"
+                                  Text="Select"
+                                  FontSize="12"
+                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                  FontWeight="Medium"
+                                  Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="1"
+                                  Text="Video"
+                                  FontSize="12"
+                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                  FontWeight="Medium"/>
+                        <TextBlock Grid.Column="2"
+                                  Text="Duration"
+                                  FontSize="12"
+                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                  FontWeight="Medium"
+                                  TextAlignment="Right"
+                                  Margin="0,0,16,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Video List -->
+                <ScrollViewer Grid.Row="2">
+                    <ItemsControl ItemsSource="{Binding Videos}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource MaterialDesignCardBackground}"
+                                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="24,12">
+                                    <Grid ColumnDefinitions="Auto,*,120">
+                                        <!-- Checkbox -->
+                                        <CheckBox Grid.Column="0"
+                                                 x:Name="VideoCheckBox"
+                                                 IsChecked="{Binding $parent[UserControl].DataContext.SelectAll}"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,16,0"/>
+
+                                        <!-- Video Info -->
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="{Binding Title}"
+                                                      FontSize="14"
+                                                      TextWrapping="Wrap"
+                                                      MaxLines="2"
+                                                      FontWeight="Medium"/>
+                                            <TextBlock Text="{Binding Author.ChannelTitle}"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+
+                                        <!-- Duration -->
+                                        <TextBlock Grid.Column="2"
+                                                  Text="{Binding Duration}"
+                                                  FontSize="13"
+                                                  VerticalAlignment="Center"
+                                                  TextAlignment="Right"
+                                                  Margin="0,0,16,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Download Settings -->
+                <Border Grid.Row="3"
+                        Background="{DynamicResource MaterialDesignCardBackground}"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="0,1,0,0"
+                        Padding="24,16">
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Text="Download Settings (applies to all selected videos)"
+                                  FontSize="14"
+                                  FontWeight="Medium"
+                                  Margin="0,0,0,16"/>
+
+                        <!-- Quality -->
+                        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="8" Margin="0,0,12,0">
+                            <TextBlock Text="Quality"
+                                      FontSize="13"
+                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                            <ComboBox x:Name="QualityComboBox"
+                                     SelectedIndex="0"
+                                     HorizontalAlignment="Stretch"
+                                     Theme="{DynamicResource MaterialFilledComboBox}">
+                                <ComboBoxItem Content="Best Quality"/>
+                                <ComboBoxItem Content="1080p"/>
+                                <ComboBoxItem Content="720p"/>
+                                <ComboBoxItem Content="480p"/>
+                                <ComboBoxItem Content="Audio Only"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Format -->
+                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="8" Margin="12,0,0,0">
+                            <TextBlock Text="Format"
+                                      FontSize="13"
+                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                            <ComboBox x:Name="FormatComboBox"
+                                     SelectedIndex="0"
+                                     HorizontalAlignment="Stretch"
+                                     Theme="{DynamicResource MaterialFilledComboBox}">
+                                <ComboBoxItem Content="MP4"/>
+                                <ComboBoxItem Content="WebM"/>
+                                <ComboBoxItem Content="MP3"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Download Location -->
+                        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="8" Margin="0,16,0,0">
+                            <TextBlock Text="Save Location"
+                                      FontSize="13"
+                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0"
+                                        x:Name="LocationTextBox"
+                                        Watermark="Select folder for downloads..."
+                                        Theme="{DynamicResource MaterialFilledTextBox}"
+                                        Margin="0,0,8,0"/>
+                                <Button Grid.Column="1"
+                                       x:Name="BrowseButton"
+                                       Content="Browse"
+                                       Theme="{DynamicResource MaterialOutlineButton}"
+                                       VerticalAlignment="Stretch"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+            </Grid>
+
+            <!-- Action Buttons -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,1,0,0"
+                    Padding="24,16">
+                <StackPanel Orientation="Horizontal"
+                           HorizontalAlignment="Right"
+                           Spacing="12">
+                    <Button x:Name="CancelButton"
+                           Content="Cancel"
+                           Theme="{DynamicResource MaterialOutlineButton}"
+                           MinWidth="100"/>
+                    <Button x:Name="DownloadButton"
+                           Content="Download Selected"
+                           Theme="{DynamicResource MaterialOutlineButton}"
+                           MinWidth="150"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </Border>
+
+</UserControl>

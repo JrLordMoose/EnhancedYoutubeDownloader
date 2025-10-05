@@ -1,0 +1,277 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Enhanced YouTube Downloader is a production-ready cross-platform desktop application built with .NET 9.0 and Avalonia UI. It provides video downloading from YouTube with advanced features like pause/resume, queue management, caching, and scheduling.
+
+Always analyze and keep in mind all files within the "guides-and-instructions" folder. This folder contains instruction and context documents, as well as previous chats located "@guides-andinstructions/chats". The most important files to focus on are:
+
+@guides-andinstructions/AI Agent Instruction Prompt_ Clone and Enhance YoutubeDownloader.md
+@guides-andinstructions/Comprehensive Analysis of YoutubeDownloader Application.md
+
+The latest exported chat file located within the folder "@guides-andinstructions/chats", identified by the highest number at the end of its filename, indicating it's the most recent. These documents provide essential guidance and context for your tasks.
+
+## Building and Running
+
+### Prerequisites
+- .NET 9.0 SDK
+- PowerShell (for automatic FFmpeg download)
+
+### Common Commands
+
+```bash
+# Restore dependencies (downloads FFmpeg automatically via PowerShell script)
+dotnet restore
+
+# Build solution
+dotnet build
+
+# Run application
+dotnet run --project src/Desktop/EnhancedYoutubeDownloader.csproj
+
+# Run tests
+dotnet test src/Tests/EnhancedYoutubeDownloader.Tests.csproj
+
+# Run specific test
+dotnet test src/Tests/EnhancedYoutubeDownloader.Tests.csproj --filter "FullyQualifiedName~TestName"
+
+# Build for distribution (self-contained)
+dotnet publish -c Release -r win-x64 --self-contained
+dotnet publish -c Release -r linux-x64 --self-contained
+dotnet publish -c Release -r osx-x64 --self-contained
+```
+
+### FFmpeg Setup
+
+FFmpeg is automatically downloaded during restore via the `Download-FFmpeg.ps1` script. If manual download is needed, the script is located in `src/Desktop/Download-FFmpeg.ps1`.
+
+## Architecture
+
+The solution follows a clean architecture with clear separation:
+
+```
+src/
+├── Shared/    - Interfaces and shared models (IDownloadService, DownloadItem, DownloadStatus)
+├── Core/      - Business logic and core services (DownloadService, CacheService)
+├── Desktop/   - Avalonia UI application (ViewModels, Views, Framework)
+└── Tests/     - xUnit tests with Moq and FluentAssertions
+```
+
+### Key Architectural Patterns
+
+**Dependency Injection**: The application uses Microsoft.Extensions.DependencyInjection configured in `src/Desktop/App.axaml.cs:64-90`. All services are registered as singletons, ViewModels as transient.
+
+**MVVM Pattern**: Avalonia UI with CommunityToolkit.Mvvm for ViewModels. Views are in AXAML (Avalonia XAML), code-behind in `.axaml.cs` files.
+
+**Reactive Programming**: Uses `System.Reactive` with `Subject<T>` for event streams. The DownloadService exposes `IObservable<DownloadItem>` for status changes.
+
+**Service Layer**: Business logic is encapsulated in services implementing interfaces from `Shared/Interfaces/`:
+- `IDownloadService` - Download operations, pause/resume, queue management
+- `ICacheService` - SQLite-based metadata caching with expiration
+- `INotificationService` - User feedback (toast notifications)
+- `IQueryResolver` - URL parsing and YouTube query resolution
+
+## Important Components
+
+### Core Services (`src/Core/Services/`)
+
+**DownloadService** (`DownloadService.cs`):
+- Manages concurrent downloads with configurable parallelism (default: 3)
+- State machine: Queued → Started → [Paused] → Completed/Failed/Canceled
+- **Pause/resume with chunked HTTP downloads** - Uses Range headers for resumable downloads
+- **Per-download CancellationTokens** - Independent pause/cancel of individual downloads
+- **State persistence** - SQLite-based download state with byte-level progress
+- Uses YoutubeExplode for YouTube API access
+- Periodic state saves (every 1MB) for crash recovery
+
+**DownloadStateRepository** (`DownloadStateRepository.cs`):
+- SQLite database at `%AppData%/EnhancedYoutubeDownloader/download_state.db`
+- Persists download progress for pause/resume functionality
+- Schema: `DownloadState` table with DownloadId, VideoId, FilePath, BytesDownloaded, TotalBytes, Status
+- Automatic cleanup on download completion
+
+**CacheService** (`CacheService.cs`):
+- SQLite database at `%AppData%/EnhancedYoutubeDownloader/cache.db`
+- Caches video metadata with TTL expiration (24 hours default)
+- Schema: `VideoMetadata` table with VideoId, JsonData, CreatedAt, ExpiresAt
+
+**QueryResolver** (`QueryResolver.cs`):
+- **URL parsing** - Regex-based extraction of video/playlist/channel IDs
+- **Multi-format support** - Handles youtube.com/watch, youtu.be, channel URLs, @handles
+- **Query resolution** - Single videos, playlists, channels, search queries
+- **Cache integration** - Checks CacheService before fetching from YouTube
+- Returns QueryResult with QueryResultKind (Video, Playlist, Channel, Search)
+
+### Desktop Layer (`src/Desktop/`)
+
+**Framework** (`Framework/`):
+- `ViewModelManager` - Factory for creating ViewModels via DI
+- `DialogManager` - Modal dialog management with DialogHost.Avalonia
+- `SnackbarManager` - **Thread-safe toast notification queue** with Material Design integration
+  - Supports 4 severity levels (Info, Success, Warning, Error)
+  - Auto-dismiss with configurable timeouts
+  - Action button support for user interactions
+  - Progress notifications (persistent, no auto-dismiss)
+- `ViewModelBase` - Base class for all ViewModels using `ObservableObject`
+
+**ViewModels** (`ViewModels/`):
+- `DashboardViewModel` - Main queue UI, handles URL processing with QueryResolver integration
+  - **Error categorization** - Maps exceptions to 8 error categories
+  - **Suggested actions** - Context-aware error remediation
+  - Batch operations and download management
+- `DownloadViewModel` - Individual download item representation
+- **Dialog ViewModels** in `ViewModels/Dialogs/`:
+  - `SettingsViewModel` - App settings with 3 tabs (General, Downloads, Advanced)
+  - `AuthSetupViewModel` - Google authentication for private content
+  - `DownloadSingleSetupViewModel` - Single video download configuration
+  - `DownloadMultipleSetupViewModel` - Playlist/channel download configuration
+  - `MessageBoxViewModel` - Generic message/confirm dialogs
+  - `ErrorDialogViewModel` - **Rich error display with suggested actions**
+
+**Services** (`Services/`):
+- `SettingsService` - User preferences with JSON persistence (uses Cogwheel)
+- `UpdateService` - Auto-updates via Onova package
+- `NotificationService` - Toast implementation wrapping SnackbarManager
+
+**Controls** (`Controls/`):
+- `SnackbarHost` - Material Design snackbar UI component with queue visualization
+- `LoadingIndicator` - Circular progress with configurable message and subtext
+
+**Views** (`Views/Dialogs/`):
+- **DownloadSingleSetupDialog** - Video info, quality/format selector, file path picker
+- **DownloadMultipleSetupDialog** - Video checklist with virtualization, batch settings
+- **SettingsDialog** - TabControl with 3 sections (General, Downloads, Advanced)
+- **AuthSetupDialog** - WebView for Google authentication with instructions
+- **MessageBoxDialog** - Icon, title, message, primary/secondary buttons
+- **ErrorDialog** - Error icon, message, expandable details, category badge, action buttons
+
+### Shared Models (`src/Shared/Models/`)
+
+**DownloadItem** - Observable model representing a download:
+- Properties: Video, FilePath, Status, Progress, timestamps
+- **Byte-level tracking**: BytesDownloaded, TotalBytes, PartialFilePath
+- Computed properties: Title, Author, Duration, ThumbnailUrl, BytesProgress
+- Action flags: CanPause, CanResume, CanCancel, CanRestart
+
+**DownloadStatus** enum: Queued, Started, Paused, Completed, Failed, Canceled
+
+**FormatProfile** - Presets for quality/format combinations
+
+**QueryResult** - Result of URL/query resolution:
+- Properties: Kind (QueryResultKind), Video (single), Videos (multiple), Title, Description, Author
+- Used by QueryResolver for all YouTube query types
+
+**QueryResultKind** enum: Video, Playlist, Channel, Search
+
+**ErrorInfo** - Structured error information:
+- Properties: Message, Details, Category (ErrorCategory), SuggestedActions (List<ErrorAction>)
+- **ErrorCategory** enum: Unknown, Network, Permission, InvalidUrl, FileSystem, YouTube, VideoNotAvailable, FormatNotAvailable
+- **ErrorAction**: Text, ActionKey, Description
+
+**CachedVideo** - Serializable video metadata for caching:
+- Properties: Id, Title, Author, AuthorChannelId, Duration, Description, Keywords, Thumbnails, UploadDate
+- Used by CacheService for SQLite persistence
+
+## Dependencies
+
+### Core Packages
+- **YoutubeExplode 6.5.4+** - YouTube API access and video resolution
+- **YoutubeExplode.Converter** - Media conversion with FFmpeg integration
+- **Gress** - Progress reporting
+- **Microsoft.Data.Sqlite 9.0.0** - Caching database
+
+### UI Packages
+- **Avalonia 11.3.0** - Cross-platform UI framework
+- **Material.Avalonia 3.9.2** - Material Design components
+- **DialogHost.Avalonia** - Modal dialogs
+- **CommunityToolkit.Mvvm 8.4.0** - MVVM helpers
+
+### Development
+- **xUnit** - Test framework
+- **Moq** - Mocking
+- **FluentAssertions** - Assertion library
+- **CSharpier.MsBuild** - Code formatting
+
+## Configuration
+
+- **Directory.Build.props** - Shared MSBuild properties (targets .NET 9.0, enables nullable, treats warnings as errors)
+- **Settings**: Stored in user AppData via SettingsService (Cogwheel-based)
+- **Material Theme**: Custom colors defined in `App.axaml.cs:117` (Light: #343838/#F9A825, Dark: #E8E8E8/#F9A825)
+
+## Development Notes
+
+### Event Handling Pattern
+The codebase uses `DisposableCollector` to manage event subscriptions. ViewModels subscribe to service events and collect disposables:
+```csharp
+_eventRoot.Add(_settingsService.WatchProperty(o => o.Theme, OnThemeChanged));
+```
+
+### Observable Properties
+ViewModels use CommunityToolkit.Mvvm's `[ObservableProperty]` attribute with partial classes:
+```csharp
+[ObservableProperty]
+[NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
+private string? _query;
+```
+
+### FFmpeg Integration
+YoutubeExplode.Converter automatically finds FFmpeg in the output directory. The build process copies `ffmpeg.exe` (Windows) or `ffmpeg` (Unix) to the output.
+
+## Testing
+
+Tests are in `src/Tests/` using xUnit. Run all tests with `dotnet test` or specific tests with `--filter`.
+
+The test project references both Core and Shared projects and uses Moq for service mocking.
+
+### Test Coverage
+- **DownloadServiceTests** (10 tests) - Pause, resume, cancel, restart, byte progress
+- **DownloadStateRepositoryTests** (7 tests) - State persistence and retrieval
+- **CacheServiceTests** (5 tests) - Metadata caching and expiration
+- **DownloadItemTests** (6 tests) - Model state management
+- **QueryResolverTests** (10 tests) - URL parsing and validation
+
+## New Features (Session 4)
+
+### Pause/Resume Functionality ✅
+- **Chunked HTTP downloads** with Range header support for resumable downloads
+- **Per-download cancellation** - Each download has its own CancellationTokenSource
+- **State persistence** - DownloadStateRepository saves progress to SQLite every 1MB
+- **Partial file management** - Downloads saved to `.part` files, renamed on completion
+- **Resume validation** - Verifies partial file size matches saved state before resuming
+- **17 unit tests** with full coverage of pause/resume scenarios
+
+### UI Feedback System ✅
+- **SnackbarManager** - Thread-safe Material Design toast notification queue
+  - 4 severity levels with distinct colors and icons
+  - Auto-dismiss (3-5 seconds) with manual close option
+  - Action buttons for user interactions
+  - Progress notifications (persistent until dismissed)
+- **ErrorDialog** - Rich error display with:
+  - 8 error categories (Network, Permission, InvalidUrl, etc.)
+  - Expandable details section with full stack trace
+  - Suggested actions based on error type
+  - Copy to clipboard functionality
+- **LoadingIndicator** - Material circular progress with configurable messages
+- **Error categorization** - Intelligent exception mapping to user-friendly categories
+
+### Dialog Views ✅
+All 5 Material Design dialogs created with complete AXAML markup:
+- **DownloadSingleSetupDialog** - Video info, quality/format selectors, file path picker
+- **DownloadMultipleSetupDialog** - Video checklist with virtualization, batch configuration
+- **SettingsDialog** - 3-tab interface (General, Downloads, Advanced)
+- **AuthSetupDialog** - WebView placeholder for Google authentication
+- **MessageBoxDialog** - Flexible message/confirmation dialog
+
+### QueryResolver ✅
+- **URL parsing** - Regex extraction for all YouTube URL formats
+- **Multi-source support** - Videos, playlists, channels, @handles, search queries
+- **Cache integration** - Checks CacheService before API calls (24-hour TTL)
+- **Automatic fallback** - Search queries when URL parsing fails
+
+## Related Resources
+
+- Original project: [YoutubeDownloader by Tyrrrz](https://github.com/Tyrrrz/YoutubeDownloader)
+- YoutubeExplode docs: https://github.com/Tyrrrz/YoutubeExplode
+- Avalonia docs: https://docs.avaloniaui.net/

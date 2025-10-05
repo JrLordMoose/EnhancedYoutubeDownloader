@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:framework="using:EnhancedYoutubeDownloader.Framework"
+             xmlns:controls="clr-namespace:EnhancedYoutubeDownloader.Controls"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
+             x:Class="EnhancedYoutubeDownloader.Controls.SnackbarHost"
+             x:DataType="controls:SnackbarHost">
+
+    <UserControl.Resources>
+        <!-- Severity to Color Converters -->
+        <SolidColorBrush x:Key="InfoBrush" Color="#2196F3"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#4CAF50"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#FF9800"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#F44336"/>
+    </UserControl.Resources>
+
+    <!-- Snackbar Container (Bottom Center) -->
+    <ItemsControl ItemsSource="{Binding SnackbarQueue}"
+                  x:DataType="controls:SnackbarHost">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel VerticalAlignment="Bottom"
+                           HorizontalAlignment="Center"
+                           Spacing="8"
+                           Margin="16"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="framework:SnackbarItem">
+                <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
+                        BorderBrush="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"
+                        BorderThickness="2"
+                        CornerRadius="4"
+                        Padding="16,12"
+                        MinWidth="288"
+                        MaxWidth="568"
+                        BoxShadow="0 4 8 0 #40000000"
+                        x:DataType="framework:SnackbarItem">
+
+                    <!-- Fade in animation -->
+                    <Border.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.3"/>
+                        </Transitions>
+                    </Border.Transitions>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto"
+                          x:DataType="framework:SnackbarItem">
+
+                        <!-- Severity Icon -->
+                        <materialIcons:MaterialIcon Grid.Column="0"
+                                                  Width="20"
+                                                  Height="20"
+                                                  Margin="0,0,12,0"
+                                                  VerticalAlignment="Center"
+                                                  Foreground="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"
+                                                  x:DataType="framework:SnackbarItem">
+                            <materialIcons:MaterialIcon.Kind>
+                                <MultiBinding Converter="{StaticResource SeverityToIconConverter}">
+                                    <Binding Path="Severity"/>
+                                </MultiBinding>
+                            </materialIcons:MaterialIcon.Kind>
+                        </materialIcons:MaterialIcon>
+
+                        <!-- Message Content -->
+                        <StackPanel Grid.Column="1" Spacing="4"
+                                   x:DataType="framework:SnackbarItem">
+                            <TextBlock Text="{Binding Message}"
+                                      TextWrapping="Wrap"
+                                      VerticalAlignment="Center"
+                                      x:DataType="framework:SnackbarItem"/>
+
+                            <!-- Progress Bar (for progress notifications) -->
+                            <ProgressBar IsVisible="{Binding IsProgress}"
+                                        Value="{Binding Progress}"
+                                        Maximum="1"
+                                        Height="4"
+                                        Foreground="{DynamicResource SecondaryHueMidBrush}"
+                                        x:DataType="framework:SnackbarItem"/>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Column="2"
+                                   Orientation="Horizontal"
+                                   Spacing="4"
+                                   Margin="12,0,0,0"
+                                   x:DataType="framework:SnackbarItem">
+
+                            <!-- Custom Action Button -->
+                            <Button Content="{Binding ActionText}"
+                                    Command="{Binding Action}"
+                                    Theme="{DynamicResource MaterialFlatButton}"
+                                    IsVisible="{Binding ActionText, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                    Foreground="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"
+                                    x:DataType="framework:SnackbarItem"/>
+
+                            <!-- Close Button -->
+                            <Button Command="{Binding $parent[ItemsControl].((controls:SnackbarHost)DataContext).DismissCurrentCommand, FallbackValue={x:Null}}"
+                                    Classes="Flat"
+                                    Width="28"
+                                    Height="28"
+                                    Padding="4"
+                                    x:CompileBindings="False">
+                                <materialIcons:MaterialIcon Kind="Close" Width="16" Height="16"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+</UserControl>
