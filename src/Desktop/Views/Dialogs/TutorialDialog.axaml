@@ -1,9 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.TutorialDialog"
              x:DataType="vm:TutorialViewModel">
 
@@ -11,13 +11,11 @@
         <vm:TutorialViewModel />
     </Design.DataContext>
 
-    <!-- Dialog Content Card -->
+    <!-- Modern Dialog Card with Shadow Effect -->
     <Border Background="{DynamicResource MaterialPaperBrush}"
-            CornerRadius="8"
-            MinWidth="600"
-            MaxWidth="600"
-            MinHeight="650"
-            MaxHeight="700">
+            CornerRadius="12"
+            Width="850"
+            Height="600">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -25,84 +23,187 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Header -->
+            <!-- Elegant Header with Gradient Feel -->
             <Border Grid.Row="0"
                     Background="{DynamicResource MaterialPrimaryBrush}"
-                    CornerRadius="8,8,0,0"
-                    Padding="24,16">
-                <TextBlock Text="{Binding Title}"
-                          FontSize="20"
-                          FontWeight="SemiBold"
-                          Foreground="White"/>
+                    CornerRadius="12,12,0,0"
+                    Padding="32,20">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding Title}"
+                              FontSize="22"
+                              FontWeight="SemiBold"
+                              Foreground="White"/>
+                    <TextBlock Text="Everything you need to know to get started"
+                              FontSize="13"
+                              Opacity="0.9"
+                              Foreground="White"/>
+                </StackPanel>
             </Border>
 
-            <!-- Content -->
-            <ScrollViewer Grid.Row="1" Padding="24" VerticalScrollBarVisibility="Auto">
-                <StackPanel Spacing="16">
-                    <!-- Welcome Message -->
-                    <TextBlock Text="{Binding WelcomeText}"
-                              FontSize="18"
-                              FontWeight="Medium"
-                              Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <!-- Scrollable Content Area with Cards -->
+            <ScrollViewer Grid.Row="1"
+                         Padding="24,16,24,8"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Disabled"
+                         AllowAutoHide="False">
+                <StackPanel Spacing="20" MaxWidth="760">
 
-                    <!-- Instructions -->
-                    <TextBlock Text="{Binding InstructionsText}"
-                              TextWrapping="Wrap"
-                              FontSize="14"
-                              LineHeight="24"
-                              Foreground="{DynamicResource MaterialBodyBrush}"/>
+                    <!-- Quick Start Steps -->
+                    <StackPanel Spacing="12">
+                        <!-- Step 1 -->
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
+                                BorderBrush="{DynamicResource MaterialDividerBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                                            Width="32" Height="32"
+                                            CornerRadius="16">
+                                        <TextBlock Text="1"
+                                                  FontSize="16"
+                                                  FontWeight="Bold"
+                                                  Foreground="White"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Enter URL or Search"
+                                              FontSize="16"
+                                              FontWeight="SemiBold"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Paste any YouTube video, playlist, or channel URL, or enter a search query. Press Enter or click Download."
+                                          TextWrapping="Wrap"
+                                          Foreground="{DynamicResource MaterialBodyBrush}"
+                                          Margin="44,0,0,0"/>
+                            </StackPanel>
+                        </Border>
 
-                    <!-- Action Buttons Section -->
-                    <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
-                            BorderBrush="{DynamicResource MaterialDividerBrush}"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="16"
-                            Margin="0,8,0,0">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="Need More Help?"
-                                      FontSize="16"
-                                      FontWeight="SemiBold"/>
+                        <!-- Step 2 -->
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
+                                BorderBrush="{DynamicResource MaterialDividerBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                                            Width="32" Height="32"
+                                            CornerRadius="16">
+                                        <TextBlock Text="2"
+                                                  FontSize="16"
+                                                  FontWeight="Bold"
+                                                  Foreground="White"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Configure Download Settings"
+                                              FontSize="16"
+                                              FontWeight="SemiBold"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Choose quality (Best, 1080p, 720p, etc.), select format (MP4, WebM, MP3), and enable/disable subtitles and metadata."
+                                          TextWrapping="Wrap"
+                                          Foreground="{DynamicResource MaterialBodyBrush}"
+                                          Margin="44,0,0,0"/>
+                            </StackPanel>
+                        </Border>
 
-                            <Button Content="📚 Visit GitHub Page"
-                                    Classes="Flat"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Center"
-                                    Command="{Binding OpenGitHubCommand}"
-                                    ToolTip.Tip="Opens https://github.com/JrLordMoose/EnhancedYoutubeDownloader"/>
+                        <!-- Step 3 -->
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
+                                BorderBrush="{DynamicResource MaterialDividerBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                                            Width="32" Height="32"
+                                            CornerRadius="16">
+                                        <TextBlock Text="3"
+                                                  FontSize="16"
+                                                  FontWeight="Bold"
+                                                  Foreground="White"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Manage Downloads"
+                                              FontSize="16"
+                                              FontWeight="SemiBold"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Pause, resume, or cancel downloads as needed. Open completed files directly from the dashboard."
+                                          TextWrapping="Wrap"
+                                          Foreground="{DynamicResource MaterialBodyBrush}"
+                                          Margin="44,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                            <Button Content="🐛 Report a Bug"
+                    <!-- Divider -->
+                    <Border Height="1" Background="{DynamicResource MaterialDividerBrush}" Margin="0,8"/>
+
+                    <!-- Help Section -->
+                    <StackPanel Spacing="16" Margin="0,0,0,60">
+                        <TextBlock Text="Need More Help?"
+                                  FontSize="18"
+                                  FontWeight="SemiBold"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+
+                        <Grid ColumnDefinitions="*,16,*">
+                            <!-- GitHub Button -->
+                            <Button Grid.Column="0"
                                     Classes="Outline"
+                                    Height="48"
                                     HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Center"
+                                    Command="{Binding OpenGitHubCommand}"
+                                    ToolTip.Tip="View documentation and source code">
+                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                    <TextBlock Text="📚" FontSize="18" VerticalAlignment="Center"/>
+                                    <TextBlock Text="GitHub Docs" FontSize="14" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Bug Report Button -->
+                            <Button Grid.Column="2"
+                                    Classes="Outline"
+                                    Height="48"
+                                    HorizontalAlignment="Stretch"
                                     Command="{Binding OpenBugReportCommand}"
-                                    ToolTip.Tip="Opens bug report form in your browser"/>
-                        </StackPanel>
-                    </Border>
+                                    ToolTip.Tip="Report bugs or request features">
+                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                    <TextBlock Text="🐛" FontSize="18" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Report Bug" FontSize="14" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
                 </StackPanel>
             </ScrollViewer>
 
-            <!-- Footer -->
+            <!-- Clean Footer -->
             <Border Grid.Row="2"
                     Background="{DynamicResource MaterialCardBackgroundBrush}"
                     BorderBrush="{DynamicResource MaterialDividerBrush}"
                     BorderThickness="0,1,0,0"
-                    CornerRadius="0,0,8,8"
-                    Padding="24,12">
+                    CornerRadius="0,0,12,12"
+                    Padding="32,16">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0"
-                              Text="Happy downloading! 🎬"
+                    <TextBlock Text="🎬 Happy downloading!"
                               VerticalAlignment="Center"
-                              Foreground="{DynamicResource MaterialBodyBrush}"/>
+                              FontSize="14"
+                              Foreground="{DynamicResource MaterialBodyBrush}"
+                              HorizontalAlignment="Left"/>
 
-                    <Button Grid.Column="1"
-                            Content="Got It!"
+                    <Button Content="Got It!"
                             Classes="Flat"
+                            Height="40"
+                            MinWidth="120"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            HorizontalAlignment="Right"
                             Command="{Binding CloseDialogCommand}"/>
                 </Grid>
             </Border>

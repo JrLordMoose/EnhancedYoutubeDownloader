@@ -81,6 +81,74 @@ dotnet publish -c Release -r osx-x64 --self-contained
 
 FFmpeg is automatically downloaded during restore via the `Download-FFmpeg.ps1` script. If manual download is needed, the script is located in `src/Desktop/Download-FFmpeg.ps1`.
 
+### Building Windows Installer
+
+The project includes a Windows installer for easy distribution to end users:
+
+#### Prerequisites
+- .NET 9.0 SDK
+- [Inno Setup 6](https://jrsoftware.org/isdl.php) - Free Windows installer creator
+
+#### Build Installer
+
+```powershell
+# Build installer with default version (1.0.0)
+.\build-installer.ps1
+
+# Build installer with custom version
+.\build-installer.ps1 -Version "1.2.3"
+
+# Build in Debug configuration (default is Release)
+.\build-installer.ps1 -Configuration Debug
+```
+
+The script performs these steps:
+1. Cleans previous builds
+2. Restores dependencies
+3. Publishes self-contained win-x64 application
+4. Verifies FFmpeg is included
+5. Compiles Inno Setup script to create installer EXE
+
+Output: `release/EnhancedYoutubeDownloader-Setup-v{version}.exe`
+
+#### Installer Features
+
+The Windows installer (`setup.iss`) provides:
+- **Self-contained deployment** - Bundles .NET 9.0 runtime, no prerequisites needed
+- **Desktop shortcut** - Optional (checked by default), creates shortcut on user's desktop
+- **Launch after install** - Optional (checked by default), runs app immediately after installation
+- **Start Menu integration** - Adds program shortcuts and uninstaller
+- **Add/Remove Programs** - Professional uninstall experience
+- **Modern UI** - Clean, professional installation wizard
+- **No admin required** - Installs to user's Program Files folder (per-user installation)
+
+#### Manual Installer Build
+
+If you prefer to build manually:
+
+```bash
+# 1. Publish self-contained application
+dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj \
+  --configuration Release \
+  --runtime win-x64 \
+  --self-contained true \
+  --output src/Desktop/bin/Release/net9.0/win-x64/publish
+
+# 2. Compile Inno Setup script
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+```
+
+#### Installer Configuration
+
+Edit `setup.iss` to customize:
+- `#define MyAppVersion` - Version number (line 5)
+- `AppId` - Unique GUID for the application (line 13)
+- `DefaultDirName` - Installation directory (line 18)
+- `LicenseFile` - Path to LICENSE file (line 21)
+- `SetupIconFile` - Application icon for installer (line 23)
+
+For advanced customization, see [Inno Setup documentation](https://jrsoftware.org/ishelp/).
+
 ## Architecture
 
 The solution follows a clean architecture with clear separation:

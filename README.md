@@ -36,15 +36,38 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 
 ## Getting Started
 
-### Prerequisites
-- .NET 9.0 SDK
-- PowerShell (for FFmpeg download)
+### Installation (End Users)
+
+#### Windows
+Download and run the installer:
+1. Download `EnhancedYoutubeDownloader-Setup-v1.0.0.exe` from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page
+2. Run the installer and follow the setup wizard
+3. Choose installation options:
+   - ✅ Create desktop shortcut (default: checked)
+   - ✅ Launch after installation (default: checked)
+4. Click Install and you're ready to download!
+
+**Features:**
+- Professional Windows installer with desktop shortcut
+- Start Menu integration with uninstall shortcut
+- Add/Remove Programs integration
+- Smart uninstaller with optional data cleanup
+
+#### Other Platforms
+Download the appropriate package for your platform from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page.
 
 ### Building from Source
 
+#### Prerequisites
+- .NET 9.0 SDK
+- PowerShell (for FFmpeg download)
+- Inno Setup 6+ (optional, for building Windows installer)
+
+#### Build Steps
+
 1. Clone the repository:
 ```bash
-git clone https://github.com/EnhancedYoutubeDownloader/EnhancedYoutubeDownloader.git
+git clone https://github.com/JrLordMoose/EnhancedYoutubeDownloader.git
 cd EnhancedYoutubeDownloader
 ```
 
@@ -65,11 +88,40 @@ dotnet run --project src/Desktop/EnhancedYoutubeDownloader.csproj
 
 ### Building for Distribution
 
+#### Standard Distribution
 ```bash
 dotnet publish -c Release -r win-x64 --self-contained
 dotnet publish -c Release -r linux-x64 --self-contained
 dotnet publish -c Release -r osx-x64 --self-contained
 ```
+
+#### Windows Installer
+Build a professional Windows installer with desktop shortcut and launch options:
+
+**Automated Build (PowerShell):**
+```powershell
+.\build-installer.ps1
+```
+
+**Manual Build:**
+```bash
+# 1. Publish self-contained application
+dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x64 --self-contained
+
+# 2. Build installer with Inno Setup
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v1.0.0.exe
+```
+
+**Installer Features:**
+- Desktop shortcut creation (default: enabled)
+- Launch application after installation (default: enabled)
+- Start Menu shortcuts (app + uninstaller)
+- Add/Remove Programs integration
+- Smart data cleanup on uninstall with user confirmation
+
+See [CLAUDE.md](CLAUDE.md) for detailed build instructions.
 
 ## Architecture
 
