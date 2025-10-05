@@ -2,7 +2,11 @@
 
 An enhanced, production-ready version of YouTube Downloader that surpasses the original in functionality, user experience, and code quality.
 
+
+
+
 ## Features
+<img width="1126" height="754" alt="enhanced_ytdownloader_screenshot" src="https://github.com/user-attachments/assets/12869c5f-3c74-4778-8658-85c0d2370ba5" />
 
 ### Core Features
 - ✅ Cross-platform support (Windows, Linux, macOS)
@@ -159,4 +163,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Original [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader) by Tyrrrz
 - [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode) for YouTube API access
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
+
 - [Material Design](https://material.io/) for design system
