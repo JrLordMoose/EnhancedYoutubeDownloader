@@ -41,6 +41,23 @@ public class App : Application, IDisposable
             .Build();
 
         _settingsService = _host.Services.GetRequiredService<SettingsService>();
+
+        // Ensure AutoStartDownload is enabled (fixes issue where it was persisted as false)
+        Console.WriteLine(
+            $"[APP] Initial AutoStartDownload value: {_settingsService.AutoStartDownload}"
+        );
+        if (!_settingsService.AutoStartDownload)
+        {
+            Console.WriteLine("[APP] AutoStartDownload is false, setting to true");
+            _settingsService.AutoStartDownload = true;
+            _settingsService.Save();
+            Console.WriteLine("[APP] AutoStartDownload reset to true and saved");
+        }
+        else
+        {
+            Console.WriteLine("[APP] AutoStartDownload is already true");
+        }
+
         _mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
 
         // Re-initialize the theme when the user changes it

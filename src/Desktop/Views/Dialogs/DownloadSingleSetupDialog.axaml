@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.DownloadSingleSetupDialog"
              x:DataType="vm:DownloadSingleSetupViewModel"
-             MinWidth="500" MaxWidth="700">
+             Width="600" Height="550">
 
     <Design.DataContext>
         <vm:DownloadSingleSetupViewModel />
@@ -18,188 +18,117 @@
             Padding="0"
             BoxShadow="0 8 16 0 #40000000">
 
-        <Grid RowDefinitions="Auto,*,Auto">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
 
             <!-- Header -->
             <Border Grid.Row="0"
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,0,0,1"
-                    Padding="24,20">
+                    Padding="20,16">
                 <TextBlock Text="Download Video"
-                          FontSize="19"
+                          FontSize="18"
                           FontWeight="SemiBold"/>
             </Border>
 
-            <!-- Content -->
-            <ScrollViewer Grid.Row="1" Padding="24,16">
-                <StackPanel Spacing="20">
-
-                    <!-- Video Info Section -->
-                    <Border Background="{DynamicResource MaterialDesignCardBackground}"
-                            BorderBrush="{DynamicResource MaterialDesignDivider}"
-                            BorderThickness="1"
+            <!-- Video Info (Compact) -->
+            <Border Grid.Row="1"
+                    Padding="20,16"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    Margin="16,12,16,0"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <Grid ColumnDefinitions="80,*">
+                    <!-- Thumbnail -->
+                    <Border Grid.Column="0"
+                            Width="80" Height="60"
                             CornerRadius="4"
-                            Padding="16">
-                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="120,*">
-
-                            <!-- Thumbnail -->
-                            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="4"
-                                    Width="120" Height="90"
-                                    CornerRadius="4"
-                                    ClipToBounds="True"
-                                    Background="{DynamicResource MaterialDesignDivider}"
-                                    Margin="0,0,16,0">
-                                <Panel>
-                                    <Image asyncImageLoader:ImageLoader.Source="{Binding Video.Thumbnails[0].Url}"
-                                           Stretch="UniformToFill"/>
-                                    <TextBlock Text="No Thumbnail"
-                                              IsVisible="{Binding Video.Thumbnails[0].Url, Converter={x:Static ObjectConverters.IsNull}}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                              FontSize="12"/>
-                                </Panel>
-                            </Border>
-
-                            <!-- Title -->
-                            <TextBlock Grid.Row="0" Grid.Column="1"
-                                      Text="{Binding Video.Title}"
-                                      FontSize="16"
-                                      TextWrapping="Wrap"
-                                      FontWeight="Medium"
-                                      MaxLines="2"/>
-
-                            <!-- Author -->
-                            <StackPanel Grid.Row="1" Grid.Column="1"
-                                       Orientation="Horizontal"
-                                       Spacing="8"
-                                       Margin="0,4,0,0">
-                                <TextBlock Text="Channel:"
-                                          FontSize="13"
-                                          Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                <TextBlock Text="{Binding Video.Author.ChannelTitle}"
-                                          FontSize="13"/>
-                            </StackPanel>
-
-                            <!-- Duration -->
-                            <StackPanel Grid.Row="2" Grid.Column="1"
-                                       Orientation="Horizontal"
-                                       Spacing="8"
-                                       Margin="0,4,0,0">
-                                <TextBlock Text="Duration:"
-                                          FontSize="13"
-                                          Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                <TextBlock Text="{Binding Video.Duration}"
-                                          FontSize="13"/>
-                            </StackPanel>
-                        </Grid>
+                            ClipToBounds="True"
+                            Background="{DynamicResource MaterialDesignDivider}"
+                            Margin="0,0,12,0">
+                        <Image asyncImageLoader:ImageLoader.Source="{Binding Video.Thumbnails[0].Url}"
+                               Stretch="UniformToFill"/>
                     </Border>
 
-                    <!-- Quality Settings -->
-                    <StackPanel Spacing="16">
-                        <TextBlock Text="Download Settings"
+                    <!-- Info -->
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="{Binding Video.Title}"
                                   FontSize="14"
-                                  FontWeight="Medium"/>
-
-                        <!-- Quality Selector -->
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Quality"
-                                      FontSize="13"
-                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            <ComboBox SelectedItem="{Binding SelectedQuality}"
-                                     SelectedIndex="0"
-                                     HorizontalAlignment="Stretch"
-                                     Theme="{DynamicResource MaterialFilledComboBox}">
-                                <ComboBoxItem Content="Best Quality"/>
-                                <ComboBoxItem Content="1080p (Full HD)"/>
-                                <ComboBoxItem Content="720p (HD)"/>
-                                <ComboBoxItem Content="480p (SD)"/>
-                                <ComboBoxItem Content="360p"/>
-                                <ComboBoxItem Content="Audio Only (Best)"/>
-                            </ComboBox>
-                        </StackPanel>
-
-                        <!-- Format Selector -->
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Format"
-                                      FontSize="13"
-                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            <ComboBox SelectedItem="{Binding SelectedFormat}"
-                                     SelectedIndex="0"
-                                     HorizontalAlignment="Stretch"
-                                     Theme="{DynamicResource MaterialFilledComboBox}">
-                                <ComboBoxItem Content="MP4"/>
-                                <ComboBoxItem Content="WebM"/>
-                                <ComboBoxItem Content="MP3"/>
-                            </ComboBox>
-                        </StackPanel>
+                                  FontWeight="Medium"
+                                  TextWrapping="Wrap"
+                                  MaxLines="2"/>
+                        <TextBlock FontSize="12" Opacity="0.7">
+                            <Run Text="{Binding Video.Author.ChannelTitle}"/>
+                            <Run Text=" • "/>
+                            <Run Text="{Binding Video.Duration}"/>
+                        </TextBlock>
                     </StackPanel>
+                </Grid>
+            </Border>
 
-                    <!-- Additional Options -->
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Additional Options"
-                                  FontSize="14"
-                                  FontWeight="Medium"/>
-
-                        <!-- Subtitle Toggle -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Text="Download Subtitles"
-                                          FontSize="14"/>
-                                <TextBlock Text="Include available subtitle tracks"
-                                          FontSize="12"
-                                          Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            </StackPanel>
-                            <ToggleSwitch IsChecked="{Binding DownloadSubtitles}"
-                                         Grid.Column="1"
-                                         VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <!-- Tag Injection Toggle -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Text="Inject Metadata Tags"
-                                          FontSize="14"/>
-                                <TextBlock Text="Add title, author, and thumbnail to file"
-                                          FontSize="12"
-                                          Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            </StackPanel>
-                            <ToggleSwitch IsChecked="{Binding InjectTags}"
-                                         Grid.Column="1"
-                                         VerticalAlignment="Center"/>
-                        </Grid>
-                    </StackPanel>
-
-                    <!-- File Path -->
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="Save Location"
-                                  FontSize="13"
-                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBox Grid.Column="0"
-                                    Text="{Binding FilePath, Mode=TwoWay}"
-                                    Watermark="Select download location..."
-                                    Theme="{DynamicResource MaterialFilledTextBox}"
-                                    Margin="0,0,8,0"/>
-                            <Button Grid.Column="1"
-                                   x:Name="BrowseButton"
-                                   Content="Browse"
-                                   Command="{Binding BrowseCommand}"
-                                   Theme="{DynamicResource MaterialOutlineButton}"
-                                   VerticalAlignment="Stretch"/>
-                        </Grid>
-                    </StackPanel>
-
+            <!-- Quality -->
+            <Border Grid.Row="2" Padding="20,12">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Quality" FontSize="12" Opacity="0.7"/>
+                    <ComboBox ItemsSource="{Binding QualityOptions}"
+                             SelectedItem="{Binding SelectedQuality}"
+                             HorizontalAlignment="Stretch"
+                             Theme="{DynamicResource MaterialFilledComboBox}"/>
                 </StackPanel>
-            </ScrollViewer>
+            </Border>
+
+            <!-- Format -->
+            <Border Grid.Row="3" Padding="20,0,20,12">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Format" FontSize="12" Opacity="0.7"/>
+                    <ComboBox ItemsSource="{Binding FormatOptions}"
+                             SelectedItem="{Binding SelectedFormat}"
+                             HorizontalAlignment="Stretch"
+                             Theme="{DynamicResource MaterialFilledComboBox}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Options (Compact) -->
+            <Border Grid.Row="4" Padding="20,0,20,12">
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="Download Subtitles" FontSize="13" VerticalAlignment="Center"/>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding DownloadSubtitles}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="Inject Metadata Tags" FontSize="13" VerticalAlignment="Center"/>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding InjectTags}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Save Location -->
+            <Border Grid.Row="5" Padding="20,0,20,16">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Save Location" FontSize="12" Opacity="0.7"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Grid.Column="0"
+                                Text="{Binding FilePath, Mode=TwoWay}"
+                                Watermark="Select download location..."
+                                Theme="{DynamicResource MaterialFilledTextBox}"
+                                Margin="0,0,8,0"/>
+                        <Button Grid.Column="1"
+                               x:Name="BrowseButton"
+                               Content="Browse"
+                               Command="{Binding BrowseCommand}"
+                               Theme="{DynamicResource MaterialOutlineButton}"
+                               VerticalAlignment="Stretch"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
 
             <!-- Action Buttons -->
-            <Border Grid.Row="2"
+            <Border Grid.Row="6"
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,1,0,0"
-                    Padding="24,16">
+                    Padding="20,16">
                 <StackPanel Orientation="Horizontal"
                            HorizontalAlignment="Right"
                            Spacing="12">

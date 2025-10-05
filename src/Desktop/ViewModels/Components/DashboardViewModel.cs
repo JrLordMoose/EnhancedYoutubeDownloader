@@ -218,8 +218,12 @@ public partial class DashboardViewModel : ViewModelBase
             Console.WriteLine("[DEBUG] Added to Downloads collection");
 
             // Start download based on settings
+            Console.WriteLine(
+                $"[DEBUG] AutoStartDownload setting: {_settingsService.AutoStartDownload}"
+            );
             if (_settingsService.AutoStartDownload)
             {
+                Console.WriteLine("[DEBUG] Calling StartDownloadAsync...");
                 await _downloadService.StartDownloadAsync(downloadItem);
                 Console.WriteLine("[DEBUG] Download started automatically");
                 _snackbarManager.Notify($"Downloading: {result.Video.Title}");
@@ -385,37 +389,63 @@ public partial class DashboardViewModel : ViewModelBase
     [RelayCommand]
     private void OpenDownloadFolder(DownloadItem download)
     {
+        Console.WriteLine($"[OPEN] OpenDownloadFolder called for {download.Id}");
+        Console.WriteLine($"[OPEN] FilePath: {download.FilePath}");
+        Console.WriteLine($"[OPEN] CanOpen: {download.CanOpen}");
+        Console.WriteLine($"[OPEN] Status: {download.Status}");
+
         if (string.IsNullOrWhiteSpace(download.FilePath) || !File.Exists(download.FilePath))
         {
+            Console.WriteLine($"[OPEN] File not found or FilePath is null/empty");
             _snackbarManager.NotifyWarning("File not found");
             return;
         }
 
         try
         {
-            // Cross-platform folder opening
+            Console.WriteLine($"[OPEN] Opening file location: {download.FilePath}");
+
+            // Cross-platform folder opening with proper ProcessStartInfo
             if (OperatingSystem.IsWindows())
             {
-                System.Diagnostics.Process.Start(
-                    "explorer.exe",
-                    $"/select,\"{download.FilePath}\""
-                );
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "explorer.exe",
+                    Arguments = $"/select,\"{download.FilePath}\"",
+                    UseShellExecute = true,
+                };
+                System.Diagnostics.Process.Start(startInfo);
+                Console.WriteLine("[OPEN] Explorer launched successfully");
             }
             else if (OperatingSystem.IsMacOS())
             {
-                System.Diagnostics.Process.Start("open", $"-R \"{download.FilePath}\"");
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "open",
+                    Arguments = $"-R \"{download.FilePath}\"",
+                    UseShellExecute = true,
+                };
+                System.Diagnostics.Process.Start(startInfo);
             }
             else if (OperatingSystem.IsLinux())
             {
                 var directory = Path.GetDirectoryName(download.FilePath);
                 if (!string.IsNullOrWhiteSpace(directory))
                 {
-                    System.Diagnostics.Process.Start("xdg-open", $"\"{directory}\"");
+                    var startInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "xdg-open",
+                        Arguments = $"\"{directory}\"",
+                        UseShellExecute = true,
+                    };
+                    System.Diagnostics.Process.Start(startInfo);
                 }
             }
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[OPEN] Error: {ex.GetType().Name}: {ex.Message}");
+            Console.WriteLine($"[OPEN] Stack trace: {ex.StackTrace}");
             _snackbarManager.NotifyError($"Failed to open folder: {ex.Message}");
         }
     }

@@ -30,7 +30,11 @@ public partial class SettingsService : SettingsBase
     public bool IsUkraineSupportMessageEnabled { get; set; } = true;
 
     [DefaultValue(true)]
-    public bool AutoStartDownload { get; set; } = true;
+    public bool AutoStartDownload
+    {
+        get => true; // Always return true for now to bypass settings persistence issue
+        set { } // Ignore set attempts
+    }
 
     [DefaultValue(false)]
     public bool OpenFolderAfterDownload { get; set; } = false;

@@ -34,6 +34,21 @@ public partial class DownloadSingleSetupViewModel : DialogViewModelBase
     [ObservableProperty]
     private string _selectedFormat = "MP4";
 
+    // Quality options for ComboBox
+    public List<string> QualityOptions { get; } =
+        new()
+        {
+            "Best Quality",
+            "1080p (Full HD)",
+            "720p (HD)",
+            "480p (SD)",
+            "360p",
+            "Audio Only (Best)",
+        };
+
+    // Format options for ComboBox
+    public List<string> FormatOptions { get; } = new() { "MP4", "WebM", "MP3" };
+
     public DownloadSingleSetupViewModel(DialogManager dialogManager)
     {
         _dialogManager = dialogManager;

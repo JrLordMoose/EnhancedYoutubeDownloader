@@ -165,48 +165,53 @@
                                                       Margin="0,4,0,0"/>
                                         </Grid>
 
-                                        <!-- Action Buttons (Column 2) -->
-                                        <StackPanel Grid.Column="2"
-                                                   Orientation="Horizontal"
-                                                   Spacing="4"
-                                                   VerticalAlignment="Top"
-                                                   Margin="12,0,0,0">
-                                            <!-- Download/Resume Button (Queued/Paused) -->
-                                            <Button Content="Start"
-                                                    Classes="Outline"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.ResumeDownloadCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    IsVisible="{Binding CanResume}"/>
-                                            <!-- Pause Button (Started) -->
-                                            <Button Content="Pause"
-                                                    Classes="Outline"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.PauseDownloadCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    IsVisible="{Binding CanPause}"/>
-                                            <!-- Cancel Button -->
-                                            <Button Content="Cancel"
-                                                    Classes="Outline"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.CancelDownloadCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    IsVisible="{Binding CanCancel}"/>
-                                            <!-- Open Folder Button (Completed) -->
-                                            <Button Content="Open"
-                                                    Classes="Outline"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.OpenDownloadFolderCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    IsVisible="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static models:DownloadStatus.Completed}}"/>
-                                            <!-- Restart Button (Failed/Canceled/Completed) -->
-                                            <Button Content="Restart"
-                                                    Classes="Outline"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.RestartDownloadCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    IsVisible="{Binding CanRestart}"/>
-                                            <!-- Delete Button (Always visible) -->
-                                            <Button Content="Delete"
-                                                    Classes="Outline"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.Dashboard.DeleteDownloadCommand}"
-                                                    CommandParameter="{Binding}"/>
-                                        </StackPanel>
+                                        <!-- Action Buttons (Column 2) - Wrapped in ScrollViewer for overflow -->
+                                        <ScrollViewer Grid.Column="2"
+                                                     HorizontalScrollBarVisibility="Auto"
+                                                     VerticalScrollBarVisibility="Disabled"
+                                                     MinWidth="200"
+                                                     MaxWidth="400"
+                                                     Margin="12,0,0,0">
+                                            <StackPanel Orientation="Horizontal"
+                                                       Spacing="4"
+                                                       VerticalAlignment="Top">
+                                                <!-- Download/Resume Button (Queued/Paused) -->
+                                                <Button Content="Start"
+                                                        Classes="Outline"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.ResumeDownloadCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding CanResume}"/>
+                                                <!-- Pause Button (Started) -->
+                                                <Button Content="Pause"
+                                                        Classes="Outline"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.PauseDownloadCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding CanPause}"/>
+                                                <!-- Cancel Button -->
+                                                <Button Content="Cancel"
+                                                        Classes="Outline"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.CancelDownloadCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding CanCancel}"/>
+                                                <!-- Open Folder Button (Completed) - Uses CanOpen flag -->
+                                                <Button Content="Open"
+                                                        Classes="Outline"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.OpenDownloadFolderCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding CanOpen}"/>
+                                                <!-- Restart Button (Failed/Canceled/Completed) -->
+                                                <Button Content="Restart"
+                                                        Classes="Outline"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.RestartDownloadCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding CanRestart}"/>
+                                                <!-- Delete Button (Always visible) -->
+                                                <Button Content="Delete"
+                                                        Classes="Outline"
+                                                        Command="{Binding $parent[ItemsControl].DataContext.Dashboard.DeleteDownloadCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                            </StackPanel>
+                                        </ScrollViewer>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

@@ -79,6 +79,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         downloadItem.CanCancel = true;
         downloadItem.CanResume = false;
         downloadItem.CanRestart = false;
+        downloadItem.CanOpen = false;
         _downloadStatusChanged.OnNext(downloadItem);
 
         // Create a new CancellationTokenSource for this download
@@ -108,6 +109,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         downloadItem.CanResume = true;
         downloadItem.CanCancel = true;
         downloadItem.CanRestart = false;
+        downloadItem.CanOpen = false;
 
         // Reset speed and ETA tracking
         downloadItem.ResetTracking();
@@ -159,6 +161,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         downloadItem.CanResume = false;
         downloadItem.CanCancel = true;
         downloadItem.CanRestart = false;
+        downloadItem.CanOpen = false;
         _downloadStatusChanged.OnNext(downloadItem);
 
         // Create a new CancellationTokenSource for the resumed download
@@ -183,6 +186,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         downloadItem.CanResume = false;
         downloadItem.CanCancel = false;
         downloadItem.CanRestart = true;
+        downloadItem.CanOpen = false;
 
         // Reset speed and ETA tracking
         downloadItem.ResetTracking();
@@ -214,6 +218,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         downloadItem.CanResume = false;
         downloadItem.CanCancel = false;
         downloadItem.CanRestart = false;
+        downloadItem.CanOpen = false;
 
         // Reset speed and ETA tracking
         downloadItem.ResetTracking();
@@ -280,9 +285,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             var options = new OptionSet
             {
                 Format = formatString,
-                Output = downloadItem.PartialFilePath,
+                Output = downloadItem.FilePath, // Use final path since NoPart=true
                 NoPlaylist = true,
-                NoPart = true, // Don't use .part files (we manage this ourselves)
+                NoPart = true, // Don't use .part files (yt-dlp downloads directly to final location)
 
                 // Subtitle options
                 WriteSubs = profile.IncludeSubtitles,
@@ -390,18 +395,66 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             // Download completed successfully
             if (!cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[YTDLP] Download completed, moving file from .part");
+                Console.WriteLine($"[YTDLP] Download completed, checking file location");
+                Console.WriteLine($"[YTDLP] Expected FilePath: {downloadItem.FilePath}");
 
-                // Move .part file to final location
-                if (!string.IsNullOrEmpty(downloadItem.PartialFilePath) &&
-                    File.Exists(downloadItem.PartialFilePath))
+                // yt-dlp may save to various locations, search for the actual file
+                string? actualFilePath = null;
+
+                // Check expected location first
+                if (File.Exists(downloadItem.FilePath))
                 {
-                    if (File.Exists(downloadItem.FilePath))
+                    actualFilePath = downloadItem.FilePath;
+                    Console.WriteLine($"[YTDLP] File found at expected location: {actualFilePath}");
+                }
+                // Check if yt-dlp added extension to the FilePath (e.g., .mp4.part.mp4)
+                else
+                {
+                    var directory = Path.GetDirectoryName(downloadItem.FilePath) ?? "";
+                    var baseFileName = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
+
+                    // Search for files matching the base name
+                    var possibleFiles = Directory.GetFiles(directory, $"{baseFileName}*")
+                        .Where(f => !string.IsNullOrEmpty(baseFileName) && f.Contains(baseFileName))
+                        .OrderByDescending(f => new FileInfo(f).LastWriteTime)
+                        .ToList();
+
+                    Console.WriteLine($"[YTDLP] Searching directory: {directory}");
+                    Console.WriteLine($"[YTDLP] Base filename: {baseFileName}");
+                    Console.WriteLine($"[YTDLP] Found {possibleFiles.Count} possible files");
+
+                    if (possibleFiles.Any())
                     {
-                        File.Delete(downloadItem.FilePath);
+                        actualFilePath = possibleFiles.First();
+                        Console.WriteLine($"[YTDLP] Found actual file: {actualFilePath}");
+
+                        // If it's not at the expected location, move it
+                        if (actualFilePath != downloadItem.FilePath && !string.IsNullOrEmpty(downloadItem.FilePath))
+                        {
+                            if (File.Exists(downloadItem.FilePath))
+                            {
+                                File.Delete(downloadItem.FilePath);
+                            }
+                            File.Move(actualFilePath, downloadItem.FilePath!);
+                            actualFilePath = downloadItem.FilePath;
+                            Console.WriteLine($"[YTDLP] File moved to expected location: {actualFilePath}");
+                        }
                     }
-                    File.Move(downloadItem.PartialFilePath, downloadItem.FilePath!);
-                    Console.WriteLine($"[YTDLP] File moved to: {downloadItem.FilePath}");
+                    else
+                    {
+                        Console.WriteLine($"[YTDLP] ERROR: No matching files found!");
+                    }
+                }
+
+                // Update FilePath to actual location
+                if (!string.IsNullOrEmpty(actualFilePath))
+                {
+                    downloadItem.FilePath = actualFilePath;
+                    Console.WriteLine($"[YTDLP] Final FilePath: {downloadItem.FilePath}");
+                }
+                else
+                {
+                    Console.WriteLine($"[YTDLP] ERROR: Could not locate downloaded file!");
                 }
 
                 downloadItem.Status = DownloadStatus.Completed;
@@ -411,6 +464,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 downloadItem.CanResume = false;
                 downloadItem.CanCancel = false;
                 downloadItem.CanRestart = true;
+                downloadItem.CanOpen = true;
+
+                Console.WriteLine($"[YTDLP] Setting CanOpen=true for completed download");
+                Console.WriteLine($"[YTDLP] FilePath: {downloadItem.FilePath}");
 
                 // Delete saved state
                 await _stateRepository.DeleteStateAsync(downloadItem.Id);
@@ -438,6 +495,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             downloadItem.CanResume = false;
             downloadItem.CanCancel = false;
             downloadItem.CanRestart = true;
+            downloadItem.CanOpen = false;
             _downloadStatusChanged.OnNext(downloadItem);
             Console.WriteLine($"[YTDLP] Status updated to Failed");
         }

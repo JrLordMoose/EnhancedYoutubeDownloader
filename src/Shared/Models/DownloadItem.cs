@@ -23,6 +23,12 @@ public partial class DownloadItem : ObservableObject
     private FormatProfile? _formatProfile;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanPause))]
+    [NotifyPropertyChangedFor(nameof(CanResume))]
+    [NotifyPropertyChangedFor(nameof(CanCancel))]
+    [NotifyPropertyChangedFor(nameof(CanRestart))]
+    [NotifyPropertyChangedFor(nameof(CanOpen))]
+    [NotifyPropertyChangedFor(nameof(IsCompleted))]
     private DownloadStatus _status = DownloadStatus.Queued;
 
     [ObservableProperty]
@@ -53,6 +59,9 @@ public partial class DownloadItem : ObservableObject
 
     [ObservableProperty]
     private bool _canRestart;
+
+    [ObservableProperty]
+    private bool _canOpen;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BytesProgress))]
@@ -88,6 +97,7 @@ public partial class DownloadItem : ObservableObject
     public TimeSpan? Duration => Video?.Duration;
     public string? ThumbnailUrl => Video?.Thumbnails?.OrderByDescending(t => t.Resolution.Area).FirstOrDefault()?.Url;
     public double BytesProgress => TotalBytes > 0 ? (BytesDownloaded * 100.0 / TotalBytes) : 0;
+    public bool IsCompleted => Status == DownloadStatus.Completed;
 
     // Formatted properties for display
     public string FormattedSpeed => DownloadSpeed > 0 ? $"{FormatBytes((long)DownloadSpeed)}/s" : "--";
