@@ -626,14 +626,7 @@ section {
 
 /* Professional Subtitle Burning - Special Gold Treatment */
 .feature-card-highlight {
-    background: linear-gradient(135deg, rgba(249, 168, 37, 0.1) 0%, var(--glass-bg) 100%);
-    border: 2px solid rgba(249, 168, 37, 0.3);
     position: relative;
-}
-
-.feature-card-highlight::before {
-    background: var(--gradient-primary);
-    height: 4px;
 }
 
 .feature-card-highlight::after {
@@ -648,14 +641,8 @@ section {
     padding: 6px 12px;
     border-radius: var(--radius-full);
     letter-spacing: 1px;
-    box-shadow: var(--shadow-glow);
-    animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.feature-card-highlight:hover {
-    border-color: var(--primary);
-    box-shadow: 0 12px 48px rgba(249, 168, 37, 0.3);
-    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 0 20px var(--primary-glow);
+    z-index: 10;
 }
 
 /* Screenshots Section */
