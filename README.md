@@ -44,7 +44,7 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 
 #### Windows
 Download and run the installer:
-1. Download `EnhancedYoutubeDownloader-Setup-v0.3.1.exe` from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.3.1.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.3.1/EnhancedYoutubeDownloader-Setup-v0.3.1.exe)** (79.71 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
