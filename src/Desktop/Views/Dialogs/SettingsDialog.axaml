@@ -54,15 +54,21 @@
                                                   FontSize="12"
                                                   Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                                     </StackPanel>
-                                    <ComboBox Grid.Column="1"
-                                             SelectedIndex="{Binding Settings.Theme, Mode=TwoWay}"
-                                             HorizontalAlignment="Stretch"
-                                             VerticalAlignment="Center"
-                                             Theme="{DynamicResource MaterialFilledComboBox}">
-                                        <ComboBoxItem Content="Auto (System)"/>
-                                        <ComboBoxItem Content="Light"/>
-                                        <ComboBoxItem Content="Dark"/>
-                                    </ComboBox>
+                                    <StackPanel Grid.Column="1" Spacing="4">
+                                        <ComboBox SelectedIndex="{Binding Settings.Theme, Mode=TwoWay}"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Center"
+                                                 Theme="{DynamicResource MaterialFilledComboBox}">
+                                            <ComboBoxItem Content="Auto (System)"/>
+                                            <ComboBoxItem Content="Light"/>
+                                            <ComboBoxItem Content="Dark"/>
+                                        </ComboBox>
+                                        <TextBlock Text="(Light Mode Coming Soon)"
+                                                  FontSize="11"
+                                                  FontStyle="Italic"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                  HorizontalAlignment="Center"/>
+                                    </StackPanel>
                                 </Grid>
                             </StackPanel>
 

@@ -1,7 +1,7 @@
 {
-  "Theme": 1,
+  "Theme": 2,
   "IsAutoUpdateEnabled": true,
-  "ParallelLimit": 3,
+  "ParallelLimit": 6,
   "DefaultQuality": 0,
   "DefaultFormat": 0,
   "ShouldInjectSubtitles": true,
@@ -16,7 +16,5 @@
   "EnableAISubtitles": true,
   "AISubtitleLanguage": "auto",
   "AskBeforeGeneratingSubtitles": true,
-  "SubtitleStyle": 1,
-  "SubtitleFontSize": 20,
-  "SubtitleBackgroundOpacity": 1
+  "SubtitleStyle": 1
 }
