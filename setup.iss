@@ -2,7 +2,7 @@
 ; This script creates a Windows installer with desktop shortcut and launch options
 
 #define MyAppName "Enhanced YouTube Downloader"
-#define MyAppVersion "0.3.1"
+#define MyAppVersion "0.3.2"
 #define MyAppPublisher "JrLordMoose"
 #define MyAppURL "https://github.com/JrLordMoose/EnhancedYoutubeDownloader"
 #define MyAppExeName "EnhancedYoutubeDownloader.exe"
@@ -41,7 +41,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
-Name: "desktopuninstall"; Description: "Create desktop uninstaller shortcut"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopuninstall"; Description: "Create desktop uninstaller shortcut%n(You can also uninstall via the install folder or Add/Remove Programs)"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "launchafterinstall"; Description: "Launch {#MyAppName} after installation"; GroupDescription: "Post-installation:"; Flags: checkedonce
 
 [Files]
@@ -51,10 +51,10 @@ Source: "src\Desktop\bin\Release\net9.0\win-x64\publish\*"; DestDir: "{app}"; Fl
 [Icons]
 ; Start Menu shortcuts
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch {#MyAppName}"
-Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"; Comment: "Uninstall {#MyAppName}"
+Name: "{group}\Uninstall {#MyAppName}"; Filename: "{app}\uninstall.exe"; Comment: "Uninstall {#MyAppName}"
 ; Desktop shortcuts
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; Comment: "Launch {#MyAppName}"
-Name: "{autodesktop}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"; Tasks: desktopuninstall; Comment: "Uninstall {#MyAppName}"
+Name: "{autodesktop}\Uninstall {#MyAppName}"; Filename: "{app}\uninstall.exe"; Tasks: desktopuninstall; Comment: "Uninstall {#MyAppName}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent; Tasks: launchafterinstall
@@ -67,6 +67,33 @@ Type: filesandordirs; Name: "{localappdata}\{#MyAppName}"
 function InitializeSetup(): Boolean;
 begin
   Result := True;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  UninstallPath: String;
+  CustomUninstallPath: String;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    // Rename unins000.exe to uninstall.exe
+    UninstallPath := ExpandConstant('{app}\unins000.exe');
+    CustomUninstallPath := ExpandConstant('{app}\uninstall.exe');
+
+    if FileExists(UninstallPath) then
+    begin
+      FileCopy(UninstallPath, CustomUninstallPath, False);
+      DeleteFile(UninstallPath);
+
+      // Also copy unins000.dat to uninstall.dat
+      if FileExists(ExpandConstant('{app}\unins000.dat')) then
+      begin
+        FileCopy(ExpandConstant('{app}\unins000.dat'),
+                 ExpandConstant('{app}\uninstall.dat'), False);
+        DeleteFile(ExpandConstant('{app}\unins000.dat'));
+      end;
+    end;
+  end;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
@@ -90,5 +117,11 @@ begin
     end;
   end;
 end;
+
+
+
+
+
+
 
 
