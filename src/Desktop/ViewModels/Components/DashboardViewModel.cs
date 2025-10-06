@@ -98,6 +98,9 @@ public partial class DashboardViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
     public partial string? Query { get; set; }
 
+    [ObservableProperty]
+    public partial string? QueryError { get; set; }
+
     public ObservableCollection<DownloadItem> Downloads { get; } = [];
 
     private bool CanShowTutorial() => !IsBusy;
@@ -120,11 +123,40 @@ public partial class DashboardViewModel : ViewModelBase
 
     private bool CanProcessQuery() => !IsBusy && !string.IsNullOrWhiteSpace(Query);
 
+    private bool IsValidQuery(string query)
+    {
+        // Clear previous error
+        QueryError = null;
+
+        // Check if it's a URL-like string or potential search query
+        if (query.StartsWith("#") || query.StartsWith("@") && !query.Contains("youtube.com"))
+        {
+            QueryError = "Invalid URL. Please enter a valid YouTube URL or search term.";
+            return false;
+        }
+
+        // Check for very short random strings (less than 3 chars and no spaces)
+        if (query.Length < 3 && !query.Contains(" "))
+        {
+            QueryError = "Invalid input. Please enter a valid YouTube URL or search term.";
+            return false;
+        }
+
+        return true;
+    }
+
     [RelayCommand(CanExecute = nameof(CanProcessQuery))]
     private async Task ProcessQueryAsync()
     {
         if (string.IsNullOrWhiteSpace(Query))
             return;
+
+        // Validate query before processing
+        if (!IsValidQuery(Query))
+        {
+            _snackbarManager.NotifyError(QueryError!);
+            return;
+        }
 
         Console.WriteLine("[DEBUG] ProcessQueryAsync: Starting");
         Console.WriteLine($"[DEBUG] IsBusy before: {IsBusy}");
@@ -133,6 +165,9 @@ public partial class DashboardViewModel : ViewModelBase
 
         try
         {
+            // Clear any previous errors
+            QueryError = null;
+
             Console.WriteLine($"[DEBUG] Resolving query: {Query}");
             _snackbarManager.Notify($"Resolving: {Query}");
 

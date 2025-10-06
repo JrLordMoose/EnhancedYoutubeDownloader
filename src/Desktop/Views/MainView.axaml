@@ -70,24 +70,39 @@
                     BorderThickness="0,0,0,1"
                     Padding="16,12">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <TextBox Grid.Column="0"
-                             x:Name="QueryTextBox"
-                             Text="{Binding Dashboard.Query}"
-                             Watermark="Enter YouTube URL, playlist, channel, or search query..."
-                             Classes="Outline"
-                             Margin="0,0,8,0"
-                             KeyDown="OnQueryTextBoxKeyDown"/>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="1"
-                            Content="Download"
-                            Classes="Flat"
-                            Command="{Binding Dashboard.ProcessQueryCommand}"
-                            IsEnabled="{Binding Dashboard.ProcessQueryCommand.CanExecute}"/>
+                        <TextBox Grid.Column="0"
+                                 x:Name="QueryTextBox"
+                                 Text="{Binding Dashboard.Query}"
+                                 Watermark="Enter YouTube URL, playlist, channel, or search query..."
+                                 Classes="Outline"
+                                 Margin="0,0,8,0"
+                                 KeyDown="OnQueryTextBoxKeyDown"/>
+
+                        <Button Grid.Column="1"
+                                Content="Download"
+                                Classes="Flat"
+                                Command="{Binding Dashboard.ProcessQueryCommand}"
+                                IsEnabled="{Binding Dashboard.ProcessQueryCommand.CanExecute}"/>
+                    </Grid>
+
+                    <!-- Error Message -->
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding Dashboard.QueryError}"
+                               IsVisible="{Binding Dashboard.QueryError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                               Foreground="#F44336"
+                               FontSize="12"
+                               Margin="0,4,0,0"/>
                 </Grid>
             </Border>
 
