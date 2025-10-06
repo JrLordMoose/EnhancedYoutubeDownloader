@@ -336,8 +336,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 NoPlaylist = true,
                 NoPart = false, // Use .part files to enable progress reporting
 
-                // Subtitle options
+                // Subtitle options (both manual and auto-generated)
                 WriteSubs = shouldWriteSubs,
+                WriteAutoSubs = shouldWriteSubs, // Also download auto-generated captions
                 EmbedSubs = shouldEmbedSubs,
                 SubLangs = "en",
                 SubFormat = shouldWriteSubs ? "srt/best" : null, // Convert to SRT for compatibility
@@ -588,23 +589,40 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
             var profile = downloadItem.FormatProfile ?? GetDefaultProfile();
             var videoDirectory = Path.GetDirectoryName(downloadItem.FilePath) ?? "";
+            var videoFileName = Path.GetFileName(downloadItem.FilePath);
             var videoFileNameWithoutExt = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
 
-            // Find the .srt subtitle file (yt-dlp saves it with same name as video)
-            var subtitlePath = Path.Combine(videoDirectory, $"{videoFileNameWithoutExt}.en.srt");
-
-            if (!File.Exists(subtitlePath))
+            // Find the .srt subtitle file (yt-dlp saves it with .part extension during download)
+            // Try multiple patterns: .mp4.part.en.srt, .part.en.srt, .en.srt, .mp4.part.srt, .part.srt, .srt
+            string? subtitlePath = null;
+            var searchPatterns = new[]
             {
-                // Try without language code
-                subtitlePath = Path.Combine(videoDirectory, $"{videoFileNameWithoutExt}.srt");
+                $"{videoFileName}.part.en.srt",     // is_video.mp4.part.en.srt
+                $"{videoFileNameWithoutExt}.part.en.srt", // is_video.part.en.srt
+                $"{videoFileNameWithoutExt}.en.srt", // is_video.en.srt
+                $"{videoFileName}.part.srt",         // is_video.mp4.part.srt
+                $"{videoFileNameWithoutExt}.part.srt", // is_video.part.srt
+                $"{videoFileNameWithoutExt}.srt"     // is_video.srt
+            };
 
-                if (!File.Exists(subtitlePath))
+            foreach (var pattern in searchPatterns)
+            {
+                var candidatePath = Path.Combine(videoDirectory, pattern);
+                if (File.Exists(candidatePath))
                 {
-                    Console.WriteLine($"[BURN-IN] Subtitle file not found. Searched for:");
-                    Console.WriteLine($"[BURN-IN]   - {videoFileNameWithoutExt}.en.srt");
-                    Console.WriteLine($"[BURN-IN]   - {videoFileNameWithoutExt}.srt");
-                    return;
+                    subtitlePath = candidatePath;
+                    break;
                 }
+            }
+
+            if (subtitlePath == null)
+            {
+                Console.WriteLine($"[BURN-IN] Subtitle file not found. Searched for:");
+                foreach (var pattern in searchPatterns)
+                {
+                    Console.WriteLine($"[BURN-IN]   - {pattern}");
+                }
+                return;
             }
 
             Console.WriteLine($"[BURN-IN] Found subtitle file: {subtitlePath}");

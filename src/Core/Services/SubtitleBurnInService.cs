@@ -49,10 +49,10 @@ public class SubtitleBurnInService : ISubtitleBurnInService
             if (backgroundOpacity < 0.0 || backgroundOpacity > 1.0)
                 throw new ArgumentOutOfRangeException(nameof(backgroundOpacity), "Opacity must be between 0.0 and 1.0");
 
-            // Escape paths for FFmpeg (Windows requires quadruple backslashes, double for colon)
-            var escapedSubtitlePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? subtitlePath.Replace("\\", "\\\\\\\\").Replace(":", "\\\\:")
-                : subtitlePath.Replace(":", "\\:");
+            // Escape paths for FFmpeg subtitles filter
+            // FFmpeg filter syntax requires escaping special characters: \ : ' [ ] ( )
+            // Reference: https://ffmpeg.org/ffmpeg-filters.html#toc-Filtergraph-syntax-1
+            var escapedSubtitlePath = EscapeSubtitlePath(subtitlePath);
 
             // Build FFmpeg subtitle filter with professional styling
             // This creates subtitles with black semi-transparent box and white text
@@ -217,5 +217,80 @@ public class SubtitleBurnInService : ISubtitleBurnInService
         // ASS format uses inverted alpha: 00 = fully opaque, FF = fully transparent
         var alpha = (int)((1.0 - opacity) * 255);
         return alpha.ToString("X2");
+    }
+
+    /// <summary>
+    /// Escapes special characters in file paths for FFmpeg subtitles filter
+    /// </summary>
+    /// <remarks>
+    /// FFmpeg's subtitles filter requires proper escaping of special characters in file paths.
+    /// The escaping requirements differ between Windows and Unix-like systems due to path separators.
+    ///
+    /// Characters that need escaping in filter parameters:
+    /// - Backslash (\) - Path separator on Windows, escape character in FFmpeg
+    /// - Colon (:) - Drive letter separator on Windows, option separator in FFmpeg filters
+    /// - Single quote (') - Quote character in filter strings
+    /// - Parentheses ((), ) - Special characters in filter syntax
+    /// - Square brackets ([, ]) - Special characters in filter syntax
+    ///
+    /// References:
+    /// - https://ffmpeg.org/ffmpeg-filters.html#toc-Filtergraph-syntax-1
+    /// - https://stackoverflow.com/questions/45916331/escape-special-characters-in-ffmpeg-subtitle-filename
+    /// </remarks>
+    private static string EscapeSubtitlePath(string path)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Windows path escaping for FFmpeg subtitles filter
+            // Order matters: escape backslashes first, then other special characters
+
+            // 1. Escape backslashes: \ → \\\\ (quadruple backslash)
+            //    Windows paths use backslash as separator, FFmpeg needs them escaped
+            var escaped = path.Replace("\\", "\\\\\\\\");
+
+            // 2. Escape colons: : → \\: (double backslash + colon)
+            //    Drive letters (C:) need special handling
+            escaped = escaped.Replace(":", "\\\\:");
+
+            // 3. Escape single quotes: ' → \\' (double backslash + quote)
+            escaped = escaped.Replace("'", "\\\\'");
+
+            // 4. Escape parentheses: ( → \( and ) → \)
+            //    These are special filter syntax characters
+            escaped = escaped.Replace("(", "\\(");
+            escaped = escaped.Replace(")", "\\)");
+
+            // 5. Escape square brackets: [ → \[ and ] → \]
+            escaped = escaped.Replace("[", "\\[");
+            escaped = escaped.Replace("]", "\\]");
+
+            return escaped;
+        }
+        else
+        {
+            // Unix/Linux/macOS path escaping for FFmpeg subtitles filter
+            // Forward slashes don't need escaping, but other special characters do
+
+            var escaped = path;
+
+            // 1. Escape backslashes (rare on Unix, but could be in filenames)
+            escaped = escaped.Replace("\\", "\\\\");
+
+            // 2. Escape colons: : → \:
+            escaped = escaped.Replace(":", "\\:");
+
+            // 3. Escape single quotes: ' → \'
+            escaped = escaped.Replace("'", "\\'");
+
+            // 4. Escape parentheses
+            escaped = escaped.Replace("(", "\\(");
+            escaped = escaped.Replace(")", "\\)");
+
+            // 5. Escape square brackets
+            escaped = escaped.Replace("[", "\\[");
+            escaped = escaped.Replace("]", "\\]");
+
+            return escaped;
+        }
     }
 }

@@ -75,14 +75,51 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
     [DefaultValue(true)]
     public bool AskBeforeGeneratingSubtitles { get; set; } = true;
 
+    private SubtitleStyle _subtitleStyle = SubtitleStyle.Embedded;
+    private int _subtitleFontSize = 24;
+    private double _subtitleBackgroundOpacity = 0.75;
+
     [DefaultValue(SubtitleStyle.Embedded)]
-    public SubtitleStyle SubtitleStyle { get; set; } = SubtitleStyle.Embedded;
+    public SubtitleStyle SubtitleStyle
+    {
+        get => _subtitleStyle;
+        set
+        {
+            if (_subtitleStyle != value)
+            {
+                _subtitleStyle = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     [DefaultValue(24)]
-    public int SubtitleFontSize { get; set; } = 24;
+    public int SubtitleFontSize
+    {
+        get => _subtitleFontSize;
+        set
+        {
+            if (_subtitleFontSize != value)
+            {
+                _subtitleFontSize = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     [DefaultValue(0.75)]
-    public double SubtitleBackgroundOpacity { get; set; } = 0.75;
+    public double SubtitleBackgroundOpacity
+    {
+        get => _subtitleBackgroundOpacity;
+        set
+        {
+            if (Math.Abs(_subtitleBackgroundOpacity - value) > 0.001)
+            {
+                _subtitleBackgroundOpacity = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public SettingsService()
         : base(Program.Name) { }

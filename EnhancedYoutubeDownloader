@@ -10,7 +10,13 @@
   "LastAuthCookies": "",
   "IsUkraineSupportMessageEnabled": false,
   "AutoStartDownload": true,
-  "OpenFolderAfterDownload": true,
+  "OpenFolderAfterDownload": false,
   "DefaultDownloadPath": "",
-  "DefaultCachePath": ""
+  "DefaultCachePath": "",
+  "EnableAISubtitles": true,
+  "AISubtitleLanguage": "auto",
+  "AskBeforeGeneratingSubtitles": true,
+  "SubtitleStyle": 1,
+  "SubtitleFontSize": 20,
+  "SubtitleBackgroundOpacity": 1
 }

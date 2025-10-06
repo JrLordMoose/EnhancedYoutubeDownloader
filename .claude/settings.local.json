@@ -42,7 +42,17 @@
       "Bash(dotnet add package:*)",
       "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/yt-dlp.exe --list-formats \"https://www.youtube.com/watch?v=1R9z-AcAGYQ\")",
       "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/yt-dlp.exe --list-subs \"https://www.youtube.com/watch?v=1R9z-AcAGYQ\")",
-      "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/ffmpeg.exe -i \"/mnt/c/Users/leore/Videos/Sub Agents Claude Code Setup Guide_ 5 Essential Steps.mp4\")"
+      "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/ffmpeg.exe -i \"/mnt/c/Users/leore/Videos/Sub Agents Claude Code Setup Guide_ 5 Essential Steps.mp4\")",
+      "Bash(src/Desktop/bin/Debug/net9.0/yt-dlp.exe --list-subs \"https://www.youtube.com/watch?v=M7Roz9JEfhU\")",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:superuser.com)",
+      "WebFetch(domain:ffmpeg.org)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" clean)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" restore)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" build)",
+      "Bash(\"/mnt/c/Users/leore/Downloads/YoutubeDownloaderV2/src/Desktop/bin/Debug/net9.0/ffmpeg.exe\" -i \"Is Codex CLI Worth The Switch (from Claude Code)_.mp4\" -vf \"subtitles=''''Is Codex CLI Worth The Switch \\(from Claude Code\\)_.mp4.part.en.srt'''':force_style=''''FontName=Arial,FontSize=32,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BackColour=&H40000000,BorderStyle=4,Outline=1,Shadow=0,MarginV=20,Alignment=2''''\" -c:a copy -y \"test_burned_subtitles.mp4\" -t 10)",
+      "Bash(src/Desktop/bin/Debug/net9.0/ffmpeg.exe -i \"Is Codex CLI Worth The Switch (from Claude Code)_.mp4\" -vf \"subtitles=''''Is Codex CLI Worth The Switch \\(from Claude Code\\)_.mp4.part.en.srt'''':force_style=''''FontName=Arial,FontSize=32,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BackColour=&H40000000,BorderStyle=4,Outline=1,Shadow=0,MarginV=20,Alignment=2''''\" -c:a copy -y test_burned.mp4 -t 5)",
+      "Bash(src/Desktop/bin/Debug/net9.0/ffmpeg.exe -version)"
     ],
     "deny": [],
     "ask": []
