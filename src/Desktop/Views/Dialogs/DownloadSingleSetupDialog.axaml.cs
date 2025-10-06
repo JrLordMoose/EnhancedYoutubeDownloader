@@ -5,8 +5,14 @@ using EnhancedYoutubeDownloader.ViewModels.Dialogs;
 
 namespace EnhancedYoutubeDownloader.Views.Dialogs;
 
+/// <summary>
+/// The view for the download single setup dialog.
+/// </summary>
 public partial class DownloadSingleSetupDialog : UserControl
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DownloadSingleSetupDialog"/> class.
+    /// </summary>
     public DownloadSingleSetupDialog()
     {
         InitializeComponent();

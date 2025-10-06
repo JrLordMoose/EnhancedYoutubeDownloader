@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace EnhancedYoutubeDownloader.Framework;
 
 /// <summary>
-/// Manages Material Design snackbar notifications with queue support
+/// Manages Material Design snackbar notifications with queue support.
 /// </summary>
 public partial class SnackbarManager : ObservableObject
 {
@@ -16,21 +16,27 @@ public partial class SnackbarManager : ObservableObject
     private bool _isProcessingQueue;
 
     /// <summary>
-    /// Collection of active snackbar items. The first item is currently displayed.
+    /// Gets the collection of active snackbar items. The first item is currently displayed.
     /// </summary>
     public ObservableCollection<SnackbarItem> SnackbarQueue { get; } = new();
 
     /// <summary>
-    /// Shows a general notification snackbar
+    /// Shows a general notification snackbar.
     /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="actionText">The text for the action button.</param>
+    /// <param name="action">The action to perform when the action button is clicked.</param>
     public void Notify(string message, string? actionText = null, Action? action = null)
     {
         NotifyInfo(message, actionText, action);
     }
 
     /// <summary>
-    /// Shows a success notification
+    /// Shows a success notification.
     /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="actionText">The text for the action button.</param>
+    /// <param name="action">The action to perform when the action button is clicked.</param>
     public void NotifySuccess(string message, string? actionText = null, Action? action = null)
     {
         EnqueueSnackbar(
@@ -46,8 +52,11 @@ public partial class SnackbarManager : ObservableObject
     }
 
     /// <summary>
-    /// Shows an error notification
+    /// Shows an error notification.
     /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="actionText">The text for the action button.</param>
+    /// <param name="action">The action to perform when the action button is clicked.</param>
     public void NotifyError(string message, string? actionText = null, Action? action = null)
     {
         EnqueueSnackbar(
@@ -63,8 +72,11 @@ public partial class SnackbarManager : ObservableObject
     }
 
     /// <summary>
-    /// Shows a warning notification
+    /// Shows a warning notification.
     /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="actionText">The text for the action button.</param>
+    /// <param name="action">The action to perform when the action button is clicked.</param>
     public void NotifyWarning(string message, string? actionText = null, Action? action = null)
     {
         EnqueueSnackbar(
@@ -80,8 +92,11 @@ public partial class SnackbarManager : ObservableObject
     }
 
     /// <summary>
-    /// Shows an info notification
+    /// Shows an info notification.
     /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="actionText">The text for the action button.</param>
+    /// <param name="action">The action to perform when the action button is clicked.</param>
     public void NotifyInfo(string message, string? actionText = null, Action? action = null)
     {
         EnqueueSnackbar(
@@ -97,8 +112,10 @@ public partial class SnackbarManager : ObservableObject
     }
 
     /// <summary>
-    /// Shows a progress notification that persists until dismissed
+    /// Shows a progress notification that persists until dismissed.
     /// </summary>
+    /// <param name="message">The message to display.</param>
+    /// <param name="progress">The progress value.</param>
     public void NotifyProgress(string message, double progress)
     {
         // Check if there's already a progress notification and update it
@@ -126,7 +143,7 @@ public partial class SnackbarManager : ObservableObject
     }
 
     /// <summary>
-    /// Dismisses the currently displayed snackbar
+    /// Dismisses the currently displayed snackbar.
     /// </summary>
     public void DismissCurrent()
     {
@@ -205,39 +222,75 @@ public partial class SnackbarManager : ObservableObject
 }
 
 /// <summary>
-/// Represents a snackbar notification item
+/// Represents a snackbar notification item.
 /// </summary>
 public partial class SnackbarItem : ObservableObject
 {
+    /// <summary>
+    /// Gets or sets the message to display.
+    /// </summary>
     [ObservableProperty]
     private string _message = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the severity of the snackbar.
+    /// </summary>
     [ObservableProperty]
     private SnackbarSeverity _severity;
 
+    /// <summary>
+    /// Gets or sets the text for the action button.
+    /// </summary>
     [ObservableProperty]
     private string? _actionText;
 
+    /// <summary>
+    /// Gets or sets the action to perform when the action button is clicked.
+    /// </summary>
     [ObservableProperty]
     private Action? _action;
 
+    /// <summary>
+    /// Gets or sets the duration to display the snackbar.
+    /// </summary>
     [ObservableProperty]
     private TimeSpan? _duration;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the snackbar is a progress notification.
+    /// </summary>
     [ObservableProperty]
     private bool _isProgress;
 
+    /// <summary>
+    /// Gets or sets the progress value for progress notifications.
+    /// </summary>
     [ObservableProperty]
     private double _progress;
 }
 
 /// <summary>
-/// Snackbar severity levels with corresponding Material Design colors
+/// Defines the severity levels for snackbar notifications.
 /// </summary>
 public enum SnackbarSeverity
 {
+    /// <summary>
+    /// Informational message.
+    /// </summary>
     Info,
+
+    /// <summary>
+    /// Success message.
+    /// </summary>
     Success,
+
+    /// <summary>
+    /// Warning message.
+    /// </summary>
     Warning,
+
+    /// <summary>
+    /// Error message.
+    /// </summary>
     Error,
 }

@@ -16,6 +16,9 @@ using EnhancedYoutubeDownloader.Utils.Extensions;
 
 namespace EnhancedYoutubeDownloader.ViewModels.Components;
 
+/// <summary>
+/// The view model for the dashboard, which is the main view of the application.
+/// </summary>
 public partial class DashboardViewModel : ViewModelBase
 {
     private readonly ViewModelManager _viewModelManager;
@@ -26,6 +29,15 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly IQueryResolver _queryResolver;
     private readonly DisposableCollector _eventRoot = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DashboardViewModel"/> class.
+    /// </summary>
+    /// <param name="viewModelManager">The view model manager.</param>
+    /// <param name="snackbarManager">The snackbar manager.</param>
+    /// <param name="dialogManager">The dialog manager.</param>
+    /// <param name="settingsService">The settings service.</param>
+    /// <param name="downloadService">The download service.</param>
+    /// <param name="queryResolver">The query resolver.</param>
     public DashboardViewModel(
         ViewModelManager viewModelManager,
         SnackbarManager snackbarManager,
@@ -70,6 +82,9 @@ public partial class DashboardViewModel : ViewModelBase
         );
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the view model is busy.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsProgressIndeterminate))]
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
@@ -77,29 +92,47 @@ public partial class DashboardViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(ShowSettingsCommand))]
     public partial bool IsBusy { get; set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the progress is indeterminate.
+    /// </summary>
     public bool IsProgressIndeterminate =>
         IsBusy && Downloads.Any(d => d.Status == DownloadStatus.Started);
 
+    /// <summary>
+    /// Gets or sets the query string.
+    /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
     public partial string? Query { get; set; }
 
+    /// <summary>
+    /// Gets the collection of downloads.
+    /// </summary>
     public ObservableCollection<DownloadItem> Downloads { get; } = [];
 
     private bool CanShowAuthSetup() => !IsBusy;
 
+    /// <summary>
+    /// Shows the authentication setup dialog.
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanShowAuthSetup))]
     private async Task ShowAuthSetupAsync() =>
         await _dialogManager.ShowDialogAsync(_viewModelManager.CreateAuthSetupViewModel());
 
     private bool CanShowSettings() => !IsBusy;
 
+    /// <summary>
+    /// Shows the settings dialog.
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanShowSettings))]
     private async Task ShowSettingsAsync() =>
         await _dialogManager.ShowDialogAsync(_viewModelManager.CreateSettingsViewModel());
 
     private bool CanProcessQuery() => !IsBusy && !string.IsNullOrWhiteSpace(Query);
 
+    /// <summary>
+    /// Processes the query.
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanProcessQuery))]
     private async Task ProcessQueryAsync()
     {
@@ -285,6 +318,9 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Removes successful downloads from the list.
+    /// </summary>
     [RelayCommand]
     private void RemoveSuccessfulDownloads()
     {
@@ -297,6 +333,9 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Removes inactive downloads from the list.
+    /// </summary>
     [RelayCommand]
     private void RemoveInactiveDownloads()
     {
@@ -314,30 +353,50 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Restarts a download.
+    /// </summary>
+    /// <param name="download">The download to restart.</param>
     [RelayCommand]
     private async Task RestartDownloadAsync(DownloadItem download)
     {
         await _downloadService.RestartDownloadAsync(download);
     }
 
+    /// <summary>
+    /// Pauses a download.
+    /// </summary>
+    /// <param name="download">The download to pause.</param>
     [RelayCommand]
     private async Task PauseDownloadAsync(DownloadItem download)
     {
         await _downloadService.PauseDownloadAsync(download);
     }
 
+    /// <summary>
+    /// Resumes a download.
+    /// </summary>
+    /// <param name="download">The download to resume.</param>
     [RelayCommand]
     private async Task ResumeDownloadAsync(DownloadItem download)
     {
         await _downloadService.ResumeDownloadAsync(download);
     }
 
+    /// <summary>
+    /// Cancels a download.
+    /// </summary>
+    /// <param name="download">The download to cancel.</param>
     [RelayCommand]
     private async Task CancelDownloadAsync(DownloadItem download)
     {
         await _downloadService.CancelDownloadAsync(download);
     }
 
+    /// <summary>
+    /// Deletes a download.
+    /// </summary>
+    /// <param name="download">The download to delete.</param>
     [RelayCommand]
     private async Task DeleteDownloadAsync(DownloadItem download)
     {
@@ -382,6 +441,10 @@ public partial class DashboardViewModel : ViewModelBase
         };
     }
 
+    /// <summary>
+    /// Opens the folder containing the downloaded file.
+    /// </summary>
+    /// <param name="download">The download item.</param>
     [RelayCommand]
     private void OpenDownloadFolder(DownloadItem download)
     {
@@ -420,9 +483,6 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Shows an error dialog with categorized error information
-    /// </summary>
     private async Task ShowErrorDialogAsync(Exception exception, string context)
     {
         var errorInfo = CategorizeError(exception, context);
@@ -441,9 +501,6 @@ public partial class DashboardViewModel : ViewModelBase
         await _dialogManager.ShowDialogAsync(errorDialog);
     }
 
-    /// <summary>
-    /// Categorizes exceptions into user-friendly error types
-    /// </summary>
     private ErrorInfo CategorizeError(Exception exception, string context)
     {
         var category = exception switch
@@ -471,9 +528,6 @@ public partial class DashboardViewModel : ViewModelBase
         };
     }
 
-    /// <summary>
-    /// Gets suggested actions based on error category
-    /// </summary>
     private List<ErrorAction> GetSuggestedActions(ErrorCategory category)
     {
         return category switch
@@ -544,9 +598,6 @@ public partial class DashboardViewModel : ViewModelBase
         };
     }
 
-    /// <summary>
-    /// Sanitizes a filename by removing invalid characters.
-    /// </summary>
     private static string SanitizeFileName(string fileName)
     {
         // Get invalid filename characters
@@ -589,9 +640,6 @@ public partial class DashboardViewModel : ViewModelBase
         return fileName;
     }
 
-    /// <summary>
-    /// Handles user-selected error actions
-    /// </summary>
     private async Task HandleErrorActionAsync(string actionKey, Exception originalException)
     {
         switch (actionKey)
@@ -623,6 +671,7 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
+    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         if (disposing)

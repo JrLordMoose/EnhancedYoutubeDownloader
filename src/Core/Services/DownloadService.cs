@@ -12,6 +12,9 @@ using YoutubeExplode.Videos.ClosedCaptions;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
 
+/// <summary>
+/// Manages video downloads, including queuing, starting, pausing, resuming, and canceling.
+/// </summary>
 public class DownloadService : IDownloadService, IDisposable
 {
     private readonly ConcurrentDictionary<string, DownloadItem> _downloads = new();
@@ -23,6 +26,10 @@ public class DownloadService : IDownloadService, IDisposable
     private readonly SemaphoreSlim _downloadSemaphore;
     private readonly DownloadStateRepository _stateRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DownloadService"/> class.
+    /// </summary>
+    /// <param name="maxConcurrentDownloads">The maximum number of concurrent downloads.</param>
     public DownloadService(int maxConcurrentDownloads = 3)
     {
         // Use custom HttpClient with User-Agent header to avoid 403 errors
@@ -32,9 +39,23 @@ public class DownloadService : IDownloadService, IDisposable
         _stateRepository = new DownloadStateRepository();
     }
 
+    /// <summary>
+    /// Gets an observable that notifies when the status of a download changes.
+    /// </summary>
     public IObservable<DownloadItem> DownloadStatusChanged => _downloadStatusChanged;
+
+    /// <summary>
+    /// Gets an observable that notifies the overall download progress.
+    /// </summary>
     public IObservable<double> OverallProgress => _overallProgress;
 
+    /// <summary>
+    /// Creates a new download item.
+    /// </summary>
+    /// <param name="video">The video to download.</param>
+    /// <param name="filePath">The path to save the downloaded file.</param>
+    /// <param name="profile">The format profile to use for the download.</param>
+    /// <returns>The created download item.</returns>
     public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null)
     {
         var downloadItem = new DownloadItem
@@ -51,6 +72,11 @@ public class DownloadService : IDownloadService, IDisposable
         return Task.FromResult(downloadItem);
     }
 
+    /// <summary>
+    /// Starts a download.
+    /// </summary>
+    /// <param name="downloadItem">The download item to start.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public Task StartDownloadAsync(DownloadItem downloadItem)
     {
         if (downloadItem.Status != DownloadStatus.Queued && downloadItem.Status != DownloadStatus.Paused)
@@ -73,6 +99,11 @@ public class DownloadService : IDownloadService, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Pauses a download.
+    /// </summary>
+    /// <param name="downloadItem">The download item to pause.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task PauseDownloadAsync(DownloadItem downloadItem)
     {
         if (downloadItem.Status != DownloadStatus.Started)
@@ -96,6 +127,11 @@ public class DownloadService : IDownloadService, IDisposable
         _downloadStatusChanged.OnNext(downloadItem);
     }
 
+    /// <summary>
+    /// Resumes a paused download.
+    /// </summary>
+    /// <param name="downloadItem">The download item to resume.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task ResumeDownloadAsync(DownloadItem downloadItem)
     {
         if (downloadItem.Status != DownloadStatus.Paused)
@@ -142,6 +178,11 @@ public class DownloadService : IDownloadService, IDisposable
         _ = Task.Run(async () => await ProcessDownloadAsync(downloadItem, cts.Token));
     }
 
+    /// <summary>
+    /// Cancels a download.
+    /// </summary>
+    /// <param name="downloadItem">The download item to cancel.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task CancelDownloadAsync(DownloadItem downloadItem)
     {
         // Cancel the download operation
@@ -168,6 +209,11 @@ public class DownloadService : IDownloadService, IDisposable
         _downloadStatusChanged.OnNext(downloadItem);
     }
 
+    /// <summary>
+    /// Restarts a download.
+    /// </summary>
+    /// <param name="downloadItem">The download item to restart.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task RestartDownloadAsync(DownloadItem downloadItem)
     {
         downloadItem.Status = DownloadStatus.Queued;
@@ -196,6 +242,11 @@ public class DownloadService : IDownloadService, IDisposable
         await StartDownloadAsync(downloadItem);
     }
 
+    /// <summary>
+    /// Deletes a download.
+    /// </summary>
+    /// <param name="downloadItem">The download item to delete.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task DeleteDownloadAsync(DownloadItem downloadItem)
     {
         // Cancel if running
@@ -448,6 +499,9 @@ public class DownloadService : IDownloadService, IDisposable
         Console.WriteLine($"[CONVERTER] Download completed successfully");
     }
 
+    /// <summary>
+    /// Disposes the service and cancels any ongoing downloads.
+    /// </summary>
     public void Dispose()
     {
         foreach (var cts in _cancellationTokens.Values)

@@ -1,27 +1,27 @@
 namespace EnhancedYoutubeDownloader.Shared.Models;
 
 /// <summary>
-/// Represents the type of YouTube query result
+/// Represents the type of YouTube query result.
 /// </summary>
 public enum QueryResultKind
 {
     /// <summary>
-    /// Single video
+    /// The result is a single video.
     /// </summary>
     Video,
 
     /// <summary>
-    /// Playlist containing multiple videos
+    /// The result is a playlist containing multiple videos.
     /// </summary>
     Playlist,
 
     /// <summary>
-    /// Channel with multiple videos
+    /// The result is a channel containing multiple videos.
     /// </summary>
     Channel,
 
     /// <summary>
-    /// Search query results
+    /// The result is a list of videos from a search query.
     /// </summary>
     Search
 }

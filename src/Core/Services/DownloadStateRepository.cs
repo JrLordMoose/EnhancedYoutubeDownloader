@@ -3,11 +3,17 @@ using Microsoft.Data.Sqlite;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
 
+/// <summary>
+/// Manages the persistence of download state to a local database.
+/// </summary>
 public class DownloadStateRepository : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly string _connectionString;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DownloadStateRepository"/> class.
+    /// </summary>
     public DownloadStateRepository()
     {
         var cacheDir = Path.Combine(
@@ -41,6 +47,11 @@ public class DownloadStateRepository : IDisposable
         createTableCommand.ExecuteNonQuery();
     }
 
+    /// <summary>
+    /// Saves the state of a download item.
+    /// </summary>
+    /// <param name="downloadItem">The download item to save.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task SaveStateAsync(DownloadItem downloadItem)
     {
         try
@@ -69,6 +80,11 @@ public class DownloadStateRepository : IDisposable
         }
     }
 
+    /// <summary>
+    /// Loads the state of a download item.
+    /// </summary>
+    /// <param name="downloadId">The ID of the download.</param>
+    /// <returns>The download state, or null if not found.</returns>
     public async Task<DownloadState?> LoadStateAsync(string downloadId)
     {
         try
@@ -106,6 +122,11 @@ public class DownloadStateRepository : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// Deletes the state of a download item.
+    /// </summary>
+    /// <param name="downloadId">The ID of the download.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task DeleteStateAsync(string downloadId)
     {
         try
@@ -122,6 +143,10 @@ public class DownloadStateRepository : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets all saved download states.
+    /// </summary>
+    /// <returns>A list of all download states.</returns>
     public async Task<List<DownloadState>> GetAllStatesAsync()
     {
         var states = new List<DownloadState>();
@@ -159,20 +184,50 @@ public class DownloadStateRepository : IDisposable
         return states;
     }
 
+    /// <summary>
+    /// Disposes the database connection.
+    /// </summary>
     public void Dispose()
     {
         _connection?.Dispose();
     }
 }
 
+/// <summary>
+/// Represents the persisted state of a download.
+/// </summary>
 public class DownloadState
 {
+    /// <summary>
+    /// Gets or sets the download ID.
+    /// </summary>
     public required string DownloadId { get; init; }
+    /// <summary>
+    /// Gets or sets the video ID.
+    /// </summary>
     public required string VideoId { get; init; }
+    /// <summary>
+    /// Gets or sets the final file path.
+    /// </summary>
     public required string FilePath { get; init; }
+    /// <summary>
+    /// Gets or sets the partial file path.
+    /// </summary>
     public string? PartialFilePath { get; init; }
+    /// <summary>
+    /// Gets or sets the number of bytes downloaded.
+    /// </summary>
     public long BytesDownloaded { get; init; }
+    /// <summary>
+    /// Gets or sets the total number of bytes to download.
+    /// </summary>
     public long TotalBytes { get; init; }
+    /// <summary>
+    /// Gets or sets the download status.
+    /// </summary>
     public DownloadStatus Status { get; init; }
+    /// <summary>
+    /// Gets or sets the last updated timestamp.
+    /// </summary>
     public DateTime LastUpdated { get; init; }
 }

@@ -5,12 +5,18 @@ using Microsoft.Data.Sqlite;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
 
+/// <summary>
+/// Provides caching services for video metadata to reduce redundant API calls.
+/// </summary>
 public class CacheService : ICacheService, IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly string _connectionString;
     private readonly JsonSerializerOptions _jsonOptions;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CacheService"/> class.
+    /// </summary>
     public CacheService()
     {
         var cacheDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EnhancedYoutubeDownloader");
@@ -43,6 +49,11 @@ public class CacheService : ICacheService, IDisposable
         createTableCommand.ExecuteNonQuery();
     }
 
+    /// <summary>
+    /// Gets cached video metadata by video ID.
+    /// </summary>
+    /// <param name="videoId">The ID of the video.</param>
+    /// <returns>The cached video metadata, or null if not found or expired.</returns>
     public async Task<CachedVideo?> GetVideoMetadataAsync(string videoId)
     {
         try
@@ -71,6 +82,13 @@ public class CacheService : ICacheService, IDisposable
         return null;
     }
 
+    /// <summary>
+    /// Sets cached video metadata.
+    /// </summary>
+    /// <param name="videoId">The ID of the video.</param>
+    /// <param name="video">The video metadata to cache.</param>
+    /// <param name="expiration">The cache expiration timespan. If null, the cache does not expire.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task SetVideoMetadataAsync(string videoId, CachedVideo video, TimeSpan? expiration = null)
     {
         try
@@ -96,16 +114,21 @@ public class CacheService : ICacheService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Checks if video metadata is cached.
+    /// </summary>
+    /// <param name="videoId">The ID of the video.</param>
+    /// <returns>True if the metadata is cached and not expired, false otherwise.</returns>
     public async Task<bool> IsVideoMetadataCachedAsync(string videoId)
     {
         try
         {
             using var command = _connection.CreateCommand();
             command.CommandText = @"
-                SELECT COUNT(*) FROM VideoMetadata 
-                WHERE VideoId = @videoId 
+                SELECT COUNT(*) FROM VideoMetadata
+                WHERE VideoId = @videoId
                 AND (ExpiresAt IS NULL OR ExpiresAt > @now)";
-            
+
             command.Parameters.AddWithValue("@videoId", videoId);
             command.Parameters.AddWithValue("@now", DateTime.UtcNow);
 
@@ -118,6 +141,10 @@ public class CacheService : ICacheService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Clears the entire cache.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task ClearCacheAsync()
     {
         try
@@ -132,6 +159,10 @@ public class CacheService : ICacheService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Clears expired cache entries.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task ClearExpiredCacheAsync()
     {
         try
@@ -147,6 +178,9 @@ public class CacheService : ICacheService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Disposes the database connection.
+    /// </summary>
     public void Dispose()
     {
         _connection?.Dispose();

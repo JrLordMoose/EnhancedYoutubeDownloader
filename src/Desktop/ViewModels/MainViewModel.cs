@@ -12,18 +12,37 @@ using EnhancedYoutubeDownloader.ViewModels.Components;
 
 namespace EnhancedYoutubeDownloader.ViewModels;
 
+/// <summary>
+/// The main view model for the application.
+/// </summary>
 public partial class MainViewModel : ViewModelBase
 {
     private readonly ViewModelManager _viewModelManager;
     private readonly SettingsService _settingsService;
     private readonly UpdateService? _updateService;
 
+    /// <summary>
+    /// Gets the title of the application window.
+    /// </summary>
     public string Title { get; } = $"{Program.Name} v{Program.VersionString}";
 
+    /// <summary>
+    /// Gets the dashboard view model.
+    /// </summary>
     public DashboardViewModel Dashboard { get; }
 
+    /// <summary>
+    /// Gets the snackbar manager.
+    /// </summary>
     public SnackbarManager SnackbarManager { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+    /// </summary>
+    /// <param name="viewModelManager">The view model manager.</param>
+    /// <param name="snackbarManager">The snackbar manager.</param>
+    /// <param name="settingsService">The settings service.</param>
+    /// <param name="updateService">The update service.</param>
     public MainViewModel(
         ViewModelManager viewModelManager,
         SnackbarManager snackbarManager,
@@ -116,6 +135,9 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Initializes the view model.
+    /// </summary>
     [RelayCommand]
     private async Task InitializeAsync()
     {
@@ -126,6 +148,7 @@ public partial class MainViewModel : ViewModelBase
         // await CheckForUpdatesAsync();
     }
 
+    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         if (disposing)

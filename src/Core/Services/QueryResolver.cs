@@ -8,6 +8,9 @@ using YoutubeExplode.Videos;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
 
+/// <summary>
+/// Resolves user queries into YouTube videos, playlists, or channels.
+/// </summary>
 public class QueryResolver : IQueryResolver
 {
     private readonly YoutubeClient _youtubeClient;
@@ -33,12 +36,21 @@ public class QueryResolver : IQueryResolver
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="QueryResolver"/> class.
+    /// </summary>
+    /// <param name="cacheService">The cache service to use for video metadata.</param>
     public QueryResolver(ICacheService cacheService)
     {
         _youtubeClient = new YoutubeClient();
         _cacheService = cacheService;
     }
 
+    /// <summary>
+    /// Resolves a query to a YouTube video, playlist, channel, or search result.
+    /// </summary>
+    /// <param name="query">The query to resolve. Can be a URL or a search term.</param>
+    /// <returns>A <see cref="QueryResult"/> containing the resolved information.</returns>
     public async Task<QueryResult> ResolveAsync(string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -85,6 +97,11 @@ public class QueryResolver : IQueryResolver
         return await ResolveSearchAsync(query);
     }
 
+    /// <summary>
+    /// Checks if a query is a YouTube URL.
+    /// </summary>
+    /// <param name="query">The query to check.</param>
+    /// <returns>True if the query is a YouTube URL, false otherwise.</returns>
     public bool IsYouTubeUrl(string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -94,6 +111,11 @@ public class QueryResolver : IQueryResolver
                query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Extracts a video ID from a URL.
+    /// </summary>
+    /// <param name="url">The URL to extract the video ID from.</param>
+    /// <returns>The video ID, or null if not found.</returns>
     public string? ExtractVideoId(string url)
     {
         if (string.IsNullOrWhiteSpace(url))
@@ -103,6 +125,11 @@ public class QueryResolver : IQueryResolver
         return match.Success ? match.Groups[1].Value : null;
     }
 
+    /// <summary>
+    /// Extracts a playlist ID from a URL.
+    /// </summary>
+    /// <param name="url">The URL to extract the playlist ID from.</param>
+    /// <returns>The playlist ID, or null if not found.</returns>
     public string? ExtractPlaylistId(string url)
     {
         if (string.IsNullOrWhiteSpace(url))
@@ -112,6 +139,11 @@ public class QueryResolver : IQueryResolver
         return match.Success ? match.Groups[1].Value : null;
     }
 
+    /// <summary>
+    /// Extracts a channel ID from a URL.
+    /// </summary>
+    /// <param name="url">The URL to extract the channel ID from.</param>
+    /// <returns>The channel ID, or null if not found.</returns>
     public string? ExtractChannelId(string url)
     {
         if (string.IsNullOrWhiteSpace(url))

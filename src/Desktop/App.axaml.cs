@@ -22,6 +22,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EnhancedYoutubeDownloader;
 
+/// <summary>
+/// The main application class.
+/// </summary>
 public class App : Application, IDisposable
 {
     private readonly DisposableCollector _eventRoot = new();
@@ -29,6 +32,9 @@ public class App : Application, IDisposable
     private readonly SettingsService _settingsService;
     private readonly MainViewModel _mainViewModel;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="App"/> class.
+    /// </summary>
     public App()
     {
         _host = Host.CreateDefaultBuilder()
@@ -97,6 +103,9 @@ public class App : Application, IDisposable
         services.AddTransient<ErrorDialogViewModel>();
     }
 
+    /// <summary>
+    /// Initializes the application by loading XAML.
+    /// </summary>
     public override void Initialize()
     {
         base.Initialize();
@@ -104,6 +113,9 @@ public class App : Application, IDisposable
         AvaloniaXamlLoader.Load(this);
     }
 
+    /// <summary>
+    /// Registers services for the application.
+    /// </summary>
     public override void RegisterServices()
     {
         base.RegisterServices();
@@ -126,6 +138,9 @@ public class App : Application, IDisposable
                 : Theme.Create(Theme.Dark, Color.Parse("#E8E8E8"), Color.Parse("#F9A825"));
     }
 
+    /// <summary>
+    /// Called when the framework initialization is complete.
+    /// </summary>
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -144,6 +159,9 @@ public class App : Application, IDisposable
         // Re-initialize the theme when the system theme changes
         InitializeTheme();
 
+    /// <summary>
+    /// Disposes the application resources.
+    /// </summary>
     public void Dispose()
     {
         _eventRoot.Dispose();

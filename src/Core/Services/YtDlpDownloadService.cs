@@ -9,6 +9,9 @@ using YoutubeDLSharp.Options;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
 
+/// <summary>
+/// A download service that uses yt-dlp to download videos.
+/// </summary>
 public class YtDlpDownloadService : IDownloadService, IDisposable
 {
     private readonly ConcurrentDictionary<string, DownloadItem> _downloads = new();
@@ -19,6 +22,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     private readonly SemaphoreSlim _downloadSemaphore;
     private readonly DownloadStateRepository _stateRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="YtDlpDownloadService"/> class.
+    /// </summary>
+    /// <param name="maxConcurrentDownloads">The maximum number of concurrent downloads.</param>
     public YtDlpDownloadService(int maxConcurrentDownloads = 3)
     {
         // Initialize YoutubeDL with path to yt-dlp.exe
@@ -40,9 +47,13 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         _stateRepository = new DownloadStateRepository();
     }
 
+    /// <inheritdoc />
     public IObservable<DownloadItem> DownloadStatusChanged => _downloadStatusChanged;
+
+    /// <inheritdoc />
     public IObservable<double> OverallProgress => _overallProgress;
 
+    /// <inheritdoc />
     public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null)
     {
         Console.WriteLine($"[YTDLP] Creating download for: {video.Title}");
@@ -63,6 +74,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         return Task.FromResult(downloadItem);
     }
 
+    /// <inheritdoc />
     public Task StartDownloadAsync(DownloadItem downloadItem)
     {
         if (downloadItem.Status != DownloadStatus.Queued && downloadItem.Status != DownloadStatus.Paused)
@@ -90,6 +102,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public async Task PauseDownloadAsync(DownloadItem downloadItem)
     {
         if (downloadItem.Status != DownloadStatus.Started)
@@ -118,6 +131,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         _downloadStatusChanged.OnNext(downloadItem);
     }
 
+    /// <inheritdoc />
     public async Task ResumeDownloadAsync(DownloadItem downloadItem)
     {
         if (downloadItem.Status != DownloadStatus.Paused)
@@ -168,6 +182,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         _ = Task.Run(async () => await ProcessDownloadAsync(downloadItem, cts.Token));
     }
 
+    /// <inheritdoc />
     public async Task CancelDownloadAsync(DownloadItem downloadItem)
     {
         Console.WriteLine($"[YTDLP] Canceling download: {downloadItem.Id}");
@@ -199,6 +214,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         _downloadStatusChanged.OnNext(downloadItem);
     }
 
+    /// <inheritdoc />
     public async Task RestartDownloadAsync(DownloadItem downloadItem)
     {
         Console.WriteLine($"[YTDLP] Restarting download: {downloadItem.Id}");
@@ -232,6 +248,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         await StartDownloadAsync(downloadItem);
     }
 
+    /// <inheritdoc />
     public async Task DeleteDownloadAsync(DownloadItem downloadItem)
     {
         Console.WriteLine($"[YTDLP] Deleting download: {downloadItem.Id}");
@@ -538,6 +555,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         };
     }
 
+    /// <summary>
+    /// Disposes the service and cancels any ongoing downloads.
+    /// </summary>
     public void Dispose()
     {
         foreach (var cts in _cancellationTokens.Values)

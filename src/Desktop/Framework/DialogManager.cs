@@ -12,10 +12,19 @@ using EnhancedYoutubeDownloader.Utils.Extensions;
 
 namespace EnhancedYoutubeDownloader.Framework;
 
+/// <summary>
+/// Manages showing dialogs and file pickers.
+/// </summary>
 public class DialogManager : IDisposable
 {
     private readonly SemaphoreSlim _dialogLock = new(1, 1);
 
+    /// <summary>
+    /// Shows a dialog and returns a result.
+    /// </summary>
+    /// <typeparam name="T">The type of the dialog result.</typeparam>
+    /// <param name="dialog">The dialog view model.</param>
+    /// <returns>The dialog result.</returns>
     public async Task<T?> ShowDialogAsync<T>(DialogViewModelBase<T> dialog)
     {
         await _dialogLock.WaitAsync();
@@ -47,11 +56,22 @@ public class DialogManager : IDisposable
         }
     }
 
+    /// <summary>
+    /// Shows a dialog.
+    /// </summary>
+    /// <param name="dialog">The dialog view model.</param>
+    /// <returns>The dialog result.</returns>
     public async Task<bool?> ShowDialogAsync(DialogViewModelBase dialog)
     {
         return await ShowDialogAsync<bool?>(dialog);
     }
 
+    /// <summary>
+    /// Shows an open file dialog.
+    /// </summary>
+    /// <param name="title">The dialog title.</param>
+    /// <param name="filters">The file filters.</param>
+    /// <returns>The selected file path.</returns>
     public Task<string?> ShowOpenFileDialogAsync(string title, string[] filters)
     {
         // This is a simplified implementation
@@ -59,6 +79,13 @@ public class DialogManager : IDisposable
         return Task.FromResult<string?>(null);
     }
 
+    /// <summary>
+    /// Shows a save file dialog.
+    /// </summary>
+    /// <param name="title">The dialog title.</param>
+    /// <param name="filters">The file filters.</param>
+    /// <param name="defaultName">The default file name.</param>
+    /// <returns>The selected file path.</returns>
     public Task<string?> ShowSaveFileDialogAsync(string title, string[] filters, string defaultName)
     {
         // This is a simplified implementation
@@ -66,6 +93,11 @@ public class DialogManager : IDisposable
         return Task.FromResult<string?>(null);
     }
 
+    /// <summary>
+    /// Shows a folder dialog.
+    /// </summary>
+    /// <param name="title">The dialog title.</param>
+    /// <returns>The selected folder path.</returns>
     public Task<string?> ShowFolderDialogAsync(string title)
     {
         // This is a simplified implementation
@@ -143,9 +175,6 @@ public class DialogManager : IDisposable
         return result.TryGetLocalPath(out var path) ? path : null;
     }
 
-    /// <summary>
-    /// Tries to get a suggested folder for file operations (user's Videos folder or Documents).
-    /// </summary>
     private static async Task<IStorageFolder?> TryGetSuggestedFolderAsync(
         IStorageProvider storageProvider
     )
@@ -174,5 +203,8 @@ public class DialogManager : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// Disposes the dialog manager.
+    /// </summary>
     public void Dispose() => _dialogLock.Dispose();
 }

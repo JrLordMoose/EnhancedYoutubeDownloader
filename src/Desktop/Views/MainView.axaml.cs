@@ -5,8 +5,14 @@ using EnhancedYoutubeDownloader.ViewModels;
 
 namespace EnhancedYoutubeDownloader.Views;
 
+/// <summary>
+/// The main window of the application.
+/// </summary>
 public partial class MainView : Window
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainView"/> class.
+    /// </summary>
     public MainView()
     {
         InitializeComponent();

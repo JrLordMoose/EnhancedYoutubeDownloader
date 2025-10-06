@@ -4,8 +4,21 @@ using System.Runtime.CompilerServices;
 
 namespace EnhancedYoutubeDownloader.Utils.Extensions;
 
+/// <summary>
+/// Provides extension methods for objects that implement <see cref="INotifyPropertyChanged"/>.
+/// </summary>
 public static class NotifyPropertyChangedExtensions
 {
+    /// <summary>
+    /// Watches a property for changes and executes a callback when the property value changes.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the source object.</typeparam>
+    /// <typeparam name="TProperty">The type of the property to watch.</typeparam>
+    /// <param name="source">The source object.</param>
+    /// <param name="propertySelector">A function that selects the property to watch.</param>
+    /// <param name="callback">The callback to execute when the property value changes.</param>
+    /// <param name="callCallbackImmediately">Whether to call the callback immediately upon registration.</param>
+    /// <returns>An <see cref="IDisposable"/> that can be used to stop watching the property.</returns>
     public static IDisposable WatchProperty<TSource, TProperty>(
         this TSource source,
         Func<TSource, TProperty> propertySelector,
