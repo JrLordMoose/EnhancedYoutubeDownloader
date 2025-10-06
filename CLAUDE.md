@@ -45,7 +45,7 @@ Failure to update all locations will cause critical bugs like the v0.3.2-v0.3.5 
    [Download EnhancedYoutubeDownloader-Setup-vX.X.X.exe](https://github.com/.../vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe)
    ```
 
-6. **GitHub Release** - Include direct download link in release notes
+6. **GitHub Release** - Include direct download link in release notes AND upload ZIP package
    ```markdown
    **[Download EnhancedYoutubeDownloader-Setup-vX.X.X.exe](https://github.com/.../vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe)** (XX MB)
    ```
@@ -56,16 +56,22 @@ Failure to update all locations will cause critical bugs like the v0.3.2-v0.3.5 
 3. `build-installer.ps1` (build script)
 4. `SettingsDialog.axaml` (UI display)
 5. `README.md` (documentation)
-6. Build installer with `build-installer.ps1`
-7. Create GitHub release with direct download link
+6. Build installer with `build-installer.ps1` (creates both .exe and .zip)
+7. Create GitHub release with **BOTH files**:
+   - `EnhancedYoutubeDownloader-Setup-vX.X.X.exe` (for new users)
+   - `EnhancedYoutubeDownloader-X.X.X.zip` (for auto-updates)
+8. Include direct download link in release notes
 
 ### Verification Steps:
 - [ ] Build completes successfully
+- [ ] Both .exe installer AND .zip package created
 - [ ] Installer shows correct version in filename
+- [ ] ZIP package shows correct version in filename
 - [ ] Title bar shows correct version after install
 - [ ] Settings > About shows correct version
 - [ ] README download link points to new version
 - [ ] GitHub release has direct download link
+- [ ] GitHub release includes both .exe and .zip files
 
 **NEVER skip these updates! Version mismatches cause critical bugs that invalidate all bug fixes.**
 

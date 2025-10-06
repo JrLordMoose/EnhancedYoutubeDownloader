@@ -122,8 +122,8 @@ public partial class MainViewModel : ViewModelBase
         await ShowUkraineSupportMessageAsync();
         await ShowDevelopmentBuildMessageAsync();
         await ShowFFmpegMessageAsync();
-        // Temporarily disabled until first GitHub release is published
-        // await CheckForUpdatesAsync();
+        // Check for updates on startup
+        await CheckForUpdatesAsync();
     }
 
     protected override void Dispose(bool disposing)

@@ -36,7 +36,8 @@
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File Download-YtDlp.ps1)",
       "Bash(git stash:*)",
       "Bash(whereis:*)",
-      "Bash(release/EnhancedYoutubeDownloader-Setup-v0.3.2.exe)"
+      "Bash(release/EnhancedYoutubeDownloader-Setup-v0.3.2.exe)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

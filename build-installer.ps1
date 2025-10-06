@@ -177,6 +177,29 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "  Installer built successfully" -ForegroundColor Green
 Write-Host ""
 
+# Step 7: Create ZIP package for auto-updates
+Write-Host "[7/7] Creating ZIP package for auto-updates..." -ForegroundColor Yellow
+$ZipFileName = "EnhancedYoutubeDownloader-$Version.zip"
+$ZipFilePath = Join-Path $ReleaseDir $ZipFileName
+
+if (Test-Path $ZipFilePath) {
+    Remove-Item $ZipFilePath -Force
+    Write-Host "  - Removed existing ZIP file" -ForegroundColor Gray
+}
+
+# Create ZIP from publish directory
+Write-Host "  - Compressing publish directory to ZIP..." -ForegroundColor Gray
+Compress-Archive -Path "$PublishDir\*" -DestinationPath $ZipFilePath -CompressionLevel Optimal
+
+if (Test-Path $ZipFilePath) {
+    $ZipSize = [math]::Round((Get-Item $ZipFilePath).Length / 1MB, 2)
+    Write-Host "  - ZIP package created: $ZipSize MB" -ForegroundColor Green
+} else {
+    Write-Host "  ERROR: Failed to create ZIP package" -ForegroundColor Red
+    exit 1
+}
+Write-Host ""
+
 # Display results
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host "Build completed successfully!" -ForegroundColor Green
@@ -196,4 +219,14 @@ if ($InstallerFiles.Count -gt 0) {
 }
 
 Write-Host ""
-Write-Host "You can now distribute the installer to users!" -ForegroundColor Green
+if (Test-Path $ZipFilePath) {
+    Write-Host "Auto-update package created:" -ForegroundColor Cyan
+    Write-Host "  File: $ZipFileName" -ForegroundColor White
+    Write-Host "  Size: $ZipSize MB" -ForegroundColor White
+    Write-Host "  Path: $ZipFilePath" -ForegroundColor White
+}
+
+Write-Host ""
+Write-Host "Distribution files ready:" -ForegroundColor Green
+Write-Host "  - .EXE installer for new users" -ForegroundColor White
+Write-Host "  - .ZIP package for auto-updates" -ForegroundColor White
