@@ -333,6 +333,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 WriteSubs = profile.IncludeSubtitles,
                 EmbedSubs = profile.IncludeSubtitles,
                 SubLangs = "en",
+                SubFormat = profile.IncludeSubtitles ? "srt/best" : null, // Convert to SRT to avoid formatting codes
 
                 // Metadata and thumbnail embedding (not supported by WebM)
                 EmbedMetadata = profile.IncludeTags && profile.Container != "webm",
