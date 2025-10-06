@@ -8,6 +8,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Failure to update all locations will cause critical bugs like the v0.3.2-v0.3.5 incident where the application version remained at 0.3.1 despite installer showing correct version, causing all bug fixes to not be compiled into the binary.
 
+## ⚠️ CRITICAL: Auto-Update Requires ZIP File!
+
+**NEVER forget to upload the ZIP file to GitHub releases!**
+
+The auto-update system (Onova) REQUIRES a ZIP package to function. Without it:
+- ❌ Users won't receive auto-update notifications
+- ❌ The "Update Available" dialog won't appear
+- ❌ Users stay on old versions with bugs
+- ❌ Update system completely breaks
+
+**ALWAYS upload BOTH files to every release:**
+1. `EnhancedYoutubeDownloader-Setup-vX.X.X.exe` - For new installations
+2. `EnhancedYoutubeDownloader-X.X.X.zip` - **FOR AUTO-UPDATES** (CRITICAL!)
+
+The build-installer.ps1 script creates BOTH files automatically. YOU MUST UPLOAD BOTH!
+
 ### Required Updates for Every Release:
 
 1. **`Directory.Build.props`** (line 4) - **THE SOURCE OF TRUTH**
@@ -62,18 +78,48 @@ Failure to update all locations will cause critical bugs like the v0.3.2-v0.3.5 
    - `EnhancedYoutubeDownloader-X.X.X.zip` (for auto-updates)
 8. Include direct download link in release notes
 
-### Verification Steps:
-- [ ] Build completes successfully
-- [ ] Both .exe installer AND .zip package created
-- [ ] Installer shows correct version in filename
-- [ ] ZIP package shows correct version in filename
-- [ ] Title bar shows correct version after install
-- [ ] Settings > About shows correct version
-- [ ] README download link points to new version
-- [ ] GitHub release has direct download link
-- [ ] GitHub release includes both .exe and .zip files
+### 📦 Release File Organization System
 
-**NEVER skip these updates! Version mismatches cause critical bugs that invalidate all bug fixes.**
+**CRITICAL: GitHub Release MUST contain exactly TWO files:**
+
+#### File 1: Windows Installer (for new users)
+```
+EnhancedYoutubeDownloader-Setup-vX.X.X.exe
+```
+- **Purpose**: Fresh installations for new users
+- **Created by**: `build-installer.ps1` script
+- **Location**: `release/EnhancedYoutubeDownloader-Setup-vX.X.X.exe`
+- **Size**: ~83 MB (self-contained with .NET runtime, FFmpeg, yt-dlp)
+- **Upload command**: `gh release upload vX.X.X release/EnhancedYoutubeDownloader-Setup-vX.X.X.exe`
+
+#### File 2: ZIP Package (for auto-updates) ⚠️ CRITICAL
+```
+EnhancedYoutubeDownloader-X.X.X.zip
+```
+- **Purpose**: **AUTO-UPDATE SYSTEM** (Onova requires this!)
+- **Created by**: `build-installer.ps1` script (automatic)
+- **Location**: `release/EnhancedYoutubeDownloader-X.X.X.zip`
+- **Size**: ~108 MB (published binaries)
+- **Upload command**: `gh release upload vX.X.X release/EnhancedYoutubeDownloader-X.X.X.zip`
+- **⚠️ WITHOUT THIS FILE**: Users won't receive update notifications!
+
+### Verification Checklist (MUST complete ALL):
+- [ ] Build completes successfully (`build-installer.ps1 -Version "X.X.X"`)
+- [ ] **BOTH files created** in `release/` folder
+  - [ ] `EnhancedYoutubeDownloader-Setup-vX.X.X.exe` exists (~83 MB)
+  - [ ] `EnhancedYoutubeDownloader-X.X.X.zip` exists (~108 MB)
+- [ ] Filenames match version exactly (no typos!)
+- [ ] Create GitHub release: `gh release create vX.X.X`
+- [ ] **Upload BOTH files to release**:
+  - [ ] `gh release upload vX.X.X release/EnhancedYoutubeDownloader-Setup-vX.X.X.exe`
+  - [ ] `gh release upload vX.X.X release/EnhancedYoutubeDownloader-X.X.X.zip` ⚠️
+- [ ] Verify release has 2 assets: `gh release view vX.X.X`
+- [ ] Update release notes with direct download links (both files)
+- [ ] Test: Install EXE and verify version in title bar
+- [ ] Test: Check Settings > About shows correct version
+- [ ] Test: Verify auto-update check works (check for updates in app)
+
+**NEVER skip these steps! Missing ZIP = broken auto-updates for ALL users!**
 
 ---
 
