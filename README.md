@@ -44,7 +44,7 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 
 #### Windows
 Download and run the installer:
-1. Download `EnhancedYoutubeDownloader-Setup-v1.0.0.exe` from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page
+1. Download `EnhancedYoutubeDownloader-Setup-v0.3.1.exe` from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page
 2. Run the installer and follow the setup wizard
 3. Choose installation options:
    - ✅ Create desktop shortcut (default: checked)
@@ -56,6 +56,7 @@ Download and run the installer:
 - Start Menu integration with uninstall shortcut
 - Add/Remove Programs integration
 - Smart uninstaller with optional data cleanup
+- FFmpeg bundled for video conversion (39 MB total)
 
 #### Other Platforms
 Download the appropriate package for your platform from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page.
@@ -115,7 +116,7 @@ dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x6
 # 2. Build installer with Inno Setup
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-# Installer output: release/EnhancedYoutubeDownloader-Setup-v1.0.0.exe
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.3.1.exe
 ```
 
 **Installer Features:**

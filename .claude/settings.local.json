@@ -8,7 +8,14 @@
       "Bash(gh release create:*)",
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1)",
       "Bash(gh release upload:*)",
-      "Bash(gh release edit:*)"
+      "Bash(gh release edit:*)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -Command \"Start-Process ''C:\\Users\\leore\\Downloads\\YoutubeDownloaderV2\\src\\Desktop\\bin\\Release\\net9.0\\win-x64\\publish\\EnhancedYoutubeDownloader.exe''\")",
+      "Bash(git add:*)",
+      "Bash(gh release view:*)",
+      "Bash(gh release:*)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.3.1\")",
+      "Bash(taskkill:*)",
+      "Bash(/mnt/c/Windows/System32/taskkill.exe /F /IM EnhancedYoutubeDownloader.exe)"
     ],
     "deny": [],
     "ask": []
