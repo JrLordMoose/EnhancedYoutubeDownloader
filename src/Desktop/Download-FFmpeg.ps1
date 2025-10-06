@@ -31,33 +31,85 @@ function Get-PlatformInfo {
 
 function Download-FFmpeg {
     $platformInfo = Get-PlatformInfo
-    $downloadUrl = "https://github.com/FFmpegBin/FFmpegBin/releases/download/7.1.1/ffmpeg-$platformInfo.zip"
-    $outputFile = Join-Path $OutputPath "ffmpeg.zip"
-    
-    Write-Host "Downloading FFmpeg for platform: $platformInfo"
-    Write-Host "URL: $downloadUrl"
-    
-    try {
-        Invoke-WebRequest -Uri $downloadUrl -OutFile $outputFile -UseBasicParsing
-        Write-Host "Download completed successfully"
-        
-        # Extract the archive
-        Expand-Archive -Path $outputFile -DestinationPath $OutputPath -Force
-        Remove-Item $outputFile -Force
-        
-        # Make executable on Unix systems
-        if ($IsLinux -or $IsMacOS) {
+
+    # Use proper FFmpeg builds from gyan.dev (Windows) or official sources
+    if ($platformInfo -like "win-*") {
+        # Download from gyan.dev - reliable Windows FFmpeg builds
+        $downloadUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+        $outputFile = Join-Path $OutputPath "ffmpeg.zip"
+        $extractPath = Join-Path $OutputPath "ffmpeg-temp"
+
+        Write-Host "Downloading FFmpeg for platform: $platformInfo"
+        Write-Host "URL: $downloadUrl"
+        Write-Host "This may take a few minutes (60-80 MB download)..."
+
+        try {
+            # Download FFmpeg
+            Invoke-WebRequest -Uri $downloadUrl -OutFile $outputFile -UseBasicParsing
+            Write-Host "Download completed successfully"
+
+            # Extract the archive
+            Write-Host "Extracting FFmpeg..."
+            Expand-Archive -Path $outputFile -DestinationPath $extractPath -Force
+
+            # Find ffmpeg.exe in the extracted folder (usually in bin subdirectory)
+            $ffmpegExe = Get-ChildItem -Path $extractPath -Filter "ffmpeg.exe" -Recurse | Select-Object -First 1
+
+            if ($ffmpegExe) {
+                # Copy ffmpeg.exe to output directory
+                Copy-Item $ffmpegExe.FullName -Destination (Join-Path $OutputPath "ffmpeg.exe") -Force
+                Write-Host "FFmpeg copied to: $OutputPath"
+
+                # Verify the file size
+                $fileSize = (Get-Item (Join-Path $OutputPath "ffmpeg.exe")).Length / 1MB
+                Write-Host "FFmpeg size: $([math]::Round($fileSize, 2)) MB"
+
+                if ($fileSize -lt 50) {
+                    throw "FFmpeg file is too small ($([math]::Round($fileSize, 2)) MB). Expected at least 50 MB."
+                }
+            } else {
+                throw "Could not find ffmpeg.exe in the downloaded archive"
+            }
+
+            # Cleanup
+            Remove-Item $outputFile -Force
+            Remove-Item $extractPath -Recurse -Force
+
+            Write-Host "FFmpeg extracted and configured successfully"
+        }
+        catch {
+            Write-Error "Failed to download or extract FFmpeg: $_"
+            throw
+        }
+    }
+    else {
+        # For non-Windows platforms, try the FFmpegBin repo
+        $downloadUrl = "https://github.com/FFmpegBin/FFmpegBin/releases/download/7.1.1/ffmpeg-$platformInfo.zip"
+        $outputFile = Join-Path $OutputPath "ffmpeg.zip"
+
+        Write-Host "Downloading FFmpeg for platform: $platformInfo"
+        Write-Host "URL: $downloadUrl"
+
+        try {
+            Invoke-WebRequest -Uri $downloadUrl -OutFile $outputFile -UseBasicParsing
+            Write-Host "Download completed successfully"
+
+            # Extract the archive
+            Expand-Archive -Path $outputFile -DestinationPath $OutputPath -Force
+            Remove-Item $outputFile -Force
+
+            # Make executable on Unix systems
             $ffmpegPath = Join-Path $OutputPath "ffmpeg"
             if (Test-Path $ffmpegPath) {
                 chmod +x $ffmpegPath
             }
+
+            Write-Host "FFmpeg extracted and configured successfully"
         }
-        
-        Write-Host "FFmpeg extracted and configured successfully"
-    }
-    catch {
-        Write-Error "Failed to download or extract FFmpeg: $_"
-        throw
+        catch {
+            Write-Error "Failed to download or extract FFmpeg: $_"
+            throw
+        }
     }
 }
 
