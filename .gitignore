@@ -58,6 +58,10 @@ src/**/bin/
 src/**/obj/
 scripts/
 
+# User folders (downloads, cache, settings)
+**/Downloads/
+**/Cache/
+
 # Misc
 *.swp
 *.swo
