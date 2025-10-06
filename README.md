@@ -4,6 +4,11 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 
 ## 🌐 [View Landing Page](https://jrlordmoose.github.io/EnhancedYoutubeDownloader/)
 
+<br>
+<img width="1920" height="888" alt="ytdownloader-landing-page-hero-image" src="https://github.com/user-attachments/assets/e6610ba7-984a-429c-8473-5cac8064df83" />
+</br>
+<p>&nbsp;</p>
+
 Experience our professional landing page featuring:
 - Modern glassmorphism design with animated gradients
 - Interactive 3D mockups and smooth animations
@@ -11,7 +16,8 @@ Experience our professional landing page featuring:
 - Easy installation guide
 
 <br>
-<img width="1126" height="754" alt="enhanced_ytdownloader_screenshot" src="https://github.com/user-attachments/assets/12869c5f-3c74-4778-8658-85c0d2370ba5" />
+<img width="1193" height="665" alt="ytdownloader-app-branded-preview-image" src="https://github.com/user-attachments/assets/e5adfbf5-1044-4468-bb14-43ce6ada46e9" />
+
 <br>
 
 ## Features
@@ -247,4 +253,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
 
 - [Material Design](https://material.io/) for design system
+
 
