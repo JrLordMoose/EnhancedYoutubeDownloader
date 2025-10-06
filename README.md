@@ -44,7 +44,7 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.3.7.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.3.7/EnhancedYoutubeDownloader-Setup-v0.3.7.exe)** (79.72 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.3.9.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/latest)** (~80 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
@@ -79,8 +79,60 @@ You may see a red warning screen saying "Windows protected your PC".
 - FFmpeg + yt-dlp bundled for video download and conversion (80 MB total)
 - Dependency validation on startup with download links
 
-#### Other Platforms
-Download the appropriate package for your platform from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page.
+#### Mac & macOS
+Currently, Mac support is experimental. To run Enhanced YouTube Downloader on Mac:
+
+1. **Install .NET 9.0 Runtime**:
+   - Download from [dotnet.microsoft.com/download/dotnet/9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
+   - Choose "macOS" → "x64" or "ARM64" (for M1/M2 Macs)
+   - Run the installer package
+
+2. **Download and Run**:
+   ```bash
+   # Clone the repository
+   git clone https://github.com/JrLordMoose/EnhancedYoutubeDownloader.git
+   cd EnhancedYoutubeDownloader
+
+   # Restore dependencies
+   dotnet restore
+
+   # Run the application
+   dotnet run --project src/Desktop/EnhancedYoutubeDownloader.csproj
+   ```
+
+**Note:** Full Mac installer coming soon!
+
+#### Linux
+To run on Linux:
+
+1. **Install .NET 9.0 Runtime**:
+   ```bash
+   # Ubuntu/Debian
+   wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+   sudo dpkg -i packages-microsoft-prod.deb
+   sudo apt-get update && sudo apt-get install -y dotnet-runtime-9.0
+
+   # Fedora/RHEL
+   sudo dnf install dotnet-runtime-9.0
+
+   # Arch Linux
+   sudo pacman -S dotnet-runtime
+   ```
+
+2. **Download and Run**:
+   ```bash
+   # Clone the repository
+   git clone https://github.com/JrLordMoose/EnhancedYoutubeDownloader.git
+   cd EnhancedYoutubeDownloader
+
+   # Restore dependencies
+   dotnet restore
+
+   # Run the application
+   dotnet run --project src/Desktop/EnhancedYoutubeDownloader.csproj
+   ```
+
+**Note:** FFmpeg will be automatically downloaded on first run.
 
 ### Building from Source
 
