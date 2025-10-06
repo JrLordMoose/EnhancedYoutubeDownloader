@@ -44,7 +44,7 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.3.6.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.3.6/EnhancedYoutubeDownloader-Setup-v0.3.6.exe)** (79.72 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.3.7.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.3.7/EnhancedYoutubeDownloader-Setup-v0.3.7.exe)** (79.72 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
@@ -137,7 +137,7 @@ dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x6
 # 2. Build installer with Inno Setup
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.3.6.exe
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.3.7.exe
 ```
 
 **Installer Features:**

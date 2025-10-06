@@ -334,9 +334,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 EmbedSubs = profile.IncludeSubtitles,
                 SubLangs = "en",
 
-                // Metadata and thumbnail embedding
-                EmbedMetadata = profile.IncludeTags,
-                EmbedThumbnail = profile.IncludeTags,
+                // Metadata and thumbnail embedding (not supported by WebM)
+                EmbedMetadata = profile.IncludeTags && profile.Container != "webm",
+                EmbedThumbnail = profile.IncludeTags && profile.Container != "webm",
 
                 // Audio extraction (for audio-only downloads)
                 ExtractAudio = isAudioOnly

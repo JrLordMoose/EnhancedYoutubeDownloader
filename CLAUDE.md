@@ -2,6 +2,75 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🔴 MEMORIZE: Critical Version Update Checklist
+
+**ALWAYS update ALL FOUR version locations when releasing a new version!**
+
+Failure to update all locations will cause critical bugs like the v0.3.2-v0.3.5 incident where the application version remained at 0.3.1 despite installer showing correct version, causing all bug fixes to not be compiled into the binary.
+
+### Required Updates for Every Release:
+
+1. **`Directory.Build.props`** (line 4) - **THE SOURCE OF TRUTH**
+   ```xml
+   <Version>X.X.X</Version>
+   ```
+   - This is THE actual application binary version
+   - Read by MSBuild during compilation
+   - Sets `Assembly.GetName().Version`
+   - Displayed in window title bar
+   - **MUST BE UPDATED FIRST!**
+
+2. **`setup.iss`** (line 5) - Installer package version
+   ```inno
+   #define MyAppVersion "X.X.X"
+   ```
+   - Controls installer filename and metadata
+   - Shown in Windows Add/Remove Programs
+
+3. **`build-installer.ps1`** (line 6) - Build script default version
+   ```powershell
+   [string]$Version = "X.X.X"
+   ```
+   - Default version parameter for build script
+
+4. **`src/Desktop/Views/Dialogs/SettingsDialog.axaml`** (line 406) - Settings UI version
+   ```xml
+   <TextBlock Text="Version X.X.X"
+   ```
+   - Displayed in Settings > About section
+   - User-facing version display
+
+5. **`README.md`** - Update download links (lines 47, 140)
+   ```markdown
+   [Download EnhancedYoutubeDownloader-Setup-vX.X.X.exe](https://github.com/.../vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe)
+   ```
+
+6. **GitHub Release** - Include direct download link in release notes
+   ```markdown
+   **[Download EnhancedYoutubeDownloader-Setup-vX.X.X.exe](https://github.com/.../vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe)** (XX MB)
+   ```
+
+### Version Update Order (CRITICAL):
+1. `Directory.Build.props` (source of truth)
+2. `setup.iss` (installer version)
+3. `build-installer.ps1` (build script)
+4. `SettingsDialog.axaml` (UI display)
+5. `README.md` (documentation)
+6. Build installer with `build-installer.ps1`
+7. Create GitHub release with direct download link
+
+### Verification Steps:
+- [ ] Build completes successfully
+- [ ] Installer shows correct version in filename
+- [ ] Title bar shows correct version after install
+- [ ] Settings > About shows correct version
+- [ ] README download link points to new version
+- [ ] GitHub release has direct download link
+
+**NEVER skip these updates! Version mismatches cause critical bugs that invalidate all bug fixes.**
+
+---
+
 ## Project Overview
 
 Enhanced YouTube Downloader is a production-ready cross-platform desktop application built with .NET 9.0 and Avalonia UI. It provides video downloading from YouTube with advanced features like pause/resume, queue management, caching, and scheduling.

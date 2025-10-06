@@ -403,7 +403,7 @@
                                         <TextBlock Text="Enhanced YouTube Downloader"
                                                   FontSize="14"
                                                   FontWeight="Medium"/>
-                                        <TextBlock Text="Version 2.0.0"
+                                        <TextBlock Text="Version 0.3.7"
                                                   FontSize="13"
                                                   Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                                         <TextBlock Text="Built with .NET 9.0 and Avalonia UI"
