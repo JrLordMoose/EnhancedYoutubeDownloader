@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Enhanced YouTube Downloader - A powerful, feature-rich desktop application for downloading YouTube videos, playlists, and channels with pause/resume, queue management, and more.">
+    <meta name="keywords" content="youtube downloader, video downloader, youtube, yt-dlp, ffmpeg, avalonia">
+    <meta name="author" content="JrLordMoose">
+    <title>Enhanced YouTube Downloader - Professional Desktop App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <h1>Enhanced YouTube Downloader</h1>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#installation">Installation</a>
+                    <a href="#screenshots">Screenshots</a>
+                    <a href="#download">Download</a>
+                    <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader" target="_blank">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="hero-title">Professional YouTube Downloading</h2>
+                <p class="hero-subtitle">A powerful, production-ready desktop application for downloading YouTube videos, playlists, and channels with advanced features like pause/resume, queue management, and metadata tagging.</p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.3.7/EnhancedYoutubeDownloader-Setup-v0.3.7.exe" class="btn btn-primary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                        </svg>
+                        Download v0.3.7 (80 MB)
+                    </a>
+                    <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader" class="btn btn-secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" />
+                        </svg>
+                        View on GitHub
+                    </a>
+                </div>
+                <p class="version-info">Latest Release: v0.3.7 | Windows 10/11 | .NET 9.0</p>
+            </div>
+            <div class="hero-image">
+                <img src="images/main-screenshot.png" alt="Enhanced YouTube Downloader Screenshot" class="screenshot-main">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Features</h2>
+            <p class="section-subtitle">Everything you need for professional YouTube downloading</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,19H18V5H14M6,19H10V5H6V19Z" />
+                        </svg>
+                    </div>
+                    <h3>Pause & Resume</h3>
+                    <p>Full pause/resume support with state persistence. Never lose download progress again.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9,10V16L14,13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                        </svg>
+                    </div>
+                    <h3>Multiple Formats</h3>
+                    <p>Download in MP4, WebM, MP3, and more. Full quality and format options.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                        </svg>
+                    </div>
+                    <h3>Unified Queue</h3>
+                    <p>Manage all downloads in one place with batch operations and multi-select.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z" />
+                        </svg>
+                    </div>
+                    <h3>Subtitles & Metadata</h3>
+                    <p>Download subtitles and embed metadata tags with thumbnail cover art.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                        </svg>
+                    </div>
+                    <h3>SQLite Caching</h3>
+                    <p>Intelligent metadata caching for faster performance and reduced API calls.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
+                        </svg>
+                    </div>
+                    <h3>Download Scheduling</h3>
+                    <p>Schedule downloads for later with time-based queue execution.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,18H5V6H19M21,4H3V20H21M17,8H7V10H17M17,11H7V13H17M15,14H7V16H15" />
+                        </svg>
+                    </div>
+                    <h3>Playlists & Channels</h3>
+                    <p>Download entire playlists and channels with bulk video selection.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z" />
+                        </svg>
+                    </div>
+                    <h3>Auto-Updates</h3>
+                    <p>Seamless automatic updates with one-click install and restart.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section id="screenshots" class="screenshots">
+        <div class="container">
+            <h2 class="section-title">Screenshots</h2>
+            <p class="section-subtitle">See the app in action</p>
+
+            <div class="screenshots-grid">
+                <div class="screenshot-card">
+                    <img src="images/main-screenshot.png" alt="Main Interface" loading="lazy">
+                    <p>Clean, modern interface with Material Design</p>
+                </div>
+                <div class="screenshot-card">
+                    <img src="images/download-progress.png" alt="Download Progress" loading="lazy">
+                    <p>Real-time download progress with pause/resume</p>
+                </div>
+                <div class="screenshot-card">
+                    <img src="images/settings.png" alt="Settings" loading="lazy">
+                    <p>Comprehensive settings and configuration</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="installation">
+        <div class="container">
+            <h2 class="section-title">Installation</h2>
+            <p class="section-subtitle">Get started in minutes</p>
+
+            <div class="installation-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Download Installer</h3>
+                        <p>Download the latest installer from the download section below or GitHub releases.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Run Installer</h3>
+                        <p>Double-click the installer and follow the setup wizard. Choose installation options like desktop shortcut.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Handle SmartScreen Warning</h3>
+                        <p>You may see a Windows SmartScreen warning. This is normal for unsigned installers. Click "More info" then "Run anyway".</p>
+                        <div class="alert alert-info">
+                            <svg class="alert-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                            </svg>
+                            The installer is safe - all code is open-source and can be reviewed on GitHub.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Launch & Enjoy</h3>
+                        <p>The app will launch automatically after installation. Start downloading your favorite YouTube content!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="system-requirements">
+                <h3>System Requirements</h3>
+                <ul>
+                    <li><strong>Operating System:</strong> Windows 10 or Windows 11</li>
+                    <li><strong>Runtime:</strong> .NET 9.0 (bundled in installer)</li>
+                    <li><strong>Disk Space:</strong> 150 MB for installation</li>
+                    <li><strong>Memory:</strong> 2 GB RAM minimum</li>
+                    <li><strong>Internet:</strong> Required for downloading videos</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <div class="container">
+            <h2 class="section-title">Download</h2>
+            <p class="section-subtitle">Latest stable release</p>
+
+            <div class="download-card">
+                <div class="download-info">
+                    <h3>Enhanced YouTube Downloader v0.3.7</h3>
+                    <p>Released: October 6, 2025</p>
+                    <ul class="download-features">
+                        <li>✅ WebM format fix for metadata/thumbnail support</li>
+                        <li>✅ Auth dialog improvements</li>
+                        <li>✅ Automatic updates enabled</li>
+                        <li>✅ Includes FFmpeg 7.x and yt-dlp</li>
+                    </ul>
+                </div>
+                <div class="download-actions">
+                    <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.3.7/EnhancedYoutubeDownloader-Setup-v0.3.7.exe" class="btn btn-primary btn-large">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                        </svg>
+                        Download Installer
+                        <span class="btn-subtitle">80 MB | Windows 10/11</span>
+                    </a>
+                    <p class="download-alt">
+                        <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases" target="_blank">View all releases</a> |
+                        <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/tag/v0.3.7" target="_blank">Release notes</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack Section -->
+    <section class="tech-stack">
+        <div class="container">
+            <h2 class="section-title">Built With</h2>
+            <p class="section-subtitle">Modern, reliable technologies</p>
+
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>.NET 9.0</h4>
+                    <p>Latest .NET framework</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Avalonia UI 11.x</h4>
+                    <p>Cross-platform UI framework</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Material Design</h4>
+                    <p>Modern design system</p>
+                </div>
+                <div class="tech-item">
+                    <h4>yt-dlp</h4>
+                    <p>YouTube download engine</p>
+                </div>
+                <div class="tech-item">
+                    <h4>FFmpeg 7.x</h4>
+                    <p>Media processing</p>
+                </div>
+                <div class="tech-item">
+                    <h4>SQLite</h4>
+                    <p>Local database</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Enhanced YouTube Downloader</h4>
+                    <p>A professional, production-ready YouTube downloading solution built with .NET and Avalonia UI.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <ul>
+                        <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader">GitHub Repository</a></li>
+                        <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases">Releases</a></li>
+                        <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/issues">Issue Tracker</a></li>
+                        <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/blob/main/README.md">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>License & Credits</h4>
+                    <p><strong>License:</strong> MIT License</p>
+                    <p><strong>Credits:</strong></p>
+                    <ul>
+                        <li><a href="https://github.com/Tyrrrz/YoutubeDownloader">Original YoutubeDownloader</a></li>
+                        <li><a href="https://avaloniaui.net/">Avalonia UI</a></li>
+                        <li><a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Enhanced YouTube Downloader. Open-source software under MIT License.</p>
+                <p>Generated with <a href="https://claude.com/claude-code">Claude Code</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
