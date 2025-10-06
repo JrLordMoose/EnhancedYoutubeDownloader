@@ -46,6 +46,20 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 Download and run the installer:
 1. Download `EnhancedYoutubeDownloader-Setup-v0.3.1.exe` from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page
 2. Run the installer and follow the setup wizard
+
+**⚠️ Windows SmartScreen Warning**
+
+You may see a red warning screen saying "Windows protected your PC":
+
+![Windows SmartScreen Warning](guides-and-instructions/images/ytscreenshot23.png)
+
+**This is normal and safe!** The warning appears because the installer isn't digitally signed (signing costs $200-500/year).
+
+**To proceed:**
+1. Click **"More info"** on the warning screen
+2. Click **"Run anyway"** button that appears
+3. The installer is safe - all code is open-source and can be reviewed on GitHub
+
 3. Choose installation options:
    - ✅ Create desktop shortcut (default: checked)
    - ✅ Launch after installation (default: checked)

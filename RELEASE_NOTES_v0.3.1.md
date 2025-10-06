@@ -31,6 +31,28 @@ During the build process, the FFmpeg download target in the project file was acc
    - OR Control Panel → Programs and Features → Enhanced YouTube Downloader
 2. Download the v0.3.1 installer from the link above
 3. Run `EnhancedYoutubeDownloader-Setup-v0.3.1.exe`
+
+**⚠️ Windows SmartScreen Warning**
+
+When you run the installer, you may see a red warning screen:
+
+![Windows SmartScreen Warning](guides-and-instructions/images/ytscreenshot23.png)
+
+**Don't worry - this is completely normal and safe!**
+
+The warning appears because the installer isn't digitally signed. Code signing certificates cost $200-500/year, so we haven't purchased one yet.
+
+**How to bypass the warning:**
+1. Click **"More info"** on the red warning screen
+2. Click **"Run anyway"** button that appears
+3. Continue with installation normally
+
+**Why it's safe:**
+- All code is open-source and available on GitHub
+- No malware, adware, or telemetry
+- Application only downloads videos locally
+- Thousands of users trust open-source software without code signing
+
 4. Follow the setup wizard
 5. Choose your preferences:
    - ✅ Create desktop shortcut (default: checked)
@@ -131,15 +153,22 @@ During the build process, the FFmpeg download target in the project file was acc
 ## 🐛 Known Issues
 
 ### Windows SmartScreen Warning
-- **Issue**: Windows may show a "Windows protected your PC" warning
-- **Cause**: Installer is not digitally signed (costs $200-500/year)
-- **Solution**: Click "More info" → "Run anyway"
-- **Safety**: Application is open-source and safe to use
+- **Issue**: Windows shows a red "Windows protected your PC" warning screen
+- **Cause**: Installer is not digitally signed (signing costs $200-500/year)
+- **What it looks like**:
+
+  ![Windows SmartScreen Warning](guides-and-instructions/images/ytscreenshot23.png)
+
+- **Solution**:
+  1. Click **"More info"** on the warning screen
+  2. Click **"Run anyway"** button that appears
+- **Safety**: Application is completely safe - all code is open-source and can be reviewed on GitHub
 
 ### Antivirus False Positives
 - Some antivirus software may flag the installer as suspicious
 - This is a false positive due to the installer being new and unsigned
 - All code is open-source and can be reviewed on GitHub
+- You can add the installer to your antivirus exclusion list if needed
 
 ---
 
