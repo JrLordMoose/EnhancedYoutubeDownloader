@@ -12,6 +12,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <DownloadFFmpeg>true</DownloadFFmpeg>
+    <DownloadYtDlp>true</DownloadYtDlp>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="..\..\favicon.ico" Link="favicon.ico" />
@@ -23,6 +24,12 @@
       Condition="Exists('ffmpeg.exe')"
     />
     <None Include="ffmpeg" CopyToOutputDirectory="PreserveNewest" Condition="Exists('ffmpeg')" />
+    <None
+      Include="yt-dlp.exe"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('yt-dlp.exe')"
+    />
+    <None Include="yt-dlp" CopyToOutputDirectory="PreserveNewest" Condition="Exists('yt-dlp')" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AsyncImageLoader.Avalonia" Version="3.3.0" />
@@ -81,6 +88,23 @@
     />
     <Exec
       Command="powershell -ExecutionPolicy Bypass -File $(ProjectDir)/Download-FFmpeg.ps1 -OutputPath $(ProjectDir)"
+      LogStandardErrorAsError="true"
+      Condition="'$(RuntimeIdentifier)' == ''"
+    />
+  </Target>
+  <!-- yt-dlp download target - automatically downloads yt-dlp during restore -->
+  <Target
+    Name="DownloadYtDlp"
+    BeforeTargets="Restore;PreBuildEvent"
+    Condition="$(DownloadYtDlp) AND !Exists('yt-dlp.exe') AND !Exists('yt-dlp')"
+  >
+    <Exec
+      Command="powershell -ExecutionPolicy Bypass -File $(ProjectDir)/Download-YtDlp.ps1 -Platform $(RuntimeIdentifier) -OutputPath $(ProjectDir)"
+      LogStandardErrorAsError="true"
+      Condition="'$(RuntimeIdentifier)' != ''"
+    />
+    <Exec
+      Command="powershell -ExecutionPolicy Bypass -File $(ProjectDir)/Download-YtDlp.ps1 -OutputPath $(ProjectDir)"
       LogStandardErrorAsError="true"
       Condition="'$(RuntimeIdentifier)' == ''"
     />

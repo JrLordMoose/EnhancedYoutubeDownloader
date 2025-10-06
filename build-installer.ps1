@@ -72,8 +72,8 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "  Application published to: $PublishDir" -ForegroundColor Green
 Write-Host ""
 
-# Step 4: Verify and download FFmpeg if needed
-Write-Host "[4/5] Verifying FFmpeg..." -ForegroundColor Yellow
+# Step 4: Verify and download FFmpeg and yt-dlp if needed
+Write-Host "[4/6] Verifying FFmpeg..." -ForegroundColor Yellow
 $FFmpegPath = Join-Path $PublishDir "ffmpeg.exe"
 if (Test-Path $FFmpegPath) {
     $FFmpegSize = (Get-Item $FFmpegPath).Length / 1MB
@@ -98,12 +98,12 @@ if (Test-Path $FFmpegPath) {
                 Write-Host "  - FFmpeg downloaded and copied: $([math]::Round($FFmpegSize, 2)) MB" -ForegroundColor Green
             } else {
                 Write-Host "  ERROR: FFmpeg download failed" -ForegroundColor Red
-                Write-Host "  Please download FFmpeg manually from: https://github.com/FFmpegBin/FFmpegBin/releases" -ForegroundColor Yellow
+                Write-Host "  Please download FFmpeg manually from: https://www.gyan.dev/ffmpeg/builds/" -ForegroundColor Yellow
                 exit 1
             }
         } catch {
             Write-Host "  ERROR: Failed to download FFmpeg: $_" -ForegroundColor Red
-            Write-Host "  Please download FFmpeg manually from: https://github.com/FFmpegBin/FFmpegBin/releases" -ForegroundColor Yellow
+            Write-Host "  Please download FFmpeg manually from: https://www.gyan.dev/ffmpeg/builds/" -ForegroundColor Yellow
             exit 1
         }
     } else {
@@ -113,8 +113,49 @@ if (Test-Path $FFmpegPath) {
 }
 Write-Host ""
 
-# Step 5: Build installer with Inno Setup
-Write-Host "[5/5] Building installer with Inno Setup..." -ForegroundColor Yellow
+# Step 5: Verify and download yt-dlp if needed
+Write-Host "[5/6] Verifying yt-dlp..." -ForegroundColor Yellow
+$YtDlpPath = Join-Path $PublishDir "yt-dlp.exe"
+if (Test-Path $YtDlpPath) {
+    $YtDlpSize = (Get-Item $YtDlpPath).Length / 1MB
+    Write-Host "  - yt-dlp found: $([math]::Round($YtDlpSize, 2)) MB" -ForegroundColor Green
+} else {
+    Write-Host "  - yt-dlp not found in publish directory" -ForegroundColor Yellow
+    Write-Host "  - Downloading yt-dlp..." -ForegroundColor Yellow
+
+    # Download yt-dlp to Desktop project directory first
+    $DesktopProjectDir = Join-Path $ProjectRoot "src\Desktop"
+    $YtDlpScript = Join-Path $DesktopProjectDir "Download-YtDlp.ps1"
+
+    if (Test-Path $YtDlpScript) {
+        try {
+            & powershell -ExecutionPolicy Bypass -File $YtDlpScript -OutputPath $DesktopProjectDir
+
+            # Copy to publish directory
+            $SourceYtDlp = Join-Path $DesktopProjectDir "yt-dlp.exe"
+            if (Test-Path $SourceYtDlp) {
+                Copy-Item $SourceYtDlp $YtDlpPath -Force
+                $YtDlpSize = (Get-Item $YtDlpPath).Length / 1MB
+                Write-Host "  - yt-dlp downloaded and copied: $([math]::Round($YtDlpSize, 2)) MB" -ForegroundColor Green
+            } else {
+                Write-Host "  ERROR: yt-dlp download failed" -ForegroundColor Red
+                Write-Host "  Please download yt-dlp manually from: https://github.com/yt-dlp/yt-dlp/releases" -ForegroundColor Yellow
+                exit 1
+            }
+        } catch {
+            Write-Host "  ERROR: Failed to download yt-dlp: $_" -ForegroundColor Red
+            Write-Host "  Please download yt-dlp manually from: https://github.com/yt-dlp/yt-dlp/releases" -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Host "  ERROR: yt-dlp download script not found at: $YtDlpScript" -ForegroundColor Red
+        exit 1
+    }
+}
+Write-Host ""
+
+# Step 6: Build installer with Inno Setup
+Write-Host "[6/6] Building installer with Inno Setup..." -ForegroundColor Yellow
 Write-Host "  Using script: $InnoSetupScript" -ForegroundColor Gray
 
 # Update version in setup.iss if specified
