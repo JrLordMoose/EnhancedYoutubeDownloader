@@ -26,8 +26,6 @@ public class SubtitleBurnInService : ISubtitleBurnInService
         string videoPath,
         string subtitlePath,
         string outputPath,
-        int fontSize = 24,
-        double backgroundOpacity = 0.75,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -42,26 +40,19 @@ public class SubtitleBurnInService : ISubtitleBurnInService
             if (!File.Exists(_ffmpegPath))
                 throw new FileNotFoundException($"FFmpeg not found: {_ffmpegPath}");
 
-            // Validate parameters
-            if (fontSize <= 0 || fontSize > 200)
-                throw new ArgumentOutOfRangeException(nameof(fontSize), "Font size must be between 1 and 200");
-
-            if (backgroundOpacity < 0.0 || backgroundOpacity > 1.0)
-                throw new ArgumentOutOfRangeException(nameof(backgroundOpacity), "Opacity must be between 0.0 and 1.0");
-
             // Escape paths for FFmpeg subtitles filter
             // FFmpeg filter syntax requires escaping special characters: \ : ' [ ] ( )
             // Reference: https://ffmpeg.org/ffmpeg-filters.html#toc-Filtergraph-syntax-1
             var escapedSubtitlePath = EscapeSubtitlePath(subtitlePath);
 
             // Build FFmpeg subtitle filter with professional styling
-            // This creates subtitles with black semi-transparent box and white text
+            // Fixed settings: Font size 24, black semi-transparent background
             var subtitleFilter = $"subtitles='{escapedSubtitlePath}':force_style='" +
                 $"FontName=Arial," +
-                $"FontSize={fontSize}," +
+                $"FontSize=24," +
                 $"PrimaryColour=&H00FFFFFF," + // White text
                 $"OutlineColour=&H00000000," + // Black outline
-                $"BackColour=&H{GetAlphaHex(backgroundOpacity)}000000," + // Black background with opacity
+                $"BackColour=&H40000000," + // Black background with 75% opacity
                 $"BorderStyle=4," + // Box background
                 $"Outline=1," + // Text outline thickness
                 $"Shadow=0," + // No shadow
@@ -207,16 +198,6 @@ public class SubtitleBurnInService : ISubtitleBurnInService
             Console.WriteLine($"[BURN-SUBS] Failed to get video duration: {ex.Message}");
             return 0;
         }
-    }
-
-    /// <summary>
-    /// Converts opacity (0.0-1.0) to ASS alpha hex value (00-FF inverted)
-    /// </summary>
-    private static string GetAlphaHex(double opacity)
-    {
-        // ASS format uses inverted alpha: 00 = fully opaque, FF = fully transparent
-        var alpha = (int)((1.0 - opacity) * 255);
-        return alpha.ToString("X2");
     }
 
     /// <summary>

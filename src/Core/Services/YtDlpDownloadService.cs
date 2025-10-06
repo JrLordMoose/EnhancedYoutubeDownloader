@@ -655,8 +655,6 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 videoPath: downloadItem.FilePath,
                 subtitlePath: subtitlePath,
                 outputPath: tempOutputPath,
-                fontSize: profile.SubtitleFontSize,
-                backgroundOpacity: profile.SubtitleBackgroundOpacity,
                 progress: burnInProgress,
                 cancellationToken: cancellationToken
             );

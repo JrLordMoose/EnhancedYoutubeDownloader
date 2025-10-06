@@ -26,12 +26,6 @@ public partial class FormatProfile : ObservableObject
     private SubtitleStyle _subtitleStyle = SubtitleStyle.Embedded;
 
     [ObservableProperty]
-    private int _subtitleFontSize = 24;
-
-    [ObservableProperty]
-    private double _subtitleBackgroundOpacity = 0.75;
-
-    [ObservableProperty]
     private bool _includeTags = true;
 
     [ObservableProperty]

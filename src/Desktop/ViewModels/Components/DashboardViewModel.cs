@@ -461,14 +461,12 @@ public partial class DashboardViewModel : ViewModelBase
             Container = containerValue,
             IncludeSubtitles = includeSubtitles,
             IncludeTags = includeTags,
-            // Copy subtitle styling settings from SettingsService
+            // Copy subtitle style setting from SettingsService
             SubtitleStyle = _settingsService.SubtitleStyle,
-            SubtitleFontSize = _settingsService.SubtitleFontSize,
-            SubtitleBackgroundOpacity = _settingsService.SubtitleBackgroundOpacity,
         };
 
         Console.WriteLine(
-            $"[FORMAT] Created profile with subtitle settings: Style={profile.SubtitleStyle}, FontSize={profile.SubtitleFontSize}, Opacity={profile.SubtitleBackgroundOpacity}"
+            $"[FORMAT] Created profile with subtitle settings: Style={profile.SubtitleStyle}"
         );
 
         return profile;

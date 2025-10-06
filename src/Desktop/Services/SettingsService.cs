@@ -30,8 +30,21 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
     [DefaultValue(true)]
     public bool IsAutoUpdateEnabled { get; set; } = true;
 
+    private int _parallelLimit = 3;
+
     [DefaultValue(3)]
-    public int ParallelLimit { get; set; } = 3;
+    public int ParallelLimit
+    {
+        get => _parallelLimit;
+        set
+        {
+            if (_parallelLimit != value)
+            {
+                _parallelLimit = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     [DefaultValue(0)]
     public int DefaultQuality { get; set; } = 0; // 0=Best, 1=1080p, 2=720p, 3=480p
@@ -76,8 +89,6 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
     public bool AskBeforeGeneratingSubtitles { get; set; } = true;
 
     private SubtitleStyle _subtitleStyle = SubtitleStyle.Embedded;
-    private int _subtitleFontSize = 24;
-    private double _subtitleBackgroundOpacity = 0.75;
 
     [DefaultValue(SubtitleStyle.Embedded)]
     public SubtitleStyle SubtitleStyle
@@ -88,34 +99,6 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
             if (_subtitleStyle != value)
             {
                 _subtitleStyle = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    [DefaultValue(24)]
-    public int SubtitleFontSize
-    {
-        get => _subtitleFontSize;
-        set
-        {
-            if (_subtitleFontSize != value)
-            {
-                _subtitleFontSize = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    [DefaultValue(0.75)]
-    public double SubtitleBackgroundOpacity
-    {
-        get => _subtitleBackgroundOpacity;
-        set
-        {
-            if (Math.Abs(_subtitleBackgroundOpacity - value) > 0.001)
-            {
-                _subtitleBackgroundOpacity = value;
                 OnPropertyChanged();
             }
         }
