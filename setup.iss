@@ -2,7 +2,7 @@
 ; This script creates a Windows installer with desktop shortcut and launch options
 
 #define MyAppName "Enhanced YouTube Downloader"
-#define MyAppVersion "0.3.5"
+#define MyAppVersion "0.3.6"
 #define MyAppPublisher "JrLordMoose"
 #define MyAppURL "https://github.com/JrLordMoose/EnhancedYoutubeDownloader"
 #define MyAppExeName "EnhancedYoutubeDownloader.exe"
@@ -118,7 +118,8 @@ begin
     end;
 
     // Ask user if they want to remove downloaded files
-    DefaultDownloadPath := ExpandConstant('{uservideos}\Downloads');
+    // Default download path is %UserProfile%\Videos\Downloads
+    DefaultDownloadPath := ExpandConstant('{userprofile}\Videos\Downloads');
     if DirExists(DefaultDownloadPath) then
     begin
       if MsgBox('Do you want to remove downloaded video files?' + #13#10#10 +
@@ -132,6 +133,7 @@ begin
     end;
   end;
 end;
+
 
 
 

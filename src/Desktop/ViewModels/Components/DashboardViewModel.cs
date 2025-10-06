@@ -320,9 +320,10 @@ public partial class DashboardViewModel : ViewModelBase
     {
         try
         {
+            // Check if we have any videos BEFORE showing the dialog
             if (result.Videos == null || !result.Videos.Any())
             {
-                _snackbarManager.Notify("No videos found");
+                _snackbarManager.NotifyError("No videos found for this query");
                 return;
             }
 
