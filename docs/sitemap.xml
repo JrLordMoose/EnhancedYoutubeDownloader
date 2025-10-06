@@ -5,7 +5,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://jrlordmoose.github.io/EnhancedYoutubeDownloader/</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -28,7 +28,7 @@
   <!-- Features Section -->
   <url>
     <loc>https://jrlordmoose.github.io/EnhancedYoutubeDownloader/#features</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -36,7 +36,7 @@
   <!-- Installation Section -->
   <url>
     <loc>https://jrlordmoose.github.io/EnhancedYoutubeDownloader/#installation</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -44,7 +44,7 @@
   <!-- Screenshots Section -->
   <url>
     <loc>https://jrlordmoose.github.io/EnhancedYoutubeDownloader/#screenshots</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -52,7 +52,7 @@
   <!-- Download Section -->
   <url>
     <loc>https://jrlordmoose.github.io/EnhancedYoutubeDownloader/#download</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -60,7 +60,7 @@
   <!-- GitHub Repository (external but important) -->
   <url>
     <loc>https://github.com/JrLordMoose/EnhancedYoutubeDownloader</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -68,7 +68,7 @@
   <!-- GitHub Releases -->
   <url>
     <loc>https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -76,7 +76,7 @@
   <!-- Latest Release -->
   <url>
     <loc>https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/tag/v0.3.9</loc>
-    <lastmod>2025-10-06</lastmod>
+    <lastmod>2024-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
