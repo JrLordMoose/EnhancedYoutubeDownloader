@@ -61,7 +61,17 @@ The build-installer.ps1 script creates BOTH files automatically. YOU MUST UPLOAD
    [Download EnhancedYoutubeDownloader-Setup-vX.X.X.exe](https://github.com/.../vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe)
    ```
 
-6. **GitHub Release** - Include direct download link in release notes AND upload ZIP package
+6. **`docs/index.html`** - **CRITICAL: Landing Page Download Buttons**
+   - **Hero section** (line ~39): Update primary download button href
+   - **Download section** (line ~301): Update installer download button href
+   ```html
+   <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe" class="btn btn-primary btn-large">
+   ```
+   - ⚠️ **MUST update BOTH buttons** or users will download old version!
+   - Landing page is the main entry point for new users
+   - Direct download links provide better UX than redirecting to releases page
+
+7. **GitHub Release** - Include direct download link in release notes AND upload ZIP package
    ```markdown
    **[Download EnhancedYoutubeDownloader-Setup-vX.X.X.exe](https://github.com/.../vX.X.X/EnhancedYoutubeDownloader-Setup-vX.X.X.exe)** (XX MB)
    ```
@@ -72,11 +82,12 @@ The build-installer.ps1 script creates BOTH files automatically. YOU MUST UPLOAD
 3. `build-installer.ps1` (build script)
 4. `SettingsDialog.axaml` (UI display)
 5. `README.md` (documentation)
-6. Build installer with `build-installer.ps1` (creates both .exe and .zip)
-7. Create GitHub release with **BOTH files**:
+6. **`docs/index.html`** (landing page download buttons - BOTH locations)
+7. Build installer with `build-installer.ps1` (creates both .exe and .zip)
+8. Create GitHub release with **BOTH files**:
    - `EnhancedYoutubeDownloader-Setup-vX.X.X.exe` (for new users)
    - `EnhancedYoutubeDownloader-X.X.X.zip` (for auto-updates)
-8. Include direct download link in release notes
+9. Include direct download link in release notes
 
 ### 📦 Release File Organization System
 
@@ -109,6 +120,9 @@ EnhancedYoutubeDownloader-X.X.X.zip
   - [ ] `EnhancedYoutubeDownloader-Setup-vX.X.X.exe` exists (~83 MB)
   - [ ] `EnhancedYoutubeDownloader-X.X.X.zip` exists (~108 MB)
 - [ ] Filenames match version exactly (no typos!)
+- [ ] **Landing page buttons updated** (`docs/index.html`):
+  - [ ] Hero section download button (line ~39) points to new version
+  - [ ] Download section button (line ~301) points to new version
 - [ ] Create GitHub release: `gh release create vX.X.X`
 - [ ] **Upload BOTH files to release**:
   - [ ] `gh release upload vX.X.X release/EnhancedYoutubeDownloader-Setup-vX.X.X.exe`
@@ -118,6 +132,7 @@ EnhancedYoutubeDownloader-X.X.X.zip
 - [ ] Test: Install EXE and verify version in title bar
 - [ ] Test: Check Settings > About shows correct version
 - [ ] Test: Verify auto-update check works (check for updates in app)
+- [ ] Test: Landing page download buttons work (direct download starts)
 
 **NEVER skip these steps! Missing ZIP = broken auto-updates for ALL users!**
 
