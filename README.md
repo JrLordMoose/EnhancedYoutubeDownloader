@@ -70,7 +70,7 @@ You may see a red warning screen saying "Windows protected your PC":
 - Start Menu integration with uninstall shortcut
 - Add/Remove Programs integration
 - Smart uninstaller with optional data cleanup
-- FFmpeg bundled for video conversion (39 MB total)
+- FFmpeg bundled for video conversion (63 MB total, includes full 94MB FFmpeg)
 
 #### Other Platforms
 Download the appropriate package for your platform from the [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases) page.
