@@ -187,6 +187,76 @@
                                                  VerticalAlignment="Center"/>
                                 </Grid>
 
+                                <!-- Subtitle Style -->
+                                <StackPanel Spacing="8">
+                                    <Grid ColumnDefinitions="*,200">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="Subtitle Style"
+                                                      FontSize="14"/>
+                                            <TextBlock Text="How subtitles are displayed in videos"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+                                        <ComboBox Grid.Column="1"
+                                                 SelectedIndex="{Binding Settings.SubtitleStyle, Mode=TwoWay}"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Center"
+                                                 Theme="{DynamicResource MaterialFilledComboBox}">
+                                            <ComboBoxItem Content="Embedded (Basic)" Tag="0"/>
+                                            <ComboBoxItem Content="Burned-In (Styled)" Tag="1"/>
+                                            <ComboBoxItem Content="External File (.ass)" Tag="2"/>
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Subtitle Font Size -->
+                                <StackPanel Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="Font Size"
+                                                      FontSize="14"/>
+                                            <TextBlock Text="Size of burned-in subtitle text"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1"
+                                                  Text="{Binding Settings.SubtitleFontSize}"
+                                                  FontSize="19"
+                                                  VerticalAlignment="Center"
+                                                  Margin="0,0,16,0"/>
+                                    </Grid>
+                                    <Slider Value="{Binding Settings.SubtitleFontSize, Mode=TwoWay}"
+                                           Minimum="16"
+                                           Maximum="48"
+                                           TickFrequency="2"
+                                           IsSnapToTickEnabled="True"
+                                           Margin="0,8,0,0"/>
+                                </StackPanel>
+
+                                <!-- Subtitle Background Opacity -->
+                                <StackPanel Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="Background Opacity"
+                                                      FontSize="14"/>
+                                            <TextBlock Text="Opacity of subtitle background box (0-100%)"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1"
+                                                  Text="{Binding Settings.SubtitleBackgroundOpacity, StringFormat='{}{0:P0}'}"
+                                                  FontSize="19"
+                                                  VerticalAlignment="Center"
+                                                  Margin="0,0,16,0"/>
+                                    </Grid>
+                                    <Slider Value="{Binding Settings.SubtitleBackgroundOpacity, Mode=TwoWay}"
+                                           Minimum="0.0"
+                                           Maximum="1.0"
+                                           TickFrequency="0.05"
+                                           IsSnapToTickEnabled="True"
+                                           Margin="0,8,0,0"/>
+                                </StackPanel>
+
                                 <!-- AI Subtitles -->
                                 <Grid ColumnDefinitions="*,Auto">
                                     <StackPanel Grid.Column="0" Spacing="4">

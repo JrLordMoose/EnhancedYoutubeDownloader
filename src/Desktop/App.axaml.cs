@@ -113,8 +113,9 @@ public class App : Application, IDisposable
             return new DownloadStateRepository(cachePath);
         });
 
-        services.AddSingleton<IDownloadService, YtDlpDownloadService>();
+        services.AddSingleton<ISubtitleBurnInService, SubtitleBurnInService>();
         services.AddSingleton<ISubtitleGenerationService, SubtitleGenerationService>();
+        services.AddSingleton<IDownloadService, YtDlpDownloadService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IQueryResolver, QueryResolver>();
         services.AddSingleton<IDependencyValidator, DependencyValidator>();

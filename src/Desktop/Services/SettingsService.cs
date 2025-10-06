@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Cogwheel;
 using EnhancedYoutubeDownloader.Framework;
+using EnhancedYoutubeDownloader.Shared.Models;
 
 namespace EnhancedYoutubeDownloader.Services;
 
@@ -73,6 +74,15 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
 
     [DefaultValue(true)]
     public bool AskBeforeGeneratingSubtitles { get; set; } = true;
+
+    [DefaultValue(SubtitleStyle.Embedded)]
+    public SubtitleStyle SubtitleStyle { get; set; } = SubtitleStyle.Embedded;
+
+    [DefaultValue(24)]
+    public int SubtitleFontSize { get; set; } = 24;
+
+    [DefaultValue(0.75)]
+    public double SubtitleBackgroundOpacity { get; set; } = 0.75;
 
     public SettingsService()
         : base(Program.Name) { }

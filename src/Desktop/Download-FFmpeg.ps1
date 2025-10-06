@@ -52,8 +52,9 @@ function Download-FFmpeg {
             Write-Host "Extracting FFmpeg..."
             Expand-Archive -Path $outputFile -DestinationPath $extractPath -Force
 
-            # Find ffmpeg.exe in the extracted folder (usually in bin subdirectory)
+            # Find ffmpeg.exe and ffprobe.exe in the extracted folder (usually in bin subdirectory)
             $ffmpegExe = Get-ChildItem -Path $extractPath -Filter "ffmpeg.exe" -Recurse | Select-Object -First 1
+            $ffprobeExe = Get-ChildItem -Path $extractPath -Filter "ffprobe.exe" -Recurse | Select-Object -First 1
 
             if ($ffmpegExe) {
                 # Copy ffmpeg.exe to output directory
@@ -69,6 +70,18 @@ function Download-FFmpeg {
                 }
             } else {
                 throw "Could not find ffmpeg.exe in the downloaded archive"
+            }
+
+            if ($ffprobeExe) {
+                # Copy ffprobe.exe to output directory
+                Copy-Item $ffprobeExe.FullName -Destination (Join-Path $OutputPath "ffprobe.exe") -Force
+                Write-Host "FFprobe copied to: $OutputPath"
+
+                # Verify the file size
+                $probeSize = (Get-Item (Join-Path $OutputPath "ffprobe.exe")).Length / 1MB
+                Write-Host "FFprobe size: $([math]::Round($probeSize, 2)) MB"
+            } else {
+                Write-Warning "Could not find ffprobe.exe in the downloaded archive. Subtitle burn-in progress reporting may not work."
             }
 
             # Cleanup

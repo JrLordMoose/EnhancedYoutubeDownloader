@@ -18,9 +18,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     private readonly YoutubeDL _ytdl;
     private readonly SemaphoreSlim _downloadSemaphore;
     private readonly DownloadStateRepository _stateRepository;
+    private readonly ISubtitleBurnInService _subtitleBurnInService;
 
-    public YtDlpDownloadService(int maxConcurrentDownloads = 3)
+    public YtDlpDownloadService(ISubtitleBurnInService subtitleBurnInService, int maxConcurrentDownloads = 3)
     {
+        _subtitleBurnInService = subtitleBurnInService ?? throw new ArgumentNullException(nameof(subtitleBurnInService));
         // Initialize YoutubeDL with path to yt-dlp.exe
         var ytdlpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "yt-dlp.exe");
         var ffmpegPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
@@ -322,6 +324,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             var formatString = BuildFormatString(profile);
             var isAudioOnly = IsAudioOnly(profile);
 
+            // For BurnedIn subtitles, we need to write .srt file but NOT embed it
+            // We'll burn it in post-processing with FFmpeg
+            var shouldEmbedSubs = profile.IncludeSubtitles && profile.SubtitleStyle != SubtitleStyle.BurnedIn;
+            var shouldWriteSubs = profile.IncludeSubtitles; // Always write if subtitles enabled
+
             var options = new OptionSet
             {
                 Format = formatString,
@@ -330,10 +337,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 NoPart = false, // Use .part files to enable progress reporting
 
                 // Subtitle options
-                WriteSubs = profile.IncludeSubtitles,
-                EmbedSubs = profile.IncludeSubtitles,
+                WriteSubs = shouldWriteSubs,
+                EmbedSubs = shouldEmbedSubs,
                 SubLangs = "en",
-                SubFormat = profile.IncludeSubtitles ? "srt/best" : null, // Convert to SRT to avoid formatting codes
+                SubFormat = shouldWriteSubs ? "srt/best" : null, // Convert to SRT for compatibility
 
                 // Metadata and thumbnail embedding (not supported by WebM)
                 EmbedMetadata = profile.IncludeTags && profile.Container != "webm",
@@ -356,7 +363,8 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             Console.WriteLine($"[YTDLP] Downloading video: {downloadItem.Video!.Url}");
             Console.WriteLine($"[YTDLP] Format: {formatString}");
             Console.WriteLine($"[YTDLP] Quality: {profile.Quality}, Container: {profile.Container}");
-            Console.WriteLine($"[YTDLP] Subtitles: {profile.IncludeSubtitles}, Tags: {profile.IncludeTags}");
+            Console.WriteLine($"[YTDLP] Subtitles: {profile.IncludeSubtitles}, Style: {profile.SubtitleStyle}, Tags: {profile.IncludeTags}");
+            Console.WriteLine($"[YTDLP] Subtitle Settings - EmbedSubs: {shouldEmbedSubs}, WriteSubs: {shouldWriteSubs}");
             Console.WriteLine($"[YTDLP] Output path: {downloadItem.PartialFilePath}");
 
             // Set up progress reporting
@@ -499,6 +507,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                     Console.WriteLine($"[YTDLP] ERROR: Could not locate downloaded file!");
                 }
 
+                // Post-processing: Burn in subtitles if requested
+                if (profile.IncludeSubtitles && profile.SubtitleStyle == SubtitleStyle.BurnedIn && !string.IsNullOrEmpty(downloadItem.FilePath))
+                {
+                    await ProcessBurnInSubtitlesAsync(downloadItem, cancellationToken);
+                }
+
                 downloadItem.Status = DownloadStatus.Completed;
                 downloadItem.CompletedAt = DateTime.UtcNow;
                 downloadItem.Progress = 100;
@@ -559,6 +573,162 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             _downloadSemaphore.Release();
             Console.WriteLine($"[YTDLP] Semaphore released for {downloadItem.Id}");
             _cancellationTokens.TryRemove(downloadItem.Id, out _);
+        }
+    }
+
+    private async Task ProcessBurnInSubtitlesAsync(DownloadItem downloadItem, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(downloadItem.FilePath) || !File.Exists(downloadItem.FilePath))
+            {
+                Console.WriteLine($"[BURN-IN] Video file not found: {downloadItem.FilePath}");
+                return;
+            }
+
+            var profile = downloadItem.FormatProfile ?? GetDefaultProfile();
+            var videoDirectory = Path.GetDirectoryName(downloadItem.FilePath) ?? "";
+            var videoFileNameWithoutExt = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
+
+            // Find the .srt subtitle file (yt-dlp saves it with same name as video)
+            var subtitlePath = Path.Combine(videoDirectory, $"{videoFileNameWithoutExt}.en.srt");
+
+            if (!File.Exists(subtitlePath))
+            {
+                // Try without language code
+                subtitlePath = Path.Combine(videoDirectory, $"{videoFileNameWithoutExt}.srt");
+
+                if (!File.Exists(subtitlePath))
+                {
+                    Console.WriteLine($"[BURN-IN] Subtitle file not found. Searched for:");
+                    Console.WriteLine($"[BURN-IN]   - {videoFileNameWithoutExt}.en.srt");
+                    Console.WriteLine($"[BURN-IN]   - {videoFileNameWithoutExt}.srt");
+                    return;
+                }
+            }
+
+            Console.WriteLine($"[BURN-IN] Found subtitle file: {subtitlePath}");
+            Console.WriteLine($"[BURN-IN] Starting subtitle burn-in process...");
+
+            // Update download item status to show burn-in is in progress
+            downloadItem.Progress = 0;
+            downloadItem.ErrorMessage = "Burning in subtitles...";
+            _downloadStatusChanged.OnNext(downloadItem);
+
+            // Create temporary output path
+            var tempOutputPath = Path.Combine(videoDirectory, $"{videoFileNameWithoutExt}_burned.mp4");
+
+            // Set up progress reporting
+            var burnInProgress = new Progress<double>(p =>
+            {
+                // Map burn-in progress to download progress (0-100)
+                downloadItem.Progress = p * 100;
+                downloadItem.ErrorMessage = $"Burning in subtitles... {downloadItem.Progress:F0}%";
+                _downloadStatusChanged.OnNext(downloadItem);
+
+                if ((int)downloadItem.Progress % 10 == 0) // Log every 10%
+                {
+                    Console.WriteLine($"[BURN-IN] Progress: {downloadItem.Progress:F0}%");
+                }
+            });
+
+            // Burn in subtitles using the service
+            var success = await _subtitleBurnInService.BurnSubtitlesAsync(
+                videoPath: downloadItem.FilePath,
+                subtitlePath: subtitlePath,
+                outputPath: tempOutputPath,
+                fontSize: profile.SubtitleFontSize,
+                backgroundOpacity: profile.SubtitleBackgroundOpacity,
+                progress: burnInProgress,
+                cancellationToken: cancellationToken
+            );
+
+            if (!success)
+            {
+                Console.WriteLine($"[BURN-IN] Failed to burn in subtitles");
+                downloadItem.ErrorMessage = "Failed to burn in subtitles, continuing with original video";
+                _downloadStatusChanged.OnNext(downloadItem);
+
+                // Clean up temp file if it exists
+                if (File.Exists(tempOutputPath))
+                {
+                    File.Delete(tempOutputPath);
+                }
+                return;
+            }
+
+            Console.WriteLine($"[BURN-IN] Burn-in successful, replacing original video");
+
+            // Replace original video with burned version
+            var originalFilePath = downloadItem.FilePath;
+            var backupPath = originalFilePath + ".backup";
+
+            try
+            {
+                // Backup original file
+                File.Move(originalFilePath, backupPath);
+
+                // Move burned version to final location
+                File.Move(tempOutputPath, originalFilePath);
+
+                // Delete backup
+                File.Delete(backupPath);
+
+                Console.WriteLine($"[BURN-IN] Video replaced successfully: {originalFilePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BURN-IN] Error replacing file: {ex.Message}");
+
+                // Restore backup if move failed
+                if (File.Exists(backupPath) && !File.Exists(originalFilePath))
+                {
+                    File.Move(backupPath, originalFilePath);
+                }
+
+                throw;
+            }
+
+            // Clean up subtitle file
+            try
+            {
+                if (File.Exists(subtitlePath))
+                {
+                    File.Delete(subtitlePath);
+                    Console.WriteLine($"[BURN-IN] Cleaned up subtitle file: {subtitlePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BURN-IN] Warning: Could not delete subtitle file: {ex.Message}");
+                // Non-critical, continue
+            }
+
+            // Update download item with final file size
+            if (File.Exists(downloadItem.FilePath))
+            {
+                var fileInfo = new FileInfo(downloadItem.FilePath);
+                downloadItem.TotalBytes = fileInfo.Length;
+                downloadItem.BytesDownloaded = fileInfo.Length;
+                Console.WriteLine($"[BURN-IN] Updated file size: {fileInfo.Length} bytes");
+            }
+
+            downloadItem.Progress = 100;
+            downloadItem.ErrorMessage = null;
+            Console.WriteLine($"[BURN-IN] Subtitle burn-in process completed successfully");
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"[BURN-IN] Burn-in process was canceled");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BURN-IN] Error during burn-in process: {ex.Message}");
+            Console.WriteLine($"[BURN-IN] Stack trace: {ex.StackTrace}");
+            downloadItem.ErrorMessage = $"Subtitle burn-in failed: {ex.Message}";
+            _downloadStatusChanged.OnNext(downloadItem);
+            // Don't throw - we have the video, just without burned subtitles
         }
     }
 

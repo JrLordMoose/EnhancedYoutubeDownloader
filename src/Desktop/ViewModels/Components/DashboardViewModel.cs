@@ -455,13 +455,23 @@ public partial class DashboardViewModel : ViewModelBase
             _ => "mp4",
         };
 
-        return new FormatProfile
+        var profile = new FormatProfile
         {
             Quality = qualityValue,
             Container = containerValue,
             IncludeSubtitles = includeSubtitles,
             IncludeTags = includeTags,
+            // Copy subtitle styling settings from SettingsService
+            SubtitleStyle = _settingsService.SubtitleStyle,
+            SubtitleFontSize = _settingsService.SubtitleFontSize,
+            SubtitleBackgroundOpacity = _settingsService.SubtitleBackgroundOpacity,
         };
+
+        Console.WriteLine(
+            $"[FORMAT] Created profile with subtitle settings: Style={profile.SubtitleStyle}, FontSize={profile.SubtitleFontSize}, Opacity={profile.SubtitleBackgroundOpacity}"
+        );
+
+        return profile;
     }
 
     [RelayCommand]
