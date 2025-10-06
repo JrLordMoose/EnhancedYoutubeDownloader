@@ -467,14 +467,31 @@ The Enhanced YouTube Downloader is now **production-ready** with:
 - Ready for GitHub release and distribution
 
 ### 📋 Next Steps
-1. Push all changes to GitHub repository
-2. Create GitHub release with tag v1.0.0
-3. Upload installer as release asset
-4. Publish comprehensive release notes
-5. Announce the release to users
+1. ~~Push all changes to GitHub repository~~ ✅ **COMPLETED**
+2. ~~Create GitHub release with tag v1.0.0~~ ✅ **COMPLETED** (as v0.3.0)
+3. ~~Upload installer as release asset~~ ✅ **COMPLETED**
+4. ~~Publish comprehensive release notes~~ ✅ **COMPLETED**
+5. ~~Announce the release to users~~ ✅ **COMPLETED**
 
 **The project has successfully evolved from a basic YouTube downloader to a professional, feature-rich application ready for public release.**
 
+---
+
+### ⚠️ **Update: Critical Issue Discovered (Session 14)**
+
+**Issue Found**: All downloads were failing immediately after installation with v0.3.0
+
+**Root Cause**: Missing `yt-dlp.exe` dependency
+- Application uses `YtDlpDownloadService` requiring BOTH `yt-dlp.exe` AND `ffmpeg.exe`
+- v0.3.0 installer only included FFmpeg (94 MB)
+- Missing yt-dlp caused all downloads to fail with generic "Failed" message
+
+**Resolution**: Released v0.3.1 with complete fix
+- Added `Download-YtDlp.ps1` script for automatic download
+- Updated build system to include yt-dlp in all builds
+- Installer size: 63 MB → 79.71 MB (now includes both executables)
+
+**See**: [Session 14 Documentation](Session_14_Critical_YtDlp_Fix_and_Phase_1_Complete.md) for full investigation and fix details.
 
 ---
 ## Where claude left off:
