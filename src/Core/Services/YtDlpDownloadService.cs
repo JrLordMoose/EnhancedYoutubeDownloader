@@ -500,6 +500,16 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 downloadItem.Status = DownloadStatus.Completed;
                 downloadItem.CompletedAt = DateTime.UtcNow;
                 downloadItem.Progress = 100;
+
+                // Set file size from completed file if not already set
+                if (downloadItem.TotalBytes == 0 && File.Exists(downloadItem.FilePath))
+                {
+                    var fileInfo = new FileInfo(downloadItem.FilePath);
+                    downloadItem.TotalBytes = fileInfo.Length;
+                    downloadItem.BytesDownloaded = fileInfo.Length;
+                    Console.WriteLine($"[YTDLP] Set file size from completed file: {fileInfo.Length} bytes");
+                }
+
                 downloadItem.CanPause = false;
                 downloadItem.CanResume = false;
                 downloadItem.CanCancel = false;
