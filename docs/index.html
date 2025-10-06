@@ -165,21 +165,52 @@
             <p class="section-subtitle">See the app in action</p>
 
             <div class="screenshots-grid">
-                <div class="screenshot-card">
+                <div class="screenshot-card" onclick="openLightbox('images/main-screenshot.png', 'Main Interface')">
                     <img src="images/main-screenshot.png" alt="Main Interface" loading="lazy">
                     <p>Clean, modern interface with Material Design</p>
+                    <span class="expand-icon">🔍</span>
                 </div>
-                <div class="screenshot-card">
+                <div class="screenshot-card" onclick="openLightbox('images/download-progress.png', 'Download Progress')">
                     <img src="images/download-progress.png" alt="Download Progress" loading="lazy">
                     <p>Real-time download progress with pause/resume</p>
+                    <span class="expand-icon">🔍</span>
                 </div>
-                <div class="screenshot-card">
+                <div class="screenshot-card" onclick="openLightbox('images/settings.png', 'Settings')">
                     <img src="images/settings.png" alt="Settings" loading="lazy">
                     <p>Comprehensive settings and configuration</p>
+                    <span class="expand-icon">🔍</span>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+
+    <script>
+        function openLightbox(src, caption) {
+            document.getElementById('lightbox').style.display = 'flex';
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-caption').textContent = caption;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close lightbox on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
 
     <!-- Installation Section -->
     <section id="installation" class="installation">

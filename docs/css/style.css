@@ -377,11 +377,18 @@ section {
     overflow: hidden;
     transition: var(--transition);
     border: 1px solid var(--bg-tertiary);
+    position: relative;
+    cursor: pointer;
 }
 
 .screenshot-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.screenshot-card:hover .expand-icon {
+    opacity: 1;
 }
 
 .screenshot-card img {
@@ -393,6 +400,68 @@ section {
     padding: var(--spacing-md);
     text-align: center;
     color: var(--text-secondary);
+}
+
+.expand-icon {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Lightbox */
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    font-size: 3rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.lightbox-close:hover {
+    color: var(--primary);
+}
+
+.lightbox-content {
+    max-width: 90%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-caption {
+    margin-top: var(--spacing-lg);
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    text-align: center;
 }
 
 /* Installation Section */
