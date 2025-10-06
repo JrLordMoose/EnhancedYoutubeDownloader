@@ -252,8 +252,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Original [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader) by Tyrrrz
 - [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode) for YouTube API access
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
-
+- [Thiink Media Graphics](https://www.thiinkmediagraphics.com/) for design and landing page
 - [Material Design](https://material.io/) for design system
+
 
 
 
