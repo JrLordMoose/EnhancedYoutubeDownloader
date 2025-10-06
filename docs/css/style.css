@@ -997,6 +997,10 @@ section {
     box-shadow: 0 20px 60px rgba(249, 168, 37, 0.3);
 }
 
+.download-info {
+    text-align: center;
+}
+
 .download-info h3 {
     font-size: var(--font-2xl);
     margin-bottom: var(--spacing-md);
