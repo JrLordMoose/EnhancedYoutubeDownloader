@@ -187,6 +187,49 @@
                                                  VerticalAlignment="Center"/>
                                 </Grid>
 
+                                <!-- AI Subtitles -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="AI Subtitle Generation (Experimental)"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Generate subtitles using AI when not available"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.EnableAISubtitles, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- AI Subtitle Language (visible only when AI subtitles enabled) -->
+                                <StackPanel Spacing="8" IsVisible="{Binding Settings.EnableAISubtitles}">
+                                    <Grid ColumnDefinitions="*,200">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="AI Subtitle Language"
+                                                      FontSize="14"/>
+                                            <TextBlock Text="Language for AI-generated subtitles"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+                                        <ComboBox Grid.Column="1"
+                                                 SelectedIndex="0"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Center"
+                                                 Theme="{DynamicResource MaterialFilledComboBox}">
+                                            <ComboBoxItem Content="Auto-detect" Tag="auto"/>
+                                            <ComboBoxItem Content="English" Tag="en"/>
+                                            <ComboBoxItem Content="Spanish" Tag="es"/>
+                                            <ComboBoxItem Content="French" Tag="fr"/>
+                                            <ComboBoxItem Content="German" Tag="de"/>
+                                            <ComboBoxItem Content="Italian" Tag="it"/>
+                                            <ComboBoxItem Content="Portuguese" Tag="pt"/>
+                                            <ComboBoxItem Content="Japanese" Tag="ja"/>
+                                            <ComboBoxItem Content="Korean" Tag="ko"/>
+                                            <ComboBoxItem Content="Chinese" Tag="zh"/>
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+
                                 <!-- Tags -->
                                 <Grid ColumnDefinitions="*,Auto">
                                     <StackPanel Grid.Column="0" Spacing="4">

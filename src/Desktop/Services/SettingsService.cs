@@ -65,6 +65,15 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
     [DefaultValue("")]
     public string DefaultCachePath { get; set; } = string.Empty;
 
+    [DefaultValue(false)]
+    public bool EnableAISubtitles { get; set; } = false;
+
+    [DefaultValue("auto")]
+    public string AISubtitleLanguage { get; set; } = "auto";
+
+    [DefaultValue(true)]
+    public bool AskBeforeGeneratingSubtitles { get; set; } = true;
+
     public SettingsService()
         : base(Program.Name) { }
 

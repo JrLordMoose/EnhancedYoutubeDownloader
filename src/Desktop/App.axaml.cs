@@ -114,6 +114,7 @@ public class App : Application, IDisposable
         });
 
         services.AddSingleton<IDownloadService, YtDlpDownloadService>();
+        services.AddSingleton<ISubtitleGenerationService, SubtitleGenerationService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IQueryResolver, QueryResolver>();
         services.AddSingleton<IDependencyValidator, DependencyValidator>();
