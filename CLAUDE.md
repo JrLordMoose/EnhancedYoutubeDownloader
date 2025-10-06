@@ -149,6 +149,77 @@ Edit `setup.iss` to customize:
 
 For advanced customization, see [Inno Setup documentation](https://jrsoftware.org/ishelp/).
 
+### Release Process
+
+When creating a new release, follow these steps to ensure version consistency:
+
+#### Version Update Checklist
+**CRITICAL**: There are THREE version locations that must ALL be updated:
+
+1. **Directory.Build.props** (line 4) - ✅ **UPDATE THIS FIRST!**
+   ```xml
+   <Version>X.Y.Z</Version>
+   ```
+   - This is the **source of truth** for the .NET application version
+   - Read by MSBuild and displayed in title bar
+   - Forgetting this causes version mismatch bugs!
+
+2. **setup.iss** (line 5)
+   ```inno
+   #define MyAppVersion "X.Y.Z"
+   ```
+   - Installer package metadata
+
+3. **build-installer.ps1** (line 6)
+   ```powershell
+   [string]$Version = "X.Y.Z"
+   ```
+   - Build script default version
+
+4. **README.md** (lines 47, 140)
+   - Update download links to new version
+
+#### GitHub Release Guidelines
+
+When creating releases with `gh release create`, **always include**:
+
+1. **Direct download link** to the installer EXE in the release notes:
+   ```markdown
+   **[Download EnhancedYoutubeDownloader-Setup-vX.Y.Z.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/vX.Y.Z/EnhancedYoutubeDownloader-Setup-vX.Y.Z.exe)** (79.72 MB)
+   ```
+
+2. **Installation instructions** with SmartScreen warning
+
+3. **What's New section** highlighting key features/fixes
+
+4. **Links section** with:
+   - Installation Guide
+   - Issue reporting
+   - Full changelog
+
+**Example Release Command**:
+```bash
+gh release create vX.Y.Z release/EnhancedYoutubeDownloader-Setup-vX.Y.Z.exe \
+  --title "vX.Y.Z - Feature Name" \
+  --notes "$(cat <<'EOF'
+## What's New
+- Feature 1
+- Fix 1
+
+## Installation
+**[Download EnhancedYoutubeDownloader-Setup-vX.Y.Z.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/vX.Y.Z/EnhancedYoutubeDownloader-Setup-vX.Y.Z.exe)** (79.72 MB)
+
+You may see a Windows SmartScreen warning - click "More info" and "Run anyway".
+
+## Links
+- [Installation Guide](...)
+- [Report Issues](...)
+
+**Full Changelog**: https://github.com/JrLordMoose/EnhancedYoutubeDownloader/compare/vX.Y.Z-1...vX.Y.Z
+EOF
+)"
+```
+
 ## Architecture
 
 The solution follows a clean architecture with clear separation:
