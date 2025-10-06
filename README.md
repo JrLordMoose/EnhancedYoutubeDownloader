@@ -14,7 +14,7 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 - ✅ Multiple quality and format options
 - ✅ Subtitle support
 - ✅ Metadata tagging
-- ✅ Authentication for private content
+- ⚠️ Authentication for private content (not fully implemented - do not modify auth settings)
 
 ### Enhanced Features
 - 🚀 **Unified Queue Management** - Single pane for all download states
