@@ -110,7 +110,7 @@ public partial class DownloadItem : ObservableObject
     public string FormattedBytes => TotalBytes > 0 ? $"{FormatBytes(BytesDownloaded)} / {FormatBytes(TotalBytes)}" : "--";
     public string FormattedProgressInfo =>
         Status == DownloadStatus.Failed
-            ? "Failed"
+            ? (!string.IsNullOrWhiteSpace(ErrorMessage) ? $"Failed: {TruncateErrorMessage(ErrorMessage, 100)}" : "Failed")
             : Status == DownloadStatus.Paused
                 ? "Paused"
                 : Status == DownloadStatus.Started && Progress <= 0 && TotalBytes == 0
@@ -118,6 +118,14 @@ public partial class DownloadItem : ObservableObject
                     : $"{Progress:F1}% • {FormattedSpeed} • {FormattedEta} • {FormattedBytes}";
 
     // Helper methods
+    private static string TruncateErrorMessage(string message, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(message) || message.Length <= maxLength)
+            return message;
+
+        return message.Substring(0, maxLength - 3) + "...";
+    }
+
     public static string FormatBytes(long bytes)
     {
         string[] sizes = { "B", "KB", "MB", "GB", "TB" };

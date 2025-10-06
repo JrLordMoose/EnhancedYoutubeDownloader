@@ -529,8 +529,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             Console.WriteLine($"[YTDLP] Exception message: {ex.Message}");
             Console.WriteLine($"[YTDLP] Stack trace: {ex.StackTrace}");
 
+            // Build detailed error message with context
+            var errorMessage = BuildDetailedErrorMessage(ex, downloadItem);
+
             downloadItem.Status = DownloadStatus.Failed;
-            downloadItem.ErrorMessage = ex.Message;
+            downloadItem.ErrorMessage = errorMessage;
             downloadItem.CanPause = false;
             downloadItem.CanResume = false;
             downloadItem.CanCancel = false;
@@ -634,6 +637,73 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             "flac" => YoutubeDLSharp.Options.AudioConversionFormat.Flac,
             _ => YoutubeDLSharp.Options.AudioConversionFormat.Best
         };
+    }
+
+    private static string BuildDetailedErrorMessage(Exception ex, DownloadItem downloadItem)
+    {
+        var errorType = ex.GetType().Name;
+        var baseMessage = ex.Message;
+
+        // Categorize error and add context
+        if (ex is UnauthorizedAccessException || ex is System.Security.SecurityException)
+        {
+            return $"Permission denied accessing '{downloadItem.FilePath}'. Check folder permissions and try again.";
+        }
+        else if (ex is IOException ioEx)
+        {
+            // Check for disk space issues
+            if (baseMessage.Contains("disk", StringComparison.OrdinalIgnoreCase) ||
+                baseMessage.Contains("space", StringComparison.OrdinalIgnoreCase))
+            {
+                return $"Insufficient disk space for '{Path.GetFileName(downloadItem.FilePath)}'. Free up space and restart download.";
+            }
+            // Check for file in use
+            else if (baseMessage.Contains("being used", StringComparison.OrdinalIgnoreCase) ||
+                     baseMessage.Contains("in use", StringComparison.OrdinalIgnoreCase))
+            {
+                return $"File is in use: '{Path.GetFileName(downloadItem.FilePath)}'. Close other programs and restart.";
+            }
+            else
+            {
+                return $"File error: {baseMessage}. Check file path and permissions.";
+            }
+        }
+        else if (ex is System.Net.Http.HttpRequestException || ex is System.Net.WebException ||
+                 baseMessage.Contains("network", StringComparison.OrdinalIgnoreCase) ||
+                 baseMessage.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
+                 baseMessage.Contains("timeout", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Network error downloading '{downloadItem.Video?.Title ?? "video"}'. Check internet connection and restart.";
+        }
+        else if (baseMessage.Contains("unavailable", StringComparison.OrdinalIgnoreCase) ||
+                 baseMessage.Contains("not available", StringComparison.OrdinalIgnoreCase) ||
+                 baseMessage.Contains("removed", StringComparison.OrdinalIgnoreCase) ||
+                 baseMessage.Contains("private", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Video unavailable: {baseMessage}";
+        }
+        else if (baseMessage.Contains("format", StringComparison.OrdinalIgnoreCase) ||
+                 baseMessage.Contains("quality", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Format not available for '{downloadItem.Video?.Title ?? "video"}'. Try different quality/format.";
+        }
+        else if (ex is InvalidOperationException)
+        {
+            return $"Download error: {baseMessage}. Try restarting the download.";
+        }
+        else
+        {
+            // Generic error with video context
+            var videoTitle = downloadItem.Video?.Title;
+            if (!string.IsNullOrWhiteSpace(videoTitle) && videoTitle.Length > 40)
+            {
+                videoTitle = videoTitle.Substring(0, 37) + "...";
+            }
+
+            return !string.IsNullOrWhiteSpace(videoTitle)
+                ? $"{baseMessage} ('{videoTitle}'). Click Restart to retry."
+                : $"{baseMessage}. Click Restart to retry.";
+        }
     }
 
     public void Dispose()

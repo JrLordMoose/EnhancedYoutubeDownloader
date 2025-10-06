@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -9,6 +12,7 @@ using EnhancedYoutubeDownloader.Core.Services;
 using EnhancedYoutubeDownloader.Framework;
 using EnhancedYoutubeDownloader.Services;
 using EnhancedYoutubeDownloader.Shared.Interfaces;
+using EnhancedYoutubeDownloader.Shared.Models;
 using EnhancedYoutubeDownloader.Utils;
 using EnhancedYoutubeDownloader.Utils.Extensions;
 using EnhancedYoutubeDownloader.ViewModels;
@@ -112,6 +116,7 @@ public class App : Application, IDisposable
         services.AddSingleton<IDownloadService, YtDlpDownloadService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IQueryResolver, QueryResolver>();
+        services.AddSingleton<IDependencyValidator, DependencyValidator>();
 
         // UpdateService is Windows-only
         if (OperatingSystem.IsWindows())
@@ -173,6 +178,148 @@ public class App : Application, IDisposable
 
         // Load settings
         _settingsService.Load();
+
+        // Validate dependencies asynchronously (don't block startup)
+        _ = ValidateDependenciesAsync();
+    }
+
+    private async System.Threading.Tasks.Task ValidateDependenciesAsync()
+    {
+        try
+        {
+            Console.WriteLine("[APP] Starting dependency validation...");
+
+            // Get dependency validator service
+            var dependencyValidator = _host.Services.GetRequiredService<IDependencyValidator>();
+
+            // Validate dependencies
+            var validationResult = await dependencyValidator.ValidateAsync();
+
+            // If validation failed, show error dialog
+            if (!validationResult.IsValid)
+            {
+                Console.WriteLine(
+                    $"[APP] Dependency validation failed: {validationResult.MissingDependencies.Count} missing"
+                );
+
+                // Show error dialog on UI thread
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ShowDependencyErrorDialogAsync(validationResult);
+                });
+            }
+            else
+            {
+                Console.WriteLine("[APP] Dependency validation completed successfully");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[APP] Error during dependency validation: {ex.Message}");
+        }
+    }
+
+    private async System.Threading.Tasks.Task ShowDependencyErrorDialogAsync(
+        DependencyValidationResult validationResult
+    )
+    {
+        try
+        {
+            // Get required services
+            var dialogManager = _host.Services.GetRequiredService<DialogManager>();
+            var viewModelManager = _host.Services.GetRequiredService<ViewModelManager>();
+
+            // Build error message
+            var messageBuilder = new StringBuilder();
+            messageBuilder.AppendLine(
+                "The following required dependencies are missing. Please download and place them in the application directory:"
+            );
+            messageBuilder.AppendLine();
+
+            foreach (var missing in validationResult.MissingDependencies)
+            {
+                messageBuilder.AppendLine($"• {missing.Name}");
+                messageBuilder.AppendLine($"  Expected location: {missing.ExpectedPath}");
+                messageBuilder.AppendLine($"  Download from: {missing.DownloadUrl}");
+                messageBuilder.AppendLine();
+            }
+
+            messageBuilder.AppendLine(
+                "The application may not function correctly without these dependencies."
+            );
+
+            // Build suggested actions
+            var actions = validationResult
+                .MissingDependencies.Select(dep => new ErrorAction
+                {
+                    Text = $"Download {dep.Name}",
+                    ActionKey = $"open_{dep.Name.ToLower().Replace(" ", "_")}",
+                    Description = $"Open {dep.Name} download page in browser",
+                })
+                .ToList();
+
+            // Create error info
+            var errorInfo = new ErrorInfo
+            {
+                Message = "Missing Required Dependencies",
+                Details = messageBuilder.ToString(),
+                Category = ErrorCategory.FileSystem,
+                SuggestedActions = actions,
+            };
+
+            // Create error dialog
+            var errorDialog = viewModelManager.CreateErrorDialogViewModel();
+            errorDialog.ErrorInfo = errorInfo;
+
+            // Handle action clicks (open URLs in browser)
+            errorDialog.OnActionSelected = actionKey =>
+            {
+                try
+                {
+                    var missingDep = validationResult.MissingDependencies.FirstOrDefault(d =>
+                        actionKey.Contains(d.Name.ToLower().Replace(" ", "_"))
+                    );
+
+                    if (missingDep != null)
+                    {
+                        Console.WriteLine(
+                            $"[APP] Opening download URL for {missingDep.Name}: {missingDep.DownloadUrl}"
+                        );
+
+                        // Open URL in default browser
+                        var psi = new ProcessStartInfo
+                        {
+                            FileName = missingDep.DownloadUrl,
+                            UseShellExecute = true,
+                        };
+                        Process.Start(psi);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[APP] Failed to open URL: {ex.Message}");
+                }
+            };
+
+            // Show dialog
+            await dialogManager.ShowDialogAsync(errorDialog);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[APP] Failed to show dependency error dialog: {ex.Message}");
+
+            // Fallback: show console message
+            Console.WriteLine("\n========================================");
+            Console.WriteLine("MISSING DEPENDENCIES:");
+            Console.WriteLine("========================================");
+            foreach (var missing in validationResult.MissingDependencies)
+            {
+                Console.WriteLine($"\n{missing.Name}:");
+                Console.WriteLine($"  Location: {missing.ExpectedPath}");
+                Console.WriteLine($"  Download: {missing.DownloadUrl}");
+            }
+            Console.WriteLine("========================================\n");
+        }
     }
 
     private void Application_OnActualThemeVariantChanged(object? sender, EventArgs args) =>
