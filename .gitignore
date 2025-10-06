@@ -58,6 +58,9 @@ src/**/bin/
 src/**/obj/
 scripts/
 
+# Release installers (distributed via GitHub Releases)
+release/
+
 # User folders (downloads, cache, settings)
 **/Downloads/
 **/Cache/
