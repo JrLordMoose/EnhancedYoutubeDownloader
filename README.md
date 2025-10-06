@@ -49,9 +49,7 @@ Download and run the installer:
 
 **⚠️ Windows SmartScreen Warning**
 
-You may see a red warning screen saying "Windows protected your PC":
-
-![Windows SmartScreen Warning](guides-and-instructions/images/ytscreenshot23.png)
+You may see a red warning screen saying "Windows protected your PC".
 
 **This is normal and safe!** The warning appears because the installer isn't digitally signed (signing costs $200-500/year).
 
