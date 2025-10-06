@@ -1062,8 +1062,10 @@ section {
 
 .tech-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-xl);
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .tech-item {
@@ -1286,7 +1288,7 @@ section {
     }
 
     .tech-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .download-card {
@@ -1309,6 +1311,10 @@ section {
 
     .hero {
         padding: var(--spacing-2xl) 0;
+    }
+
+    .tech-grid {
+        grid-template-columns: 1fr;
     }
 
     .lightbox-close {
