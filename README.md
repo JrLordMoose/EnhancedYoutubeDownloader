@@ -2,6 +2,14 @@
 
 An enhanced, production-ready version of YouTube Downloader that surpasses the original in functionality, user experience, and code quality.
 
+## 🌐 [View Landing Page](https://jrlordmoose.github.io/EnhancedYoutubeDownloader/)
+
+Experience our professional landing page featuring:
+- Modern glassmorphism design with animated gradients
+- Interactive 3D mockups and smooth animations
+- Comprehensive feature showcase
+- Easy installation guide
+
 <br>
 <img width="1126" height="754" alt="enhanced_ytdownloader_screenshot" src="https://github.com/user-attachments/assets/12869c5f-3c74-4778-8658-85c0d2370ba5" />
 <br>
