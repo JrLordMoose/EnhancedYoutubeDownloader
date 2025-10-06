@@ -2,11 +2,11 @@
 
 An enhanced, production-ready version of YouTube Downloader that surpasses the original in functionality, user experience, and code quality.
 
-
-
+<br>
+<img width="1126" height="754" alt="enhanced_ytdownloader_screenshot" src="https://github.com/user-attachments/assets/12869c5f-3c74-4778-8658-85c0d2370ba5" />
+<br>
 
 ## Features
-<img width="1126" height="754" alt="enhanced_ytdownloader_screenshot" src="https://github.com/user-attachments/assets/12869c5f-3c74-4778-8658-85c0d2370ba5" />
 
 ### Core Features
 - ✅ Cross-platform support (Windows, Linux, macOS)
@@ -51,8 +51,15 @@ Download and run the installer:
 
 You may see a red warning screen saying "Windows protected your PC".
 
-**This is normal and safe!** The warning appears because the installer isn't digitally signed (signing costs $200-500/year).
+<br>
+<p>&nbsp;</p>
 
+<img width="530" height="494" alt="ytscreenshot23" src="https://github.com/user-attachments/assets/3ad1fcbf-4f86-4520-afa6-2285c0baaa95" />
+
+<br>
+<p>&nbsp;</p>
+
+**This is normal and safe!** The warning appears because the installer isn't digitally signed (signing costs $200-500/year).
 **To proceed:**
 1. Click **"More info"** on the warning screen
 2. Click **"Run anyway"** button that appears
@@ -178,3 +185,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
 
 - [Material Design](https://material.io/) for design system
+
