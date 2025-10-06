@@ -57,6 +57,14 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- FAQ Section -->
+  <url>
+    <loc>https://jrlordmoose.github.io/EnhancedYoutubeDownloader/#faq</loc>
+    <lastmod>2024-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- GitHub Repository (external but important) -->
   <url>
     <loc>https://github.com/JrLordMoose/EnhancedYoutubeDownloader</loc>

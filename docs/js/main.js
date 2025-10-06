@@ -174,6 +174,44 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(link);
     });
 
+    // FAQ Accordion functionality
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(button => {
+        button.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            const answer = this.nextElementSibling;
+
+            // Close all other FAQs
+            faqQuestions.forEach(otherButton => {
+                if (otherButton !== this) {
+                    otherButton.setAttribute('aria-expanded', 'false');
+                    otherButton.nextElementSibling.classList.remove('active');
+                }
+            });
+
+            // Toggle current FAQ
+            this.setAttribute('aria-expanded', !isExpanded);
+            answer.classList.toggle('active');
+        });
+
+        // Keyboard accessibility
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
+
+    // Observe FAQ items for animation
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+
     // Log page load time (for debugging)
     window.addEventListener('load', function() {
         const loadTime = window.performance.timing.domContentLoadedEventEnd -
