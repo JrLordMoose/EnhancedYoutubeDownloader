@@ -298,6 +298,28 @@ section {
     margin-bottom: var(--spacing-sm);
 }
 
+.feature-card-highlight {
+    border: 2px solid var(--primary);
+    background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(249, 168, 37, 0.05) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card-highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+.feature-card-highlight:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 8px 32px rgba(249, 168, 37, 0.2);
+}
+
 .feature-card p {
     color: var(--text-secondary);
     line-height: 1.7;
