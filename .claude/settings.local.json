@@ -39,7 +39,9 @@
       "Bash(release/EnhancedYoutubeDownloader-Setup-v0.3.2.exe)",
       "Bash(git rm:*)",
       "WebFetch(domain:docs.avaloniaui.net)",
-      "Bash(dotnet add package:*)"
+      "Bash(dotnet add package:*)",
+      "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/yt-dlp.exe --list-formats \"https://www.youtube.com/watch?v=1R9z-AcAGYQ\")",
+      "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/yt-dlp.exe --list-subs \"https://www.youtube.com/watch?v=1R9z-AcAGYQ\")"
     ],
     "deny": [],
     "ask": []

@@ -454,9 +454,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                     var baseFileName = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
 
                     // Search for files matching the base name
+                    // Order by file size (largest first) to avoid picking up small stub files
                     var possibleFiles = Directory.GetFiles(searchDir, $"{baseFileName}*")
                         .Where(f => !string.IsNullOrEmpty(baseFileName) && f.Contains(baseFileName))
-                        .OrderByDescending(f => new FileInfo(f).LastWriteTime)
+                        .OrderByDescending(f => new FileInfo(f).Length)
                         .ToList();
 
                     Console.WriteLine($"[YTDLP] Searching directory: {searchDir}");
