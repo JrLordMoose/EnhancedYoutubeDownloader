@@ -15,7 +15,12 @@
       "Bash(gh release:*)",
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.3.1\")",
       "Bash(taskkill:*)",
-      "Bash(/mnt/c/Windows/System32/taskkill.exe /F /IM EnhancedYoutubeDownloader.exe)"
+      "Bash(/mnt/c/Windows/System32/taskkill.exe /F /IM EnhancedYoutubeDownloader.exe)",
+      "Bash(\"src/Desktop/bin/Release/net9.0/win-x64/publish/ffmpeg.exe\" -version)",
+      "Bash(curl:*)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File Download-FFmpeg.ps1)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []
