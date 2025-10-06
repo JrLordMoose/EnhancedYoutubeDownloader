@@ -72,15 +72,44 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "  Application published to: $PublishDir" -ForegroundColor Green
 Write-Host ""
 
-# Step 4: Verify FFmpeg is included
+# Step 4: Verify and download FFmpeg if needed
 Write-Host "[4/5] Verifying FFmpeg..." -ForegroundColor Yellow
 $FFmpegPath = Join-Path $PublishDir "ffmpeg.exe"
 if (Test-Path $FFmpegPath) {
     $FFmpegSize = (Get-Item $FFmpegPath).Length / 1MB
     Write-Host "  - FFmpeg found: $([math]::Round($FFmpegSize, 2)) MB" -ForegroundColor Green
 } else {
-    Write-Host "  WARNING: FFmpeg not found in publish directory" -ForegroundColor Yellow
-    Write-Host "  FFmpeg will be downloaded on first run" -ForegroundColor Yellow
+    Write-Host "  - FFmpeg not found in publish directory" -ForegroundColor Yellow
+    Write-Host "  - Downloading FFmpeg..." -ForegroundColor Yellow
+
+    # Download FFmpeg to Desktop project directory first
+    $DesktopProjectDir = Join-Path $ProjectRoot "src\Desktop"
+    $FFmpegScript = Join-Path $DesktopProjectDir "Download-FFmpeg.ps1"
+
+    if (Test-Path $FFmpegScript) {
+        try {
+            & powershell -ExecutionPolicy Bypass -File $FFmpegScript -OutputPath $DesktopProjectDir
+
+            # Copy to publish directory
+            $SourceFFmpeg = Join-Path $DesktopProjectDir "ffmpeg.exe"
+            if (Test-Path $SourceFFmpeg) {
+                Copy-Item $SourceFFmpeg $FFmpegPath -Force
+                $FFmpegSize = (Get-Item $FFmpegPath).Length / 1MB
+                Write-Host "  - FFmpeg downloaded and copied: $([math]::Round($FFmpegSize, 2)) MB" -ForegroundColor Green
+            } else {
+                Write-Host "  ERROR: FFmpeg download failed" -ForegroundColor Red
+                Write-Host "  Please download FFmpeg manually from: https://github.com/FFmpegBin/FFmpegBin/releases" -ForegroundColor Yellow
+                exit 1
+            }
+        } catch {
+            Write-Host "  ERROR: Failed to download FFmpeg: $_" -ForegroundColor Red
+            Write-Host "  Please download FFmpeg manually from: https://github.com/FFmpegBin/FFmpegBin/releases" -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Host "  ERROR: FFmpeg download script not found at: $FFmpegScript" -ForegroundColor Red
+        exit 1
+    }
 }
 Write-Host ""
 
