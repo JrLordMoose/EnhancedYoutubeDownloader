@@ -248,6 +248,12 @@ src/
 4. Add tests for new functionality
 5. Submit a pull request
 
+## Contributors
+
+Special thanks to the following contributors who have helped make this project better:
+
+- **[ThiinkMG](https://github.com/ThiinkMG)** - Graphics and design contributions
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
