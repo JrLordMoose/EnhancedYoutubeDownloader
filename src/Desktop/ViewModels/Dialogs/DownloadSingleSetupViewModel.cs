@@ -54,6 +54,25 @@ public partial class DownloadSingleSetupViewModel : DialogViewModelBase
         _dialogManager = dialogManager;
     }
 
+    /// <summary>
+    /// Called when SelectedFormat property changes - updates file extension
+    /// </summary>
+    partial void OnSelectedFormatChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(FilePath))
+            return;
+
+        // Update file extension when format changes
+        var directory = Path.GetDirectoryName(FilePath);
+        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(FilePath);
+        var newExtension = value.ToLower();
+
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            FilePath = Path.Combine(directory, $"{fileNameWithoutExtension}.{newExtension}");
+        }
+    }
+
     [RelayCommand]
     private async Task BrowseAsync()
     {
@@ -65,11 +84,13 @@ public partial class DownloadSingleSetupViewModel : DialogViewModelBase
         var defaultFileName = $"{sanitizedTitle}.{SelectedFormat.ToLower()}";
 
         // Show file picker
+        var fileTypeDescription =
+            SelectedFormat == "MP3" ? $"{SelectedFormat} Audio" : $"{SelectedFormat} Video";
         var selectedPath = await _dialogManager.PromptSaveFilePathAsync(
             defaultFileName,
             new Dictionary<string, string[]>
             {
-                { $"{SelectedFormat} Video", new[] { $".{SelectedFormat.ToLower()}" } },
+                { fileTypeDescription, new[] { $".{SelectedFormat.ToLower()}" } },
                 { "All Files", new[] { "*" } },
             }
         );

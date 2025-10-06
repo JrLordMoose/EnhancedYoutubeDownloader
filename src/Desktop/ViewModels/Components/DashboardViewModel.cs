@@ -199,7 +199,12 @@ public partial class DashboardViewModel : ViewModelBase
                 ? _settingsService.DefaultDownloadPath
                 : Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
 
-            setupDialog.FilePath = Path.Combine(defaultPath, $"{sanitizedTitle}.mp4");
+            // Use default format extension from setupDialog (defaults to "MP4")
+            var defaultExtension = setupDialog.SelectedFormat.ToLower();
+            setupDialog.FilePath = Path.Combine(
+                defaultPath,
+                $"{sanitizedTitle}.{defaultExtension}"
+            );
             Console.WriteLine($"[DEBUG] Default download path set to: {setupDialog.FilePath}");
 
             var dialogResult = await _dialogManager.ShowDialogAsync(setupDialog);
