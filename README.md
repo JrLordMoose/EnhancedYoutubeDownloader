@@ -15,12 +15,13 @@ Experience our professional landing page featuring:
 - Comprehensive feature showcase
 - Easy installation guide
 
-<br>
-<img width="1193" height="665" alt="ytdownloader-app-branded-preview-image" src="https://github.com/user-attachments/assets/e5adfbf5-1044-4468-bb14-43ce6ada46e9" />
-
-<br>
+---
 
 ## Features
+
+<br>
+<img width="1193" height="665" alt="ytdownloader-app-branded-preview-image" src="https://github.com/user-attachments/assets/e5adfbf5-1044-4468-bb14-43ce6ada46e9" />
+<br>
 
 ### Core Features
 - ✅ Cross-platform support (Windows, Linux, macOS)
@@ -253,5 +254,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
 
 - [Material Design](https://material.io/) for design system
+
 
 
