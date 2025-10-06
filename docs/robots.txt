@@ -1,0 +1,46 @@
+# robots.txt for Enhanced YouTube Downloader
+# https://jrlordmoose.github.io/EnhancedYoutubeDownloader/
+
+# Allow all crawlers to index the site
+User-agent: *
+Allow: /
+
+# Disallow crawling of CSS and JS files (optional, but allows crawling for verification)
+# Allow: /css/
+# Allow: /js/
+# Allow: /images/
+
+# Sitemap location
+Sitemap: https://jrlordmoose.github.io/EnhancedYoutubeDownloader/sitemap.xml
+
+# Crawl delay (optional, adjust if needed)
+# Crawl-delay: 1
+
+# Specific rules for major search engines
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /images/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# Yahoo
+User-agent: Slurp
+Allow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Yandex
+User-agent: YandexBot
+Allow: /
+
+# Baidu
+User-agent: Baiduspider
+Allow: /

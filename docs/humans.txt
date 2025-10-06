@@ -1,0 +1,70 @@
+# Enhanced YouTube Downloader
+# https://jrlordmoose.github.io/EnhancedYoutubeDownloader/
+
+/* TEAM */
+
+Developer: JrLordMoose
+Site: https://github.com/JrLordMoose
+Location: United States
+
+AI Assistant: Claude Code
+Site: https://claude.com/claude-code
+From: Anthropic
+
+/* THANKS */
+
+Original Project: YoutubeDownloader by Tyrrrz
+Site: https://github.com/Tyrrrz/YoutubeDownloader
+Description: The foundation for this enhanced version
+
+Partner: Thiink Media Graphics
+Site: https://www.thiinkmediagraphics.com/
+Description: Partnership and support
+
+/* SITE */
+
+Last update: 2025/10/06
+Standards: HTML5, CSS3, JavaScript ES6
+Components: Avalonia UI, Material Design
+Software: .NET 9.0, Visual Studio, Claude Code
+Language: C# / English
+Doctype: HTML5
+IDE: Visual Studio 2022, VS Code
+
+/* DEPENDENCIES */
+
+Framework: .NET 9.0
+UI Framework: Avalonia UI 11.x
+Design: Material Design 3.9.2
+Download Engine: yt-dlp
+Media Processing: FFmpeg 7.x
+Database: SQLite
+Architecture: MVVM with CommunityToolkit.Mvvm
+
+/* FEATURES */
+
+- Professional Netflix-style burned-in subtitles
+- Pause/resume downloads with state persistence
+- Download YouTube videos, playlists, and channels
+- Multiple format support (MP4, WebM, MP3)
+- Unified queue management with batch operations
+- Subtitle download and embedding
+- Metadata tagging with thumbnail cover art
+- SQLite-based intelligent caching
+- Download scheduling
+- Automatic updates
+- Material Design modern UI
+- No ads, tracking, or telemetry
+
+/* LICENSE */
+
+License: MIT License
+Open Source: Yes
+Free: Yes
+Copyright: 2025 Enhanced YouTube Downloader
+
+/* CONTACT */
+
+GitHub Issues: https://github.com/JrLordMoose/EnhancedYoutubeDownloader/issues
+Bug Report Form: https://docs.google.com/forms/d/e/1FAIpQLSfgvSuqvusqpGBs6UUbUImzUB10YzROqomsvGFZhnp41VTeRg/viewform
+Repository: https://github.com/JrLordMoose/EnhancedYoutubeDownloader
