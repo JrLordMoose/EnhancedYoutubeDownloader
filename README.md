@@ -230,6 +230,11 @@ src/
 
 ### Key Components
 
+<br>
+<img width="1421" height="738" alt="realtimedownloads-image" src="https://github.com/user-attachments/assets/68295c6f-f0c5-4e47-80ec-b4f2d774c765" />
+<br>
+<p>&nbsp;</p>
+
 - **DownloadService**: Manages download operations with pause/resume
 - **CacheService**: Handles metadata caching with SQLite
 - **NotificationService**: Provides user feedback
@@ -254,6 +259,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode) for YouTube API access
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
 - [Material Design](https://material.io/) for design system
+
 
 
 
