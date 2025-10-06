@@ -108,14 +108,17 @@ public partial class DownloadItem : ObservableObject
     public string FormattedSpeed => DownloadSpeed > 0 ? $"{FormatBytes((long)DownloadSpeed)}/s" : "--";
     public string FormattedEta => EstimatedTimeRemaining.HasValue ? FormatDuration(EstimatedTimeRemaining.Value) : "--";
     public string FormattedBytes => TotalBytes > 0 ? $"{FormatBytes(BytesDownloaded)} / {FormatBytes(TotalBytes)}" : "--";
+    public string FormattedDuration => Duration.HasValue ? FormatDuration(Duration.Value) : "--";
     public string FormattedProgressInfo =>
         Status == DownloadStatus.Failed
             ? (!string.IsNullOrWhiteSpace(ErrorMessage) ? $"Failed: {TruncateErrorMessage(ErrorMessage, 100)}" : "Failed")
             : Status == DownloadStatus.Paused
                 ? "Paused"
-                : Status == DownloadStatus.Started && Progress <= 0 && TotalBytes == 0
-                    ? "Loading..."
-                    : $"{Progress:F1}% • {FormattedSpeed} • {FormattedEta} • {FormattedBytes}";
+                : Status == DownloadStatus.Completed
+                    ? $"100.0% • {FormattedDuration} • {FormatBytes(TotalBytes > 0 ? TotalBytes : BytesDownloaded)}"
+                    : Status == DownloadStatus.Started && Progress <= 0 && TotalBytes == 0
+                        ? "Loading..."
+                        : $"{Progress:F1}% • {FormattedSpeed} • {FormattedEta} • {FormattedBytes}";
 
     // Helper methods
     private static string TruncateErrorMessage(string message, int maxLength)
