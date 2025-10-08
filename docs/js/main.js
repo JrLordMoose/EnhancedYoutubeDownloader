@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(script);
     }
 
-    // Mobile menu toggle (if needed in future)
+    // Mobile menu toggle
     const createMobileMenu = () => {
         if (window.innerWidth <= 768) {
             const nav = document.querySelector('.nav');
@@ -111,24 +111,36 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!document.querySelector('.mobile-menu-btn')) {
                 const menuBtn = document.createElement('button');
                 menuBtn.className = 'mobile-menu-btn';
+                menuBtn.setAttribute('aria-label', 'Toggle navigation menu');
+                menuBtn.setAttribute('aria-expanded', 'false');
                 menuBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="currentColor">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
                     </svg>
                 `;
-                menuBtn.style.cssText = `
-                    display: block;
-                    background: none;
-                    border: none;
-                    color: var(--text-primary);
-                    cursor: pointer;
-                    width: 40px;
-                    height: 40px;
-                    padding: 8px;
-                `;
 
                 menuBtn.addEventListener('click', () => {
-                    navLinks.classList.toggle('mobile-active');
+                    const isActive = navLinks.classList.toggle('mobile-active');
+                    menuBtn.setAttribute('aria-expanded', isActive);
+                    document.body.classList.toggle('mobile-menu-open', isActive);
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!nav.contains(e.target) && navLinks.classList.contains('mobile-active')) {
+                        navLinks.classList.remove('mobile-active');
+                        menuBtn.setAttribute('aria-expanded', 'false');
+                        document.body.classList.remove('mobile-menu-open');
+                    }
+                });
+
+                // Close menu when clicking a nav link
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('mobile-active');
+                        menuBtn.setAttribute('aria-expanded', 'false');
+                        document.body.classList.remove('mobile-menu-open');
+                    });
                 });
 
                 document.querySelector('.nav-content').appendChild(menuBtn);
