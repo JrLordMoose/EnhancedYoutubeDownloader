@@ -110,7 +110,8 @@ body {
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
-    overflow-x: hidden;
+    /* overflow-x: hidden removed - breaks position: sticky on .nav */
+    /* Use max-width: 100% on child elements instead to prevent horizontal scroll */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
