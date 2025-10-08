@@ -231,11 +231,15 @@ img {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 8px;
+    padding: 12px; /* Increased from 8px for better touch target */
     z-index: 1002;
     position: relative;
     pointer-events: auto; /* Ensure button is always clickable */
     touch-action: manipulation; /* Prevent touch delays */
+    min-width: 48px; /* WCAG minimum touch target */
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-toggle-icon {
