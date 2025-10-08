@@ -219,6 +219,109 @@ img {
     transform: translateX(-50%) scaleX(1);
 }
 
+/* Hamburger Menu Toggle Button */
+.nav-toggle {
+    display: none; /* Hidden on desktop */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 1002;
+    position: relative;
+}
+
+.nav-toggle-icon {
+    display: block;
+    width: 28px;
+    height: 2px;
+    background: var(--text-primary);
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.nav-toggle-icon::before,
+.nav-toggle-icon::after {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 2px;
+    background: var(--text-primary);
+    transition: transform 0.3s ease;
+}
+
+.nav-toggle-icon::before {
+    top: -8px;
+}
+
+.nav-toggle-icon::after {
+    top: 8px;
+}
+
+/* Hamburger menu active state (X icon) */
+.nav-toggle.active .nav-toggle-icon {
+    background: transparent;
+}
+
+.nav-toggle.active .nav-toggle-icon::before {
+    transform: rotate(45deg);
+    top: 0;
+}
+
+.nav-toggle.active .nav-toggle-icon::after {
+    transform: rotate(-45deg);
+    top: 0;
+}
+
+/* Mobile navigation menu */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: block; /* Show on mobile */
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 60px; /* Below sticky header */
+        left: 0;
+        right: 0;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: var(--spacing-lg) 0;
+        gap: 0;
+        box-shadow: var(--shadow-lg);
+        border-bottom: 1px solid var(--glass-border);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 999;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+
+    .nav-links.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .nav-links a {
+        width: 100%;
+        padding: var(--spacing-md) var(--spacing-xl);
+        border-radius: 0;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .nav-links a:last-child {
+        border-bottom: none;
+    }
+
+    .nav-links a::before {
+        display: none; /* Remove hover underline on mobile */
+    }
+}
+
 /* Keyframe Animations */
 @keyframes gradient-shift {
     0%, 100% { background-position: 0% 50%; }
