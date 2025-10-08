@@ -389,10 +389,15 @@ img {
     position: relative;
     padding: var(--spacing-4xl) 0;
     background: var(--bg-primary);
-    overflow: hidden;
+    overflow: visible; /* Allow image to scale on hover without clipping */
     min-height: 90vh;
     display: flex;
     align-items: center;
+}
+
+/* Allow hero container to overflow for hover effect */
+.hero .container {
+    overflow: visible; /* Override global container overflow-x: clip */
 }
 
 /* Animated Gradient Mesh Background */
@@ -484,6 +489,8 @@ img {
 .hero-image {
     position: relative;
     animation: scale-in 0.8s ease-out 0.2s both;
+    overflow: visible; /* Allow screenshot to scale on hover without clipping */
+    padding: 20px; /* Add padding to prevent shadow clipping */
 }
 
 .screenshot-main {
