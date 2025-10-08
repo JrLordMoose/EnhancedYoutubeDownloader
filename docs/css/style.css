@@ -1971,8 +1971,15 @@ section {
    ======================================== */
 @media (max-width: 768px) {
     .nav {
-        z-index: 100; /* Ensure nav is above hero content */
-        position: relative;
+        position: sticky; /* Keep header visible while scrolling */
+        top: 0;
+        z-index: 1000; /* Ensure nav overlays all content */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow for depth */
+    }
+
+    /* Enhanced shadow when scrolled (optional visual improvement) */
+    .nav.scrolled {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     /* If mobile menu exists (hamburger menu) */
