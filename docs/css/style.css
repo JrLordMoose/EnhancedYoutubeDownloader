@@ -173,6 +173,7 @@ img {
     align-items: center;
     padding: var(--spacing-md) 0;
     position: relative; /* Enable absolute positioning for .nav-links dropdown */
+    z-index: 1001; /* Ensure nav content is above other elements */
 }
 
 .nav-brand h1 {
@@ -233,6 +234,8 @@ img {
     padding: 8px;
     z-index: 1002;
     position: relative;
+    pointer-events: auto; /* Ensure button is always clickable */
+    touch-action: manipulation; /* Prevent touch delays */
 }
 
 .nav-toggle-icon {
@@ -300,11 +303,13 @@ img {
         z-index: 999;
         max-height: calc(100vh - 60px);
         overflow-y: auto;
+        pointer-events: none; /* Don't block clicks when hidden */
     }
 
     .nav-links.active {
         display: flex; /* Show as flex when active */
         animation: slideDownMenu 0.3s ease-out;
+        pointer-events: auto; /* Allow clicks when visible */
     }
 
     .nav-links a {
