@@ -584,3 +584,287 @@ All 5 Material Design dialogs created with complete AXAML markup:
 - Original project: [YoutubeDownloader by Tyrrrz](https://github.com/Tyrrrz/YoutubeDownloader)
 - YoutubeExplode docs: https://github.com/Tyrrrz/YoutubeExplode
 - Avalonia docs: https://docs.avaloniaui.net/
+- 🔄 Enhanced Workflow Template (Based on Actual Usage)
+
+  📍 START OF SESSION (3-5 minutes)
+
+  1. Context Loading (2-3 minutes)
+  # Open last session's Quick Resume
+  # Location: guides-and-instructions/chats/Session_[NN]_*.md
+  # Read ONLY the "Quick Resume" section (3-5 bullets)
+
+  2. Check Git Status (1 minute)
+  git status
+  git log --oneline -5  # See recent work
+
+  3. Review Next Steps (1 minute)
+  - Read "Next Session Priorities" from previous session
+  - Confirm task with user if unclear
+
+  4. Optional: Check Session Index (30 seconds)
+  - If unsure about past work: Ctrl+F in SESSION_INDEX.md
+  - Find related sessions by keyword
+
+  Total: 3-5 minutes (vs. 20-30 min without docs)
+
+  ---
+  🛠️ DURING SESSION (Variable)
+
+  Real Pattern Observed:
+
+  User Request → Immediate Action Loop:
+  1. User provides request ("fix hamburger menu", "organize files")
+  2. You analyze and plan (use TodoWrite for multi-step tasks)
+  3. You implement immediately (Read → Edit/Write → Test)
+  4. User gives feedback ("too small", "works great")
+  5. You iterate quickly (adjust and validate)
+  6. Repeat until complete
+
+  Key Behaviors:
+  - ✅ Use TodoWrite for tasks with 3+ steps (helps track progress)
+  - ✅ Read files before editing (required by tools)
+  - ✅ Make multiple parallel tool calls when possible (efficiency)
+  - ✅ Commit frequently (atomic commits per feature/fix)
+  - ✅ Push to GitHub after major work (validate deployment)
+
+  Documentation During Session:
+  - ❌ Don't stop to document mid-session
+  - ✅ Keep mental notes of decisions made
+  - ✅ Use git commit messages to capture "what" (session doc will capture "why")
+
+  ---
+  🎬 END OF SESSION (10-12 minutes)
+
+  User Signals:
+  - "let's wrap up"
+  - "that's good for now"
+  - Asks for summary/documentation
+  - Natural stopping point reached
+
+  Closing Checklist:
+
+  1. Final Commit & Push (2 minutes)
+  git add -A
+  git status  # Verify changes
+  git commit -m "Descriptive message"
+  git push origin main
+
+  2. Invoke Session Documentation Agent (5 minutes)
+  User says:
+  Create session documentation for today's work
+  or
+  Document Session [NN]: [brief description]
+
+  Agent generates:
+  - Quick Resume (3-5 bullets)
+  - Key Accomplishments (detailed)
+  - File changes with line numbers
+  - Technical decisions with rationale
+  - Next session priorities
+
+  3. Review Generated Doc (2 minutes)
+  - Check Quick Resume accuracy (most critical)
+  - Verify file paths and line numbers
+  - Confirm next steps are clear
+
+  4. Update Session Index (1 minute)
+  Agent will remind you to add entry to:
+  guides-and-instructions/chats/SESSION_INDEX.md
+
+  Quick add:
+  - Session number and title
+  - Date
+  - Keywords
+  - Related sessions
+
+  5. Commit Documentation (1 minute)
+  git add guides-and-instructions/chats/Session_[NN]_*.md
+  git add guides-and-instructions/chats/SESSION_INDEX.md  # if updated
+  git commit -m "Add Session [NN] documentation"
+  git push origin main
+
+  Total: 10-12 minutes
+
+  ---
+  📊 Time Investment Analysis
+
+  Per Session:
+  | Activity               | Time      | Value                            |
+  |------------------------|-----------|----------------------------------|
+  | Start: Context loading | 3-5 min   | Get up to speed fast             |
+  | During: Normal work    | Variable  | Focus on coding, not documenting |
+  | End: Generate docs     | 5 min     | Automated with agent             |
+  | End: Review & commit   | 5-7 min   | Quality check                    |
+  | Total overhead         | 13-17 min | vs. 0 min without docs           |
+
+  But Next Session:
+  | Activity         | Without Docs | With Docs | Savings   |
+  |------------------|--------------|-----------|-----------|
+  | Remember context | 20-30 min    | 3-5 min   | 15-25 min |
+  | Find past work   | 10-15 min    | 30 sec    | 9-15 min  |
+  | Recall decisions | 5-10 min     | 1 min     | 4-9 min   |
+  | Total            | 35-55 min    | 5 min     | 30-50 min |
+
+  NET BENEFIT PER SESSION PAIR: +13 to +33 minutes saved
+
+  Over 20 Sessions: Save 4-11 hours of context-loading time
+
+  ---
+  🎯 Pattern-Specific Optimizations
+
+  When User Has Multiple Requests
+
+  Observed Pattern (Session 23):
+  User: "analyze directory and organize files"
+  You: [analyze] → [create plan] → [execute cleanup] → "done"
+  User: "also the hamburger menu doesn't work"
+  You: [diagnose] → [fix CSS/JS] → "done"
+  User: "and the hero image is tilted"
+  You: [fix transform] → "done"
+  User: "create a session documentation agent"
+  You: [design agent] → [write spec] → "done"
+
+  Optimization:
+  - ✅ Use TodoWrite at start if multiple requests (track progress)
+  - ✅ Complete each task fully before moving to next
+  - ✅ Mark todos as completed immediately (don't batch)
+  - ✅ Commit after each major accomplishment (atomic commits)
+
+  ---
+  When User Requests Documentation
+
+  Triggers:
+  - "create session doc"
+  - "document this session"
+  - "summarize what we did"
+  - End of session reached
+
+  Immediate Action:
+  1. Run git commands to gather metadata
+  2. Analyze conversation for key accomplishments
+  3. Generate 15-section doc with Quick Resume
+  4. Save to guides-and-instructions/chats/
+  5. Remind user to update Session Index
+
+  ---
+  When Starting New Session
+
+  If User Says Nothing:
+  1. Check if there's a "Next Steps" from previous session
+  2. Proactively mention: "Last session we [X]. Should we continue with [Y]?"
+  3. Wait for confirmation before proceeding
+
+  If User Provides New Task:
+  1. Quickly scan previous session's Quick Resume (30 sec)
+  2. Check if related to past work
+  3. If yes, mention: "This relates to Session [NN] where we [X]"
+  4. Proceed with new task
+
+  ---
+  🚨 Anti-Patterns to Avoid
+
+  ❌ DON'T:
+  - Stop mid-session to write documentation (breaks flow)
+  - Create session docs for trivial changes (typo fixes, single-line edits)
+  - Skip git commits thinking "I'll commit at end" (lose atomic history)
+  - Generate docs before pushing to GitHub (might forget to push)
+  - Read entire previous session doc (just Quick Resume is enough)
+
+  ✅ DO:
+  - Commit frequently with clear messages
+  - Use TodoWrite for complex multi-step tasks
+  - Ask user for clarification if context is unclear
+  - Mark todos as completed immediately
+  - Generate session docs at END of every significant session
+  - Update Session Index right after creating session doc
+
+  ---
+  🔧 Tool Usage Patterns
+
+  Based on Session 23 Actual Usage:
+
+  File Operations:
+  Read → Edit/Write (required sequence)
+  Never edit without reading first (tool requirement)
+
+  Git Operations:
+  Status → Add → Commit → Push (standard flow)
+  Check status before committing (verify what's staged)
+
+  Multiple Independent Tasks:
+  Use parallel tool calls (multiple Read, multiple Bash in one message)
+  Maximizes efficiency
+
+  Dependent Tasks:
+  Sequential tool calls (wait for result before next)
+  E.g., Read file → Edit file → Commit
+
+  ---
+  📋 Checklist Template
+
+  Start of Session ✅
+
+  - Read previous session's Quick Resume (2 min)
+  - Check git status and recent commits (1 min)
+  - Review "Next Steps" or ask user for task (1 min)
+  - Create TodoWrite list if multi-step task
+
+  During Session ✅
+
+  - Use TodoWrite to track progress (3+ step tasks)
+  - Read files before editing (tool requirement)
+  - Commit after each major accomplishment
+  - Push to GitHub after significant work
+  - Mark todos completed immediately
+
+  End of Session ✅
+
+  - Final commit and push to GitHub
+  - Generate session documentation (invoke agent)
+  - Review Quick Resume for accuracy
+  - Update Session Index with new entry
+  - Commit documentation files
+  - Push documentation to GitHub
+
+  ---
+  🎓 Lessons from Session 23
+
+  What Worked Well:
+  - ✅ TodoWrite tracked 9 tasks through directory cleanup
+  - ✅ Multiple parallel tool calls for efficiency (ls, grep, find)
+  - ✅ Atomic commits (mobile nav separate from file cleanup separate from docs)
+  - ✅ Quick Resume section made session doc scannable
+
+  What to Improve:
+  - ⚠️ Could have tested mobile nav on real device before pushing (deferred to Session 24)
+  - ⚠️ Could have run Lighthouse audit for before/after comparison (deferred)
+  - ⚠️ Session Index could have been created during session (done at end instead)
+
+  Takeaways:
+  1. Real device testing should be part of mobile feature completion
+  2. Performance baselines should be captured before optimizations
+  3. Session Index can be updated incrementally (don't wait for end)
+
+  ---
+  🚀 Optimal Workflow Summary
+
+  Golden Rule: Document at END, not during. Focus on shipping code first, capturing context second.
+
+  Time Breakdown:
+  - Start: 3-5 min (context loading)
+  - During: 0 min overhead (just work normally)
+  - End: 10-12 min (docs + commits)
+  - Total: 13-17 min per session
+  - Savings next session: 30-50 min
+  - Net benefit: +13 to +33 min per session pair
+
+  For 20 Sessions:
+  - Time invested: 4-6 hours
+  - Time saved: 10-17 hours
+  - Net gain: 4-11 hours
+
+  Plus Intangible Benefits:
+  - No more "what did I do last time?"
+  - Searchable history of all decisions
+  - Easy onboarding for new contributors
+  - Audit trail for troubleshooting
