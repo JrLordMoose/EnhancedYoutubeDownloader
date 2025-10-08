@@ -305,7 +305,7 @@ img {
 
 .hero .container {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: 45% 55%; /* Desktop: Text 45%, Image 55% - Image is hero element */
     gap: var(--spacing-3xl);
     align-items: center;
     position: relative;
@@ -2316,4 +2316,201 @@ body.mobile-menu-open {
 
 /* ========================================
    END OF MOBILE BUTTON OVERFLOW FIXES
+   ======================================== */
+
+/* ========================================
+   DESKTOP HERO IMAGE SIZING FIXES
+   Added: 2025-10-08
+   Issue: Hero screenshot appears too small on desktop
+   Solution: Rebalance grid, increase image size, optimize proportions
+   ======================================== */
+
+/* DESKTOP LARGE (1920px+): Full HD monitors */
+@media (min-width: 1920px) {
+    .hero .container {
+        grid-template-columns: 45% 55%; /* Text: 45%, Image: 55% - Image becomes dominant */
+        gap: var(--spacing-2xl); /* Reduce gap from 64px to 48px for better balance */
+        max-width: 1600px; /* Allow wider hero on large screens */
+    }
+
+    .hero-image {
+        max-width: none; /* Remove max-width constraint */
+    }
+
+    .screenshot-main {
+        width: 100%;
+        max-width: 1000px; /* Cap at reasonable size for readability */
+        height: auto;
+        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8), 0 0 60px var(--primary-glow); /* Enhanced shadow */
+    }
+
+    /* Increase glassmorphism border effect */
+    .hero-image::before {
+        top: -30px;
+        left: -30px;
+        right: -30px;
+        bottom: -30px;
+    }
+}
+
+/* DESKTOP STANDARD (1440px - 1919px): Common laptop/desktop */
+@media (min-width: 1440px) and (max-width: 1919px) {
+    .hero .container {
+        grid-template-columns: 45% 55%; /* Image gets more space */
+        gap: var(--spacing-2xl); /* 48px gap */
+    }
+
+    .hero-image {
+        max-width: none;
+    }
+
+    .screenshot-main {
+        width: 100%;
+        max-width: 850px; /* ~850px wide on 1440px screen */
+        height: auto;
+        box-shadow: 0 16px 64px rgba(0, 0, 0, 0.7), 0 0 50px var(--primary-glow);
+    }
+
+    .hero-image::before {
+        top: -25px;
+        left: -25px;
+        right: -25px;
+        bottom: -25px;
+    }
+}
+
+/* DESKTOP SMALL (1024px - 1439px): Small desktop/large tablet */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .hero .container {
+        grid-template-columns: 50% 50%; /* Equal balance on smaller desktops */
+        gap: var(--spacing-xl); /* 32px gap */
+    }
+
+    .hero-image {
+        max-width: none;
+    }
+
+    .screenshot-main {
+        width: 100%;
+        max-width: 650px; /* ~650px wide on 1024px screen */
+        height: auto;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 40px var(--primary-glow);
+    }
+
+    .hero-image::before {
+        top: -20px;
+        left: -20px;
+        right: -20px;
+        bottom: -20px;
+    }
+}
+
+/* Fix existing 1024px breakpoint to not override desktop layout */
+@media (min-width: 1025px) {
+    /* Override previous line 308 grid setting */
+    .hero .container {
+        grid-template-columns: 45% 55% !important; /* Ensure image dominance */
+    }
+
+    /* Ensure hero content doesn't over-compress */
+    .hero-content {
+        max-width: 650px;
+    }
+
+    /* Ensure image scales to fill available space */
+    .hero-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .screenshot-main {
+        width: 100%;
+        max-width: 900px; /* Allow larger on big screens */
+        height: auto;
+        object-fit: contain;
+    }
+}
+
+/* ========================================
+   VISUAL ENHANCEMENTS: Desktop Hero Image
+   Make screenshot more prominent with visual effects
+   ======================================== */
+@media (min-width: 1024px) {
+    /* Enhanced 3D hover effect */
+    .hero-image:hover .screenshot-main {
+        transform: rotateY(-5deg) rotateX(3deg) scale(1.03); /* More pronounced tilt */
+        box-shadow: 0 25px 90px rgba(0, 0, 0, 0.9), 0 0 70px var(--primary-glow);
+    }
+
+    /* Smooth transition */
+    .screenshot-main {
+        transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+                    box-shadow 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    /* Add subtle pulsing glow effect */
+    @keyframes hero-image-pulse {
+        0%, 100% {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 40px var(--primary-glow);
+        }
+        50% {
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.7), 0 0 60px var(--primary-glow);
+        }
+    }
+
+    .screenshot-main {
+        animation: hero-image-pulse 4s ease-in-out infinite;
+    }
+
+    /* Pause animation on hover */
+    .hero-image:hover .screenshot-main {
+        animation: none;
+    }
+}
+
+/* ========================================
+   FIX: Remove max-width constraint on desktop
+   The previous .hero-image max-width: 600px (line 1300)
+   was preventing desktop images from growing
+   ======================================== */
+@media (min-width: 1024px) {
+    .hero-image {
+        max-width: none !important; /* Remove 600px constraint */
+        width: 100%; /* Fill grid column */
+    }
+}
+
+/* ========================================
+   RATIONALE FOR SIZE CHOICES:
+
+   Desktop Viewports:
+   - 1920px (Full HD): Image ~1000px wide (52% of viewport)
+     - Ensures screenshot is clearly visible
+     - Maintains text readability
+     - Creates visual impact
+
+   - 1440px (Common Laptop): Image ~850px wide (59% of viewport)
+     - Balanced proportions
+     - Screenshot is hero element
+     - Text remains prominent
+
+   - 1024px (Small Desktop): Image ~650px wide (63% of viewport)
+     - Equal text/image balance
+     - Optimized for space constraints
+
+   Grid Layout Philosophy:
+   - Text: 45% (maintains readability, doesn't dominate)
+   - Image: 55% (becomes hero element, creates visual impact)
+   - Gap: 32-48px (comfortable breathing room)
+
+   Visual Enhancement:
+   - Increased box shadows (depth perception)
+   - Enhanced glassmorphism borders (modern aesthetic)
+   - Pulsing glow animation (draws attention)
+   - Pronounced 3D hover effect (interactivity)
+   ======================================== */
+
+/* ========================================
+   END OF DESKTOP HERO IMAGE SIZING FIXES
    ======================================== */
