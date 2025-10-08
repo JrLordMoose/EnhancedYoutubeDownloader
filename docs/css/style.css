@@ -2122,3 +2122,198 @@ body.mobile-menu-open {
 /* ========================================
    END OF MOBILE NAVIGATION FIXES
    ======================================== */
+
+/* ========================================
+   MOBILE BUTTON TEXT OVERFLOW FIXES
+   Added: 2024-10-08 (Session 23 continuation)
+   Target: 404px, 390px, 360px, 320px breakpoints
+   Issue: Button subtitle text overflowing on small screens
+   ======================================== */
+
+/* BREAKPOINT: 404px and below - Initial mobile fixes */
+@media (max-width: 404px) {
+    /* Fix #1: Reduce button subtitle font size */
+    .btn-subtitle {
+        font-size: 0.65rem; /* Reduce from 0.7rem */
+        line-height: 1.3;
+        margin-top: 3px;
+    }
+
+    /* Fix #2: Reduce button padding to create more space */
+    .btn-large {
+        padding: 14px 20px; /* Reduce from 16px 32px */
+        font-size: 0.95rem;
+    }
+
+    /* Fix #3: Ensure hero subtitle doesn't overflow */
+    .hero-subtitle {
+        font-size: clamp(0.9rem, 3.8vw, 1rem);
+        padding: 0 var(--spacing-xs);
+    }
+}
+
+/* BREAKPOINT: 390px and below - Aggressive mobile fixes */
+@media (max-width: 390px) {
+    /* Fix #1: Make button subtitle stack vertically with abbreviations */
+    .btn-subtitle {
+        font-size: 0.6rem; /* Further reduce */
+        display: block;
+        margin-top: 4px;
+        line-height: 1.2;
+        white-space: normal; /* Allow wrapping if needed */
+        max-width: 100%;
+    }
+
+    /* Fix #2: Abbreviate text via CSS (hide parts on smallest screens) */
+    .btn-primary.btn-large .btn-subtitle {
+        /* Use word-spacing to tighten text */
+        word-spacing: -0.5px;
+        letter-spacing: -0.3px;
+    }
+
+    /* Fix #3: Further reduce button padding */
+    .btn-large {
+        padding: 12px 16px; /* Minimal padding */
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
+
+    /* Fix #4: Reduce main button text size */
+    .btn {
+        font-size: 0.85rem;
+    }
+
+    /* Fix #5: Ensure container has minimal padding */
+    .hero .container {
+        padding: 0 12px;
+    }
+
+    /* Fix #6: Reduce version info text size */
+    .version-info {
+        font-size: 0.7rem; /* 11.2px */
+        padding: 0 8px;
+        line-height: 1.4;
+    }
+}
+
+/* BREAKPOINT: 360px and below - Critical small screen fixes */
+@media (max-width: 360px) {
+    /* Fix #1: Hide less critical button subtitle text */
+    .btn-subtitle {
+        font-size: 0.55rem; /* Very small but readable */
+        /* Option: Use text overflow with ellipsis */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 280px; /* Prevent overflow */
+        margin: 3px auto 0;
+    }
+
+    /* Fix #2: Reduce button width slightly */
+    .btn {
+        max-width: 320px;
+        padding: 10px 12px;
+    }
+
+    .btn-large {
+        padding: 11px 14px;
+        font-size: 0.875rem;
+    }
+
+    /* Fix #3: Optimize hero title for very small screens */
+    .hero-title {
+        font-size: clamp(1.4rem, 5.5vw, 1.9rem); /* ~22.4px to 30.4px */
+    }
+
+    /* Fix #4: Container padding for edge-to-edge usage */
+    .container {
+        padding: 0 10px;
+    }
+}
+
+/* BREAKPOINT: 320px (iPhone SE) - Minimum viable fixes */
+@media (max-width: 320px) {
+    /* Fix #1: Drastically simplify button subtitle */
+    .btn-subtitle {
+        font-size: 0.5rem; /* 8px - absolute minimum */
+        letter-spacing: -0.5px;
+        word-spacing: -1px;
+    }
+
+    /* Fix #2: Compress button text */
+    .btn {
+        font-size: 0.8rem;
+        padding: 9px 10px;
+        letter-spacing: -0.3px;
+    }
+
+    .btn-large {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        letter-spacing: -0.3px;
+    }
+
+    /* Fix #3: Ensure hero content fits */
+    .hero-title {
+        font-size: clamp(1.3rem, 6vw, 1.75rem); /* ~20.8px to 28px */
+        letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+        font-size: 0.85rem; /* ~13.6px */
+        line-height: 1.5;
+        padding: 0 4px;
+    }
+
+    /* Fix #4: Minimal container padding */
+    .container {
+        padding: 0 8px;
+    }
+
+    .hero .container {
+        padding: 0 8px;
+    }
+
+    /* Fix #5: Version info - ultra compact */
+    .version-info {
+        font-size: 0.65rem; /* ~10.4px */
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0 4px;
+        line-height: 1.3;
+    }
+
+    /* Fix #6: Ensure touch targets remain accessible */
+    .btn {
+        min-height: 42px; /* Slightly reduce from 44px due to space constraints */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY: Maintain Touch Targets
+   Ensure buttons remain tappable on mobile
+   ======================================== */
+@media (max-width: 404px) {
+    /* Ensure all buttons maintain minimum 44x44px touch target */
+    .btn,
+    .btn-large {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Add spacing between stacked buttons */
+    .hero-buttons .btn + .btn {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 320px) {
+    /* Allow slight reduction on smallest screens (42px is still accessible) */
+    .btn {
+        min-height: 42px;
+    }
+}
+
+/* ========================================
+   END OF MOBILE BUTTON OVERFLOW FIXES
+   ======================================== */
