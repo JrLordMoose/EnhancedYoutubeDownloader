@@ -297,7 +297,7 @@ img {
         top: 100%; /* Directly below nav bar */
         left: 0;
         right: 0;
-        background: var(--glass-bg);
+        background: rgba(26, 26, 26, 0.98); /* Much more opaque - easier to read */
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         flex-direction: column;
@@ -319,9 +319,12 @@ img {
 
     .nav-links a {
         width: 100%;
-        padding: var(--spacing-md) var(--spacing-xl);
+        padding: var(--spacing-lg) var(--spacing-xl); /* Increased padding for better touch */
         border-radius: 0;
         border-bottom: 1px solid var(--glass-border);
+        font-size: 18px; /* Larger text for mobile readability */
+        font-weight: 500;
+        color: var(--text-primary); /* Ensure high contrast */
     }
 
     .nav-links a:last-child {
