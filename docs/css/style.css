@@ -165,6 +165,7 @@ img {
     top: 0;
     z-index: 1000;
     border-bottom: 1px solid var(--glass-border);
+    overflow: visible; /* Allow mobile menu dropdown to overflow */
 }
 
 .nav-content {
@@ -311,7 +312,7 @@ img {
     }
 
     .nav-links.active {
-        display: flex; /* Show as flex when active */
+        display: flex !important; /* Show as flex when active - !important to override display: none */
         animation: slideDownMenu 0.3s ease-out;
         pointer-events: auto; /* Allow clicks when visible */
     }
