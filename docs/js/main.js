@@ -112,7 +112,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Attaching click handler to hamburger menu');
 
         // Toggle menu function
+        let menuToggling = false;
         function toggleMenu(e) {
+            if (menuToggling) return; // Prevent double-firing
+            menuToggling = true;
+
             console.log('Hamburger triggered!', e.type);
             e.preventDefault();
             e.stopPropagation();
@@ -123,14 +127,23 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Menu classes:', navMenu.className);
             console.log('Menu display:', window.getComputedStyle(navMenu).display);
             console.log('Menu position:', window.getComputedStyle(navMenu).position);
+
+            setTimeout(() => { menuToggling = false; }, 300); // Reset after animation
         }
 
-        // Add both click and touchstart for mobile compatibility
-        navToggle.addEventListener('click', toggleMenu);
-        navToggle.addEventListener('touchstart', toggleMenu, { passive: false });
+        // Use touchstart for mobile (fires first), with click as fallback for desktop
+        if ('ontouchstart' in window) {
+            navToggle.addEventListener('touchstart', toggleMenu, { passive: false });
+        } else {
+            navToggle.addEventListener('click', toggleMenu);
+        }
 
-        // Close menu when clicking outside
+        // Close menu when clicking outside (with delay to prevent immediate close)
         document.addEventListener('click', function(e) {
+            // Ignore clicks on the toggle button itself
+            if (navToggle.contains(e.target)) {
+                return;
+            }
             if (!nav.contains(e.target) && navMenu.classList.contains('active')) {
                 navMenu.classList.remove('active');
                 navToggle.classList.remove('active');
