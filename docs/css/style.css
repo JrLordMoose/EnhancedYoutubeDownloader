@@ -1067,6 +1067,10 @@ section {
     font-size: var(--font-base);
 }
 
+.step-content .btn {
+    margin-top: var(--spacing-lg);
+}
+
 .alert {
     margin-top: var(--spacing-lg);
     padding: var(--spacing-md) var(--spacing-lg);
