@@ -315,8 +315,6 @@ img {
         display: flex !important; /* Show as flex when active - !important to override display: none */
         animation: slideDownMenu 0.3s ease-out;
         pointer-events: auto; /* Allow clicks when visible */
-        background: rgba(255, 0, 0, 0.5) !important; /* DEBUG: Red background to see if menu is rendering */
-        min-height: 200px !important; /* DEBUG: Force visible height */
     }
 
     .nav-links a {
@@ -2186,62 +2184,6 @@ section {
 }
 
 /* Mobile Navigation - Hide links on small screens */
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: block !important; /* Show hamburger on mobile */
-    }
-
-    .nav-links {
-        position: fixed;
-        top: 65px; /* Below nav bar */
-        left: 0;
-        right: 0;
-        flex-direction: column;
-        gap: 0;
-        background: var(--bg-primary);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid var(--glass-border);
-        box-shadow: var(--shadow-xl);
-        max-height: 0; /* Hidden by default */
-        overflow: hidden;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
-        z-index: 999;
-        padding: 0;
-    }
-
-    .nav-links.mobile-active {
-        max-height: 500px; /* Show menu */
-        opacity: 1;
-        transform: translateY(0);
-        padding: var(--spacing-md) 0;
-    }
-
-    .nav-links a {
-        width: 100%;
-        text-align: center;
-        padding: var(--spacing-md) var(--spacing-lg);
-        font-size: var(--font-base); /* Larger on mobile */
-        border-bottom: 1px solid var(--glass-border);
-    }
-
-    .nav-links a:last-child {
-        border-bottom: none;
-    }
-
-    .nav-links a::before {
-        display: none; /* Remove underline animation on mobile */
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-        background: var(--bg-elevated);
-        color: var(--primary);
-    }
-}
-
 /* Tablet - Show hamburger at 1024px too if nav gets cramped */
 @media (max-width: 1024px) and (min-width: 769px) {
     .nav-links {
