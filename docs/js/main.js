@@ -103,31 +103,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Hamburger menu toggle
     const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    const navMenu = document.querySelector('.nav-links');
     const nav = document.querySelector('.nav');
 
-    if (navToggle && navLinks) {
+    if (navToggle && navMenu) {
         // Toggle menu when clicking hamburger button
         navToggle.addEventListener('click', function(e) {
             e.stopPropagation();
-            const isActive = navLinks.classList.toggle('active');
+            const isActive = navMenu.classList.toggle('active');
             navToggle.classList.toggle('active');
             navToggle.setAttribute('aria-expanded', isActive);
         });
 
         // Close menu when clicking outside
         document.addEventListener('click', function(e) {
-            if (!nav.contains(e.target) && navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
+            if (!nav.contains(e.target) && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
                 navToggle.classList.remove('active');
                 navToggle.setAttribute('aria-expanded', 'false');
             }
         });
 
         // Close menu when clicking a nav link
-        navLinks.querySelectorAll('a').forEach(link => {
+        navMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function() {
-                navLinks.classList.remove('active');
+                navMenu.classList.remove('active');
                 navToggle.classList.remove('active');
                 navToggle.setAttribute('aria-expanded', 'false');
             });
@@ -135,8 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Close menu on Escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
                 navToggle.classList.remove('active');
                 navToggle.setAttribute('aria-expanded', 'false');
             }
