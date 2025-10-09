@@ -315,6 +315,8 @@ img {
         display: flex !important; /* Show as flex when active - !important to override display: none */
         animation: slideDownMenu 0.3s ease-out;
         pointer-events: auto; /* Allow clicks when visible */
+        background: rgba(255, 0, 0, 0.5) !important; /* DEBUG: Red background to see if menu is rendering */
+        min-height: 200px !important; /* DEBUG: Force visible height */
     }
 
     .nav-links a {

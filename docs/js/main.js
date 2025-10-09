@@ -120,6 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
             navToggle.classList.toggle('active');
             navToggle.setAttribute('aria-expanded', isActive);
             console.log('Menu active state:', isActive);
+            console.log('Menu classes:', navMenu.className);
+            console.log('Menu display:', window.getComputedStyle(navMenu).display);
+            console.log('Menu position:', window.getComputedStyle(navMenu).position);
         }
 
         // Add both click and touchstart for mobile compatibility
