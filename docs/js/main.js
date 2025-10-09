@@ -106,14 +106,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const navMenu = document.querySelector('.nav-links');
     const nav = document.querySelector('.nav');
 
+    console.log('Hamburger menu init:', { navToggle, navMenu, nav });
+
     if (navToggle && navMenu) {
-        // Toggle menu when clicking hamburger button
-        navToggle.addEventListener('click', function(e) {
+        console.log('Attaching click handler to hamburger menu');
+
+        // Toggle menu function
+        function toggleMenu(e) {
+            console.log('Hamburger triggered!', e.type);
+            e.preventDefault();
             e.stopPropagation();
             const isActive = navMenu.classList.toggle('active');
             navToggle.classList.toggle('active');
             navToggle.setAttribute('aria-expanded', isActive);
-        });
+            console.log('Menu active state:', isActive);
+        }
+
+        // Add both click and touchstart for mobile compatibility
+        navToggle.addEventListener('click', toggleMenu);
+        navToggle.addEventListener('touchstart', toggleMenu, { passive: false });
 
         // Close menu when clicking outside
         document.addEventListener('click', function(e) {
