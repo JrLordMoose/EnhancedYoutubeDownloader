@@ -2782,6 +2782,7 @@ body.mobile-menu-open {
     background: var(--bg-secondary);
     position: relative;
     overflow: hidden;
+    padding: 120px 0 80px;
 }
 
 .hero-section::before {
@@ -2796,13 +2797,13 @@ body.mobile-menu-open {
     z-index: 0;
 }
 
-.hero-content {
+.hero-section .hero-content {
     position: relative;
     z-index: 1;
     text-align: center;
 }
 
-.hero-title {
+.hero-section .hero-title {
     font-size: 3rem;
     font-weight: 900;
     color: var(--text-primary);
@@ -2814,7 +2815,7 @@ body.mobile-menu-open {
     background-clip: text;
 }
 
-.hero-subtitle {
+.hero-section .hero-subtitle {
     font-size: 1.25rem;
     line-height: 1.8;
     color: var(--text-secondary);
