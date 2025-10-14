@@ -903,21 +903,8 @@ section {
     position: relative;
 }
 
-.feature-card-highlight h3::after {
-    content: 'NEW';
-    position: absolute;
-    top: -30px;
-    right: -20px;
-    background: var(--gradient-primary);
-    color: var(--bg-primary);
-    font-size: var(--font-xs);
-    font-weight: 800;
-    padding: 6px 12px;
-    border-radius: var(--radius-full);
-    letter-spacing: 1px;
-    box-shadow: 0 0 20px var(--primary-glow);
-    z-index: 10;
-}
+/* REMOVED: Automatic NEW badge on all .feature-card-highlight cards
+   Now using explicit <span class="badge-new">NEW</span> in HTML for controlled placement */
 
 /* Screenshots Section */
 .screenshots {
