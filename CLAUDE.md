@@ -138,6 +138,124 @@ EnhancedYoutubeDownloader-X.X.X.zip
 
 ---
 
+## 🤖 Release Version Manager Agent
+
+**NEW:** Automate the entire release process with the specialized Release Version Manager Agent!
+
+### When to Use
+
+Invoke this agent whenever you need to create a new release. It will handle everything automatically:
+- Update all 6 version locations
+- Build installer (creates both EXE and ZIP)
+- Create GitHub release
+- Upload BOTH files (EXE + ZIP)
+- **Verify auto-update system will work**
+
+### How to Invoke
+
+Use any of these trigger phrases:
+- "create release v0.4.0"
+- "update version to 1.2.3"
+- "prepare release v2.0.0"
+- "release version manager"
+
+### What the Agent Does
+
+**Phase 1: Pre-Release Validation**
+- Checks git status is clean
+- Validates version format (X.Y.Z)
+- Confirms version is higher than current
+- Checks if release tag already exists
+
+**Phase 2: Version Updates**
+- Updates all 6 version locations in correct order:
+  1. Directory.Build.props (source of truth)
+  2. setup.iss (installer version)
+  3. build-installer.ps1 (build script)
+  4. SettingsDialog.axaml (UI display)
+  5. README.md (download link)
+  6. docs/index.html (landing page - 4 locations!)
+
+**Phase 3: Build**
+- Runs `build-installer.ps1 -Version "X.Y.Z"`
+- Verifies both files created (~83 MB EXE, ~108 MB ZIP)
+- Confirms filenames match version exactly
+
+**Phase 4: GitHub Release**
+- Creates release with proper notes template
+- Includes direct download links
+- Adds installation instructions
+
+**Phase 5: Upload**
+- Uploads EXE file (for new users)
+- Uploads ZIP file ⚠️ **CRITICAL for auto-updates!**
+
+**Phase 6: Critical Verification** ⭐ **NEW**
+- Runs `gh release view vX.Y.Z` to list assets
+- **Verifies exactly 2 files present**
+- **Tests ZIP file is downloadable**
+- **Validates Onova requirements met:**
+  - ZIP filename matches pattern: `EnhancedYoutubeDownloader-*.zip`
+  - ZIP contains published binaries
+  - File sizes reasonable
+- **Confirms version consistency** across all files
+- **🚨 STOPS if ZIP missing** (breaks auto-updates for ALL users!)
+
+**Phase 7: Post-Release**
+- Commits version number changes
+- Pushes to main branch
+- Provides user validation checklist
+
+**Phase 8: User Testing**
+- Provides step-by-step testing checklist:
+  - Install EXE test
+  - Auto-update test (CRITICAL - test with old version!)
+  - Landing page button test
+  - GitHub release verification
+
+### Why Use This Agent?
+
+**Manual Process (Error-Prone):**
+- 30+ minutes
+- 11 manual steps
+- Easy to forget ZIP file
+- Easy to make typos in version numbers
+- No verification ZIP file works for auto-updates
+
+**With Agent (Automated & Verified):**
+- 5-10 minutes
+- Single command: "create release v0.4.0"
+- **Impossible to forget ZIP file** (agent checks!)
+- **Automatic verification** auto-updates will work
+- Consistent release process every time
+- Full audit trail in agent output
+
+### Safety Features
+
+- ✅ Validates version format before starting
+- ✅ Confirms all files updated before building
+- ✅ Verifies both files exist before uploading
+- ✅ **Confirms both files uploaded before marking complete**
+- ✅ Tests ZIP file accessibility
+- ✅ **Alerts if ZIP missing** (breaks auto-updates!)
+- ✅ Provides rollback instructions if failures occur
+
+### Agent Location
+
+Full specification: `.claude/agents/release-version-manager-agent.md`
+
+### Integration with Manual Process
+
+The agent implements the critical checklist above. You can still do releases manually if needed, but the agent:
+- **Reduces human error** to near zero
+- **Guarantees ZIP file uploaded** (most critical step!)
+- **Verifies auto-updates will work** (tests ZIP accessibility)
+- **Saves 20+ minutes** per release
+
+**Recommendation:** Always use the Release Version Manager Agent for releases to ensure zero-error deploys with guaranteed auto-update functionality!
+
+---
+
 ## Project Overview
 
 Enhanced YouTube Downloader is a production-ready cross-platform desktop application built with .NET 9.0 and Avalonia UI. It provides video downloading from YouTube with advanced features like pause/resume, queue management, caching, and scheduling.
