@@ -1,8 +1,8 @@
 # Session Index
 
 **Last Updated:** 2025-10-14
-**Total Sessions:** 31
-**Date Range:** Session 1 (Initial commit) to Session 31 (2025-10-14)
+**Total Sessions:** 33
+**Date Range:** Session 1 (Initial commit) to Session 33 (2025-10-14)
 
 ---
 
@@ -22,6 +22,8 @@
 ### 2025
 
 #### October
+- **Session 33** (2025-10-14) - [Landing Page NEW Badge Cleanup and Organization](#session-33)
+- **Session 32** (2025-10-14) - [v0.4.1 Multi-Platform Release and Testing](#session-32)
 - **Session 31** (2025-10-14) - [Multi-Platform Support Phase 4-5: Platform Badges & GenericVideo Fix](#session-31)
 - **Session 30** (2025-10-13) - [Multi-Platform Support Phase 1-3: Landing Pages & Platform Detection](#session-30)
 - **Session 29** (2025-10-12) - [YouTube Shorts Support & v0.4.0 Release](#session-29)
@@ -49,6 +51,8 @@
 ## Sessions by Topic
 
 ### 🎨 UI/UX & Design
+- **Session 33**: Landing Page Badge Cleanup (NEW badge organization, CSS pseudo-element removal)
+- **Session 32**: Blog Page Navigation Fixes (logo clickable, mobile UX, hero title formatting)
 - **Session 31**: Platform Badges UI (amber badges, Material Design)
 - **Session 30**: Multi-Platform Landing Page Updates (blog page, feature sections)
 - **Session 26**: Download Button Two-Line Layout (vertical stack, iPhone 15 fix, WCAG AA)
@@ -97,6 +101,7 @@
 - **Session 21**: Touch Target Sizing
 
 ### 🚀 Releases
+- **Session 32**: v0.4.1 Release (Multi-platform support - TikTok, Instagram, Twitter, 1,800+ sites)
 - **Session 29**: v0.4.0 Release (YouTube Shorts support)
 - **Session 18**: v0.3.6 Release (Version fix)
 - **Session 16**: v0.3.2 Release (Installer improvements)
@@ -156,12 +161,17 @@
 - **accessibility**: Sessions 26, 25, 23, 22, 21
 - **alt-text**: Session 25
 - **authentication**: Sessions 9, 6 _(files available, not indexed yet)_
+- **badge-cleanup**: Session 33
+- **badge-positioning**: Session 33
+- **blog-page**: Sessions 33, 32, 30
 - **bouncy-animation**: Session 25
 - **bug-fix**: Sessions 26, 18, 17, 15, 14
 - **btn-stacked**: Session 26
 - **button-overflow**: Sessions 26, 24
 - **clickable-hero**: Session 25
-- **css**: Sessions 26, 25, 23, 22, 21, 19
+- **clickable-logo**: Session 32
+- **css**: Sessions 33, 32, 26, 25, 23, 22, 21, 19
+- **css-pseudo-elements**: Session 33
 - **cubic-bezier**: Session 25
 - **case-study**: Session 22
 
@@ -170,17 +180,20 @@
 - **directory-cleanup**: Session 23
 - **dropdown**: Session 23
 - **error-handling**: Sessions 19, 14, 7 _(partial indexing)_
-- **faq**: Session 22
+- **explicit-html-control**: Session 33
+- **faq**: Sessions 33, 32, 22
+- **features-reorganization**: Session 33
 - **ffmpeg**: Sessions 20, 14
 - **flex-column**: Session 26
 - **font-scaling**: Sessions 26, 24
 
 ### G-I
 - **generic-video**: Session 31
-- **github-pages**: Sessions 26, 25, 23, 22, 21, 19
-- **hamburger-menu**: Session 23
+- **github-pages**: Sessions 33, 32, 26, 25, 23, 22, 21, 19
+- **hamburger-menu**: Sessions 32, 23
 - **hero-image**: Session 25
-- **hero-section**: Sessions 25, 23, 21, 19
+- **hero-section**: Sessions 32, 25, 23, 21, 19
+- **hero-title-formatting**: Session 32
 - **instagram**: Session 31
 - **installer**: Sessions 16, 11
 - **indexing**: Session 23 (this session index creation)
@@ -189,23 +202,27 @@
 
 ### J-M
 - **javascript**: Sessions 23, 22, 21
-- **landing-page**: Sessions 30, 26, 25, 24, 23, 22, 21, 19
+- **landing-page**: Sessions 33, 32, 30, 26, 25, 24, 23, 22, 21, 19
 - **lighthouse**: Session 26 (planned for Session 27)
-- **mobile**: Sessions 26, 24, 23, 21
-- **mobile-navigation**: Session 23
-- **mobile-optimization**: Sessions 26, 24, 23
-- **multi-platform**: Sessions 31, 30
+- **mobile**: Sessions 32, 26, 24, 23, 21
+- **mobile-navigation**: Sessions 32, 23
+- **mobile-optimization**: Sessions 32, 26, 24, 23
+- **mobile-ux**: Session 32
+- **multi-platform**: Sessions 32, 31, 30
+- **multi-platform-faq**: Sessions 33, 32
 
 ### N-R
-- **navigation**: Session 23
+- **navigation**: Sessions 32, 23
+- **navigation-css-aliases**: Session 32
+- **new-badge**: Session 33
 - **performance**: Sessions 22, 16, 12 _(some sessions)_
 - **platform-badges**: Session 31
 - **platform-detection**: Sessions 31, 30
 - **platformtype-enum**: Sessions 31, 30
 - **query-resolver**: Session 31
 - **queue**: Sessions 15, 8, 6 _(files available, not fully indexed)_
-- **release**: Sessions 29, 18, 16, 15, 13, 11
-- **responsive-design**: Sessions 23, 21
+- **release**: Sessions 32, 29, 18, 16, 15, 13, 11
+- **responsive-design**: Sessions 32, 23, 21
 
 ### S-Z
 - **schema-org**: Session 22
@@ -216,22 +233,117 @@
 - **static-expansion**: Session 25
 - **stub-pattern**: Session 31
 - **subtitle**: Sessions 20, 16 _(some sessions)_
-- **testing**: Sessions 31, 26, 23, 18, 14, 12 _(various)_
-- **tiktok**: Session 31
-- **twitter**: Session 31
+- **testing**: Sessions 32, 31, 26, 23, 18, 14, 12 _(various)_
+- **tiktok**: Sessions 32, 31
+- **twitter**: Sessions 32, 31
 - **3d-tilt**: Sessions 25 (removal), 23 (fix)
-- **touch-targets**: Sessions 26, 23, 21
+- **touch-targets**: Sessions 32, 26, 23, 21
 - **two-line-button**: Session 26
-- **ux-ui**: Sessions 26, 25, 23, 22, 21, 19
-- **ux-ui-designer-agent**: Sessions 26, 25
+- **ux-ui**: Sessions 33, 32, 26, 25, 23, 22, 21, 19
+- **ux-ui-designer-agent**: Sessions 32, 26, 25
+- **v0.4.1**: Session 32
 - **vertical-stack**: Session 26
-- **wcag**: Sessions 26, 23, 22
-- **yt-dlp**: Sessions 31, 30, 14
+- **visual-hierarchy**: Session 33
+- **wcag**: Sessions 32, 26, 23, 22
+- **yt-dlp**: Sessions 32, 31, 30, 14
 - **youtube-shorts**: Session 29
 
 ---
 
 ## Session Details
+
+### Session 33
+**Title:** Landing Page NEW Badge Cleanup and Organization
+**Date:** 2025-10-14
+**Type:** UI/UX Refinement + CSS Cleanup
+**Status:** ✅ Complete
+**Version:** Landing page only (docs/)
+
+**Summary:**
+Cleaned up landing page features section by reducing NEW badge clutter from 3 badges to 1, removing automatic CSS pseudo-element badge generation in favor of explicit HTML control, and reorganizing features to place NEW items at the top. Moved badge from inline position (after title text) to top of card for better visual prominence. Also updated FAQs to reflect multi-platform capabilities, changing app name from "Enhanced YouTube Downloader" to "Enhanced Video Downloader" throughout.
+
+**Key Accomplishments:**
+- ✅ Reduced NEW badges from 3 to 1 (67% reduction)
+- ✅ Removed CSS pseudo-element `::after` rule that auto-generated badges
+- ✅ Reorganized features: Multi-Platform Support first, YouTube Shorts second
+- ✅ Moved badge from inline to top of card (cleaner visual hierarchy)
+- ✅ Added HTML section comments (NEW FEATURES / CORE FEATURES)
+- ✅ Updated FAQs to reflect multi-platform support
+- ✅ Added new FAQ: "Which platforms and websites are supported?"
+- ✅ 4 commits across blog fixes, badge cleanup, and FAQ updates
+
+**Keywords:** `badge-cleanup` `new-badge` `badge-positioning` `css-pseudo-elements` `explicit-html-control` `features-reorganization` `visual-hierarchy` `landing-page` `faq` `multi-platform-faq` `ux-ui` `material-design` `user-feedback` `iterative-design`
+
+**Related Sessions:**
+- Session 32 (predecessor: v0.4.1 release, blog page updates)
+- Session 31 (context: Platform badges in download UI)
+- Session 30 (context: Multi-platform landing page updates)
+- Session 27 (similar: Hamburger menu mobile fix, CSS cleanup)
+
+**Files Modified:**
+- `docs/index.html` (lines 325-436 features, 646-692 FAQs)
+- `docs/css/style.css` (lines 901-920 removed - pseudo-element)
+- `docs/blog.html` (navigation fixes, v0.4.1 post)
+
+**Git Commits:**
+- `324c20c` - Make logo clickable, add mobile UX fixes, format hero title
+- `a4a3014` - Reorganize features section with single NEW badge at top
+- `da33a12` - Remove automatic NEW badge from CSS pseudo-element
+- `8772893` - Move NEW badge to top of feature card
+- `367b835` - Update FAQs to reflect multi-platform capabilities
+
+**Next Steps:**
+1. Monitor user feedback on badge placement
+2. Consider badge removal timeline (when to remove NEW badge)
+3. Test mobile responsiveness of updated features section
+
+---
+
+### Session 32
+**Title:** v0.4.1 Multi-Platform Release and Testing
+**Date:** 2025-10-14
+**Type:** Release + Testing + UI Fixes
+**Status:** ✅ Complete
+**Version:** v0.4.1 (application + landing page)
+
+**Summary:**
+Released v0.4.1 with multi-platform support (TikTok, Instagram, Twitter, 1,800+ sites via yt-dlp) after manual testing confirmed platform detection and downloads working. Fixed blog page navigation issues (logo not clickable, CSS class mismatches), added v0.4.1 blog post with comprehensive feature list, formatted hero title with line breaks, and deployed UX/UI Designer Agent to fix mobile hamburger menu and accessibility issues. Created foundation for Session 33's badge cleanup work.
+
+**Key Accomplishments:**
+- ✅ Released v0.4.1 with full multi-platform support
+- ✅ Manual testing: TikTok, Instagram, Twitter downloads verified
+- ✅ Blog page navigation fixes (logo clickable, CSS aliases)
+- ✅ Added v0.4.1 blog post (comprehensive feature list)
+- ✅ Hero title formatted: "THE / ENHANCED VIDEO / DOWNLOADER"
+- ✅ UX/UI Designer Agent fixed hamburger menu (mobile)
+- ✅ 48x48px touch targets (WCAG 2.1 AA compliant)
+- ✅ 6+ commits covering blog updates, mobile UX, and navigation
+
+**Keywords:** `v0.4.1` `multi-platform` `release` `testing` `tiktok` `instagram` `twitter` `yt-dlp` `blog-page` `navigation-css-aliases` `clickable-logo` `hero-title-formatting` `hamburger-menu` `mobile-ux` `ux-ui-designer-agent` `wcag` `touch-targets` `accessibility` `github-pages`
+
+**Related Sessions:**
+- Session 33 (successor: Badge cleanup and FAQ updates)
+- Session 31 (predecessor: Platform badges and GenericVideo fix)
+- Session 30 (context: Multi-platform Phase 1-3)
+- Session 29 (context: v0.4.0 YouTube Shorts release)
+
+**Files Modified:**
+- `docs/blog.html` (navigation, v0.4.1 post)
+- `docs/css/style.css` (navigation CSS aliases, hamburger menu, hero centering)
+- `docs/index.html` (hero title formatting)
+
+**Git Commits:**
+- `6d515cb` - Fix blog page navigation and add v0.4.1 release post
+- `2dcb9ce` - Fix blog hero section horizontal centering
+- `5b1a9a0` - Remove logo image from blog navigation
+- `324c20c` - Make logo clickable, add mobile UX fixes, format hero title
+
+**Next Steps:**
+1. Monitor download success rates for non-YouTube platforms
+2. Collect user feedback on multi-platform UX
+3. Consider adding platform-specific download options
+
+---
 
 ### Session 31
 **Title:** Multi-Platform Support Phase 4-5: Platform Badges & GenericVideo Fix
@@ -557,11 +669,11 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 ## Statistics
 
 ### Session Metrics
-- **Total Sessions:** 31 (documented)
+- **Total Sessions:** 33 (documented)
 - **Average Duration:** ~1-2 hours per session
 - **Longest Session:** Session 12 (~4 hours - Complete Project Summary)
 - **Shortest Session:** Session 25 (~45 min - Hero image interaction + SEO)
-- **Most Recent:** Session 31 (2025-10-14)
+- **Most Recent:** Session 33 (2025-10-14)
 
 ### Work Distribution
 - **Feature Development:** ~55% (17+ sessions)
@@ -581,8 +693,8 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 - **Releases:** 6+ versions (v0.3.1 → v0.4.0, v1.0.0)
 
 ### Documentation
-- **Session Docs:** 31 files
-- **Total Doc Size:** ~800KB+ markdown
+- **Session Docs:** 33 files
+- **Total Doc Size:** ~850KB+ markdown
 - **Average Doc Size:** ~25-30KB per session
 - **Implementation Guides:** 5+ guides
 - **Agent Configs:** 4 agents (UX/UI, SEO, Session Doc, Release Manager)
@@ -678,7 +790,7 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 
 ---
 
-**Index Version:** 1.3
+**Index Version:** 1.4
 **Created:** 2024-10-08
 **Last Updated:** 2025-10-14
-**Next Update:** After Session 32
+**Next Update:** After Session 34
