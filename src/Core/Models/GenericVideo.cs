@@ -1,3 +1,4 @@
+using YoutubeExplode.Channels;
 using YoutubeExplode.Common;
 using YoutubeExplode.Videos;
 
@@ -13,8 +14,10 @@ public class GenericVideo : IVideo
     {
         Url = url;
         Title = title;
-        Id = new VideoId(url); // Use URL as ID
-        Author = new Author(string.Empty, title);
+        // Use a hash of the URL as a pseudo video ID to avoid conflicts
+        Id = new VideoId(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(url)).Replace("/", "_").Replace("+", "-").Substring(0, Math.Min(11, url.Length)));
+        // Create Author with a valid dummy channel ID
+        Author = new Author(new ChannelId("UCGenericVideo000"), title);
         Duration = null;
         Thumbnails = Array.Empty<Thumbnail>();
         Keywords = Array.Empty<string>();
