@@ -14,7 +14,7 @@ public class QueryResolver : IQueryResolver
     private readonly ICacheService _cacheService;
 
     private static readonly Regex VideoIdRegex = new(
-        @"(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([a-zA-Z0-9_-]{11})",
+        @"(?:youtube\.com/watch\?v=|youtube\.com/shorts/|youtu\.be/|youtube\.com/embed/)([a-zA-Z0-9_-]{11})",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
