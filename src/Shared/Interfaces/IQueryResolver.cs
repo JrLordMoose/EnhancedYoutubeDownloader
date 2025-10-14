@@ -41,4 +41,11 @@ public interface IQueryResolver
     /// <param name="url">YouTube URL</param>
     /// <returns>Channel ID if found, null otherwise</returns>
     string? ExtractChannelId(string url);
+
+    /// <summary>
+    /// Detects the platform type from a given URL or query string
+    /// </summary>
+    /// <param name="query">URL or query string to analyze</param>
+    /// <returns>Detected platform type</returns>
+    PlatformType DetectPlatform(string query);
 }

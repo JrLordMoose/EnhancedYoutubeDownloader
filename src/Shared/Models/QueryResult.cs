@@ -3,7 +3,7 @@ using YoutubeExplode.Videos;
 namespace EnhancedYoutubeDownloader.Shared.Models;
 
 /// <summary>
-/// Represents the result of resolving a YouTube query
+/// Represents the result of resolving a video download query
 /// </summary>
 public class QueryResult
 {
@@ -11,6 +11,11 @@ public class QueryResult
     /// The kind of query result (video, playlist, channel, or search)
     /// </summary>
     public required QueryResultKind Kind { get; init; }
+
+    /// <summary>
+    /// The platform/service from which content is being downloaded
+    /// </summary>
+    public PlatformType Platform { get; init; } = PlatformType.YouTube;
 
     /// <summary>
     /// Single video (when Kind is Video)

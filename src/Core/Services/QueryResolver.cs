@@ -33,6 +33,22 @@ public class QueryResolver : IQueryResolver
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
+    // Multi-platform URL patterns
+    private static readonly Regex TikTokUrlRegex = new(
+        @"(?:tiktok\.com/@[\w.-]+/video/|vm\.tiktok\.com/|vt\.tiktok\.com/)(\d+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    private static readonly Regex InstagramUrlRegex = new(
+        @"instagram\.com/(?:p|reel|tv|stories)/([a-zA-Z0-9_-]+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    private static readonly Regex TwitterUrlRegex = new(
+        @"(?:twitter\.com|x\.com)/[\w]+/status/(\d+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
     public QueryResolver(ICacheService cacheService)
     {
         _youtubeClient = new YoutubeClient();
@@ -46,6 +62,9 @@ public class QueryResolver : IQueryResolver
 
         query = query.Trim();
 
+        // Detect platform type
+        var platform = DetectPlatform(query);
+
         // Try to resolve as video URL
         var videoId = ExtractVideoId(query);
         if (videoId != null)
@@ -54,6 +73,7 @@ public class QueryResolver : IQueryResolver
             return new QueryResult
             {
                 Kind = QueryResultKind.Video,
+                Platform = platform,
                 Video = video,
                 Title = video.Title,
                 Author = video.Author.ChannelTitle
@@ -64,25 +84,25 @@ public class QueryResolver : IQueryResolver
         var playlistId = ExtractPlaylistId(query);
         if (playlistId != null)
         {
-            return await ResolvePlaylistAsync(playlistId);
+            return await ResolvePlaylistAsync(playlistId, platform);
         }
 
         // Try to resolve as channel URL
         var channelId = ExtractChannelId(query);
         if (channelId != null)
         {
-            return await ResolveChannelAsync(channelId);
+            return await ResolveChannelAsync(channelId, platform);
         }
 
         // Try to resolve as channel handle
         var channelHandle = ExtractChannelHandle(query);
         if (channelHandle != null)
         {
-            return await ResolveChannelByHandleAsync(channelHandle);
+            return await ResolveChannelByHandleAsync(channelHandle, platform);
         }
 
         // Fallback to search
-        return await ResolveSearchAsync(query);
+        return await ResolveSearchAsync(query, platform);
     }
 
     public bool IsYouTubeUrl(string query)
@@ -92,6 +112,55 @@ public class QueryResolver : IQueryResolver
 
         return query.Contains("youtube.com", StringComparison.OrdinalIgnoreCase) ||
                query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Detects the platform type from a given URL or query string
+    /// </summary>
+    public PlatformType DetectPlatform(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return PlatformType.Unknown;
+
+        query = query.Trim();
+
+        // Check for YouTube URLs
+        if (query.Contains("youtube.com", StringComparison.OrdinalIgnoreCase) ||
+            query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase))
+        {
+            return PlatformType.YouTube;
+        }
+
+        // Check for TikTok URLs
+        if (TikTokUrlRegex.IsMatch(query) ||
+            query.Contains("tiktok.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return PlatformType.TikTok;
+        }
+
+        // Check for Instagram URLs
+        if (InstagramUrlRegex.IsMatch(query) ||
+            query.Contains("instagram.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return PlatformType.Instagram;
+        }
+
+        // Check for Twitter/X URLs
+        if (TwitterUrlRegex.IsMatch(query) ||
+            query.Contains("twitter.com", StringComparison.OrdinalIgnoreCase) ||
+            query.Contains("x.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return PlatformType.Twitter;
+        }
+
+        // Check if it looks like a URL (contains protocol or domain pattern)
+        if (query.Contains("://") || query.Contains("www."))
+        {
+            return PlatformType.Generic;
+        }
+
+        // Not a recognized URL pattern
+        return PlatformType.Unknown;
     }
 
     public string? ExtractVideoId(string url)
@@ -167,7 +236,7 @@ public class QueryResolver : IQueryResolver
         return video;
     }
 
-    private async Task<QueryResult> ResolvePlaylistAsync(string playlistId)
+    private async Task<QueryResult> ResolvePlaylistAsync(string playlistId, PlatformType platform)
     {
         var playlist = await _youtubeClient.Playlists.GetAsync(playlistId);
         var videos = new List<IVideo>();
@@ -180,6 +249,7 @@ public class QueryResolver : IQueryResolver
         return new QueryResult
         {
             Kind = QueryResultKind.Playlist,
+            Platform = platform,
             Videos = videos,
             Title = playlist.Title,
             Description = playlist.Description,
@@ -187,7 +257,7 @@ public class QueryResolver : IQueryResolver
         };
     }
 
-    private async Task<QueryResult> ResolveChannelAsync(string channelId)
+    private async Task<QueryResult> ResolveChannelAsync(string channelId, PlatformType platform)
     {
         var channel = await _youtubeClient.Channels.GetAsync(channelId);
         var videos = new List<IVideo>();
@@ -200,6 +270,7 @@ public class QueryResolver : IQueryResolver
         return new QueryResult
         {
             Kind = QueryResultKind.Channel,
+            Platform = platform,
             Videos = videos,
             Title = channel.Title,
             Description = null,
@@ -207,7 +278,7 @@ public class QueryResolver : IQueryResolver
         };
     }
 
-    private async Task<QueryResult> ResolveChannelByHandleAsync(string handle)
+    private async Task<QueryResult> ResolveChannelByHandleAsync(string handle, PlatformType platform)
     {
         // YoutubeExplode supports handles via ChannelHandle
         var channelHandle = new ChannelHandle(handle);
@@ -222,6 +293,7 @@ public class QueryResolver : IQueryResolver
         return new QueryResult
         {
             Kind = QueryResultKind.Channel,
+            Platform = platform,
             Videos = videos,
             Title = channel.Title,
             Description = null,
@@ -229,7 +301,7 @@ public class QueryResolver : IQueryResolver
         };
     }
 
-    private async Task<QueryResult> ResolveSearchAsync(string searchQuery)
+    private async Task<QueryResult> ResolveSearchAsync(string searchQuery, PlatformType platform)
     {
         var videos = new List<IVideo>();
         var count = 0;
@@ -243,6 +315,7 @@ public class QueryResolver : IQueryResolver
         return new QueryResult
         {
             Kind = QueryResultKind.Search,
+            Platform = platform,
             Videos = videos,
             Title = $"Search results for: {searchQuery}",
             Description = null,
