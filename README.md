@@ -59,7 +59,7 @@ Experience our professional landing page featuring:
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.3.9.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/latest)** (~80 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.0.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/latest)** (~80 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
