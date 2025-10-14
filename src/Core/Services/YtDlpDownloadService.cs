@@ -333,9 +333,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             var options = new OptionSet
             {
                 Format = formatString,
-                Output = downloadItem.PartialFilePath, // Use .part path for progress reporting
+                Output = downloadItem.FilePath, // Direct output to final path
                 NoPlaylist = true,
-                NoPart = false, // Use .part files to enable progress reporting
+                NoPart = true, // Disable .part files to avoid path issues with non-YouTube URLs
 
                 // Subtitle options (both manual and auto-generated)
                 WriteSubs = shouldWriteSubs,
@@ -367,7 +367,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             Console.WriteLine($"[YTDLP] Quality: {profile.Quality}, Container: {profile.Container}");
             Console.WriteLine($"[YTDLP] Subtitles: {profile.IncludeSubtitles}, Style: {profile.SubtitleStyle}, Tags: {profile.IncludeTags}");
             Console.WriteLine($"[YTDLP] Subtitle Settings - EmbedSubs: {shouldEmbedSubs}, WriteSubs: {shouldWriteSubs}");
-            Console.WriteLine($"[YTDLP] Output path: {downloadItem.PartialFilePath}");
+            Console.WriteLine($"[YTDLP] Output path: {downloadItem.FilePath}");
 
             // Set up progress reporting
             var progress = new Progress<DownloadProgress>(p =>
