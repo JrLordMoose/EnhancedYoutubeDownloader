@@ -5,15 +5,15 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 ## 🌐 [View Landing Page](https://jrlordmoose.github.io/EnhancedYoutubeDownloader/)
 
 <br>
-<img width="1920" height="888" alt="ytdownloader-landing-page-hero-image" src="https://github.com/user-attachments/assets/e6610ba7-984a-429c-8473-5cac8064df83" />
+<img width="1332" height="836" alt="enhanced-video-downloader-landing-page-hero" src="guides-and-instructions/landing-page-images/app-preview-main-hero-image2.png" />
 </br>
 <p>&nbsp;</p>
 
 Experience our professional landing page featuring:
+- Multi-platform support (YouTube, TikTok, Instagram, Twitter, 1,800+ sites)
 - Modern glassmorphism design with animated gradients
-- Interactive 3D mockups and smooth animations
-- Comprehensive feature showcase
-- Easy installation guide
+- Netflix-style burned-in subtitles
+- Intelligent pause/resume and queue management
 
 ---
 
