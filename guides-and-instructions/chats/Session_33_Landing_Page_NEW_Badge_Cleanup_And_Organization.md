@@ -1,8 +1,8 @@
 # Session 33: Landing Page NEW Badge Cleanup and Organization
 
 **Date**: October 14, 2025
-**Duration**: ~45 minutes
-**Focus**: Features section badge organization, CSS cleanup, mobile responsiveness
+**Duration**: ~60 minutes
+**Focus**: Features section badge organization, CSS cleanup, mobile responsiveness, FAQ updates
 
 ---
 
@@ -12,6 +12,7 @@
 - **Reduced NEW badges** from 3 to 1 (only Multi-Platform Support)
 - **Removed CSS pseudo-element** that auto-generated NEW badge on all `.feature-card-highlight` elements
 - **Repositioned badge** from inline with title to top of card for better visibility
+- **Updated FAQs** to reflect multi-platform capabilities (renamed app, added platform support FAQ)
 
 ---
 
@@ -30,6 +31,7 @@ This session continued from Session 32 where we completed the v0.4.1 multi-platf
 - CSS pseudo-element removed (explicit HTML control)
 - Badge positioned at top of card (before icon)
 - NEW features grouped at top of grid
+- FAQs updated to reflect multi-platform support (app renamed, new platform FAQ added)
 
 ---
 
@@ -125,6 +127,44 @@ This session continued from Session 32 where we completed the v0.4.1 multi-platf
 - `324c20c` - Make logo clickable, add mobile UX fixes, format hero title
 - `5b1a9a0` - Remove logo image from blog navigation
 - `2dcb9ce` - Fix blog hero section horizontal centering
+
+### 5. FAQ Section Updates
+
+**Problem:** Landing page FAQs still referenced "Enhanced YouTube Downloader" and didn't highlight the multi-platform capabilities added in v0.4.1.
+
+**Solution:** Updated FAQ section to reflect current multi-platform support.
+
+**Changes Made:**
+- **Renamed application** throughout FAQs: "Enhanced YouTube Downloader" → "Enhanced Video Downloader"
+- **Added new FAQ #2**: "Which platforms and websites are supported?"
+  - Lists YouTube, TikTok, Instagram, Twitter/X, 1,800+ sites
+  - Explains automatic platform detection
+- **Enhanced FAQ #1**: "What is Enhanced Video Downloader?"
+  - Added comprehensive platform list
+  - Emphasized evolution from YouTube-only to multi-platform
+- **Clarified FAQ #3**: "Is Enhanced Video Downloader free?"
+  - Added "All features are available to everyone, forever."
+  - Reinforced no premium tiers or paywalls
+- **Updated Tyrrrz comparison**: Emphasized multi-platform support as key differentiator
+
+**File:** `/docs/index.html:646-692`
+
+**Commit:** `367b835` - "Update FAQs to reflect multi-platform capabilities"
+
+**FAQ Content Example:**
+```html
+<div class="faq-item">
+    <button class="faq-question" aria-expanded="false">
+        <span>Which platforms and websites are supported?</span>
+        <svg class="faq-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+        </svg>
+    </button>
+    <div class="faq-answer">
+        <p>Enhanced Video Downloader supports <strong>YouTube</strong> (videos, Shorts, playlists, channels), <strong>TikTok</strong> (videos and sounds), <strong>Instagram</strong> (Reels, Stories, Posts), <strong>Twitter/X</strong> (videos and GIFs), plus over <strong>1,800 additional websites</strong> through yt-dlp integration. Simply paste the URL and the app will automatically detect the platform and available formats.</p>
+    </div>
+</div>
+```
 
 ---
 
@@ -237,16 +277,26 @@ The badge inherits styling from existing `.badge-new` class:
 ## Files Modified
 
 ### `/docs/index.html`
-**Lines:** 325-436 (features section)
+**Lines Modified:**
+- 325-436 (features section)
+- 646-692 (FAQ section)
 
 **Changes:**
-1. Reordered feature cards (Multi-Platform first, YouTube Shorts second)
-2. Added section comments (`<!-- NEW FEATURES -->` and `<!-- CORE FEATURES -->`)
-3. Moved badge from inline to top of card (line 328)
-4. Removed badge from YouTube Shorts h3
-5. Removed badge from Professional Subtitle Burning
+1. **Features section:**
+   - Reordered feature cards (Multi-Platform first, YouTube Shorts second)
+   - Added section comments (`<!-- NEW FEATURES -->` and `<!-- CORE FEATURES -->`)
+   - Moved badge from inline to top of card (line 328)
+   - Removed badge from YouTube Shorts h3
+   - Removed badge from Professional Subtitle Burning
 
-**Commits:** 3 commits (`a4a3014`, `8772893`, and earlier mobile fixes)
+2. **FAQ section:**
+   - Changed app name from "Enhanced YouTube Downloader" to "Enhanced Video Downloader"
+   - Added new FAQ: "Which platforms and websites are supported?"
+   - Updated FAQ #1 with comprehensive platform list
+   - Enhanced FAQ #3 with "forever free" clarification
+   - Updated Tyrrrz comparison to mention multi-platform support
+
+**Commits:** 4 commits (`a4a3014`, `8772893`, `367b835`, and earlier mobile fixes)
 
 ### `/docs/css/style.css`
 **Lines:** 901-920 (removed pseudo-element)
@@ -302,6 +352,11 @@ The badge inherits styling from existing `.badge-new` class:
 3. **`8772893`** - Move NEW badge to top of feature card
    - Moved badge from inline to top-level
    - Clean title without badge
+
+4. **`367b835`** - Update FAQs to reflect multi-platform capabilities
+   - Renamed app to "Enhanced Video Downloader"
+   - Added platform support FAQ
+   - Enhanced existing FAQ content
 
 ### Commit Messages
 
@@ -465,15 +520,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Summary
 
-Session 33 focused on cleaning up the landing page features section by reducing badge clutter and improving visual hierarchy. We removed CSS-generated badges in favor of explicit HTML control, reorganized features to place NEW items at the top, and repositioned the single remaining badge for maximum prominence. The changes resulted in a cleaner, more professional appearance with a single, well-placed NEW badge drawing attention to the most significant v0.4.1 feature: Multi-Platform Support.
+Session 33 focused on cleaning up the landing page features section by reducing badge clutter and improving visual hierarchy, plus updating FAQs to reflect multi-platform capabilities. We removed CSS-generated badges in favor of explicit HTML control, reorganized features to place NEW items at the top, repositioned the single remaining badge for maximum prominence, and comprehensively updated the FAQ section to accurately represent the application's evolution from YouTube-only to multi-platform support. The changes resulted in a cleaner, more professional appearance with a single, well-placed NEW badge drawing attention to the most significant v0.4.1 feature: Multi-Platform Support, along with clear documentation of supported platforms in the FAQ section.
 
 **Key Metrics:**
 - Badges reduced: 3 → 1 (67% reduction)
 - CSS lines removed: 15 lines (pseudo-element rule)
-- Commits: 3 focused commits
+- Commits: 4 focused commits
 - Files modified: 2 (index.html, style.css)
 - User feedback cycles: 3 iterations
-- Final result: Clean, scannable features section with clear hierarchy
+- FAQs updated: 4 FAQs revised, 1 new FAQ added
+- Final result: Clean, scannable features section with clear hierarchy and accurate multi-platform documentation
 
 ---
 
