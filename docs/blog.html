@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stay updated with the latest features, releases, and improvements to Enhanced YouTube Downloader. Read our blog for updates, tips, and announcements.">
+    <meta name="keywords" content="YouTube Downloader updates, blog, release notes, feature announcements, video downloader news">
+    <meta name="author" content="JrLordMoose">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Blog & Updates - Enhanced YouTube Downloader">
+    <meta property="og:description" content="Latest features, releases, and improvements to Enhanced YouTube Downloader">
+    <meta property="og:url" content="https://jrlordmoose.github.io/EnhancedYoutubeDownloader/blog.html">
+    <meta property="og:site_name" content="Enhanced YouTube Downloader">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog & Updates - Enhanced YouTube Downloader">
+    <meta name="twitter:description" content="Latest features, releases, and improvements to Enhanced YouTube Downloader">
+
+    <title>Blog & Updates - Enhanced YouTube Downloader</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="favicon.ico" alt="Enhanced YouTube Downloader Logo" class="logo-icon">
+                <span class="logo-text">Enhanced YouTube Downloader</span>
+            </div>
+
+            <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-links">
+                <a href="index.html#features" aria-label="View features of Enhanced YouTube Downloader">Features</a>
+                <a href="index.html#installation" aria-label="View installation instructions">Installation</a>
+                <a href="index.html#screenshots" aria-label="View application screenshots">Screenshots</a>
+                <a href="index.html#download" aria-label="Download Enhanced YouTube Downloader">Download</a>
+                <a href="index.html#faq" aria-label="View frequently asked questions">FAQ</a>
+                <a href="blog.html" class="active" aria-label="Read blog and updates" aria-current="page">Blog</a>
+                <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Hero Section -->
+    <section class="hero-section" style="padding: 120px 0 80px;">
+        <div class="hero-content">
+            <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 1.5rem;">Blog & Updates</h1>
+            <p class="hero-subtitle" style="max-width: 700px; margin: 0 auto;">Stay up to date with the latest features, improvements, and announcements for Enhanced YouTube Downloader. Discover what's new and what's coming next.</p>
+        </div>
+    </section>
+
+    <!-- Blog Posts Grid -->
+    <section class="section" style="padding: 60px 0;">
+        <div class="container">
+            <!-- v0.4.0 Release -->
+            <article class="blog-post-card">
+                <div class="blog-post-header">
+                    <span class="badge-new">NEW</span>
+                    <h2 class="blog-post-title">Version 0.4.0: YouTube Shorts Support</h2>
+                    <p class="blog-post-meta">Released: October 14, 2025</p>
+                </div>
+                <div class="blog-post-content">
+                    <p>We're excited to announce full support for YouTube Shorts! Download your favorite short-form content directly using <code>youtube.com/shorts/*</code> URLs.</p>
+
+                    <h3>What's New</h3>
+                    <ul>
+                        <li><strong>YouTube Shorts URL Support</strong> - Paste any <code>youtube.com/shorts/VIDEO_ID</code> URL and download instantly</li>
+                        <li><strong>Seamless Integration</strong> - Works with all existing features: subtitles, quality selection, batch operations</li>
+                        <li><strong>Format Options</strong> - Download Shorts in MP4, WebM, or audio-only formats</li>
+                    </ul>
+
+                    <h3>Why This Matters</h3>
+                    <p>YouTube Shorts have become a major content format. Whether you're a creator archiving your work, a researcher studying trends, or simply want to save your favorite clips, Enhanced YouTube Downloader now handles Shorts as effortlessly as regular videos.</p>
+
+                    <h3>Technical Details</h3>
+                    <p>The update includes enhanced regex pattern matching in our <code>QueryResolver</code> service, ensuring reliable detection and processing of Shorts URLs. All existing quality selection, subtitle burning, and metadata features work seamlessly with Shorts.</p>
+
+                    <div class="blog-post-actions">
+                        <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/tag/v0.4.0" class="btn btn-primary" target="_blank" rel="noopener noreferrer">View Release Notes</a>
+                        <a href="index.html#download" class="btn btn-secondary">Download v0.4.0</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- v0.3.9 Release -->
+            <article class="blog-post-card">
+                <div class="blog-post-header">
+                    <h2 class="blog-post-title">Version 0.3.9: Hamburger Menu Mobile Fix</h2>
+                    <p class="blog-post-meta">Released: October 13, 2025</p>
+                </div>
+                <div class="blog-post-content">
+                    <p>Improved mobile navigation experience with a comprehensive hamburger menu overhaul.</p>
+
+                    <h3>Improvements</h3>
+                    <ul>
+                        <li><strong>Enhanced Mobile Menu</strong> - Fixed visibility issues on small screens</li>
+                        <li><strong>Better Contrast</strong> - Improved text readability with darker backgrounds</li>
+                        <li><strong>CSS Cleanup</strong> - Removed duplicate styles causing conflicts</li>
+                        <li><strong>Touch Targets</strong> - Increased button sizes for better mobile usability</li>
+                    </ul>
+
+                    <div class="blog-post-actions">
+                        <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/tag/v0.3.9" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View Release Notes</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- v0.3.7 Release -->
+            <article class="blog-post-card">
+                <div class="blog-post-header">
+                    <h2 class="blog-post-title">Version 0.3.7: Landing Page Launch</h2>
+                    <p class="blog-post-meta">Released: October 10, 2025</p>
+                </div>
+                <div class="blog-post-content">
+                    <p>Major visual overhaul with a stunning new landing page featuring glassmorphism design and interactive elements.</p>
+
+                    <h3>New Features</h3>
+                    <ul>
+                        <li><strong>Professional Landing Page</strong> - Modern glassmorphism design with animated gradients</li>
+                        <li><strong>Interactive Mockups</strong> - 3D-styled screenshots with hover effects</li>
+                        <li><strong>Comprehensive FAQ</strong> - Answers to common questions</li>
+                        <li><strong>Installation Guide</strong> - Step-by-step setup instructions with SmartScreen guidance</li>
+                    </ul>
+
+                    <h3>Design Philosophy</h3>
+                    <p>The new landing page reflects our commitment to professional software design. We've applied modern web design principles including glassmorphism effects, smooth animations, and responsive layouts to create an engaging user experience that matches the quality of our application.</p>
+
+                    <div class="blog-post-actions">
+                        <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/tag/v0.3.7" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View Release Notes</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Core Features Highlight -->
+            <article class="blog-post-card" style="background: linear-gradient(135deg, rgba(249, 168, 37, 0.1) 0%, rgba(232, 232, 232, 0.05) 100%);">
+                <div class="blog-post-header">
+                    <h2 class="blog-post-title">Core Features Overview</h2>
+                    <p class="blog-post-meta">Evergreen</p>
+                </div>
+                <div class="blog-post-content">
+                    <p>Enhanced YouTube Downloader is packed with powerful features designed for both casual users and power users.</p>
+
+                    <h3>Key Capabilities</h3>
+                    <ul>
+                        <li><strong>Netflix-Style Burned Subtitles</strong> - Professional subtitle rendering with customizable styling</li>
+                        <li><strong>Intelligent Pause/Resume</strong> - Never lose progress on large downloads</li>
+                        <li><strong>Advanced Queue Management</strong> - Manage multiple downloads with drag-and-drop reordering</li>
+                        <li><strong>Batch Operations</strong> - Download entire playlists and channels efficiently</li>
+                        <li><strong>Format Profiles</strong> - Quick presets for common scenarios (MP4 1080p, Audio Only, etc.)</li>
+                        <li><strong>Metadata Caching</strong> - SQLite-based caching for faster repeated queries</li>
+                        <li><strong>Cross-Platform</strong> - Windows, Linux, and macOS support</li>
+                    </ul>
+
+                    <div class="blog-post-actions">
+                        <a href="index.html#features" class="btn btn-primary">Explore All Features</a>
+                        <a href="index.html#download" class="btn btn-secondary">Download Now</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup (Optional Future Feature) -->
+    <section class="section cta-section" style="padding: 80px 0;">
+        <div class="container">
+            <div class="cta-content" style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Stay Updated</h2>
+                <p style="font-size: 1.125rem; margin-bottom: 2rem; opacity: 0.9;">Follow our GitHub repository to receive notifications about new releases, features, and updates.</p>
+                <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">Watch on GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Enhanced YouTube Downloader</h4>
+                <p>Professional-grade video downloading with advanced features and exceptional user experience.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Links</h4>
+                <ul>
+                    <li><a href="blog.html">Blog & Updates</a></li>
+                    <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+                    <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases" target="_blank" rel="noopener noreferrer">Releases</a></li>
+                    <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/issues" target="_blank" rel="noopener noreferrer">Report Issues</a></li>
+                    <li><a href="index.html#faq">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#installation">Installation Guide</a></li>
+                    <li><a href="index.html#screenshots">Screenshots</a></li>
+                    <li><a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentation</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Technology</h4>
+                <ul>
+                    <li><a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0" target="_blank" rel="noopener noreferrer">.NET 9.0</a></li>
+                    <li><a href="https://avaloniaui.net/" target="_blank" rel="noopener noreferrer">Avalonia UI</a></li>
+                    <li><a href="https://github.com/Tyrrrz/YoutubeExplode" target="_blank" rel="noopener noreferrer">YoutubeExplode</a></li>
+                    <li><a href="https://ffmpeg.org/" target="_blank" rel="noopener noreferrer">FFmpeg</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Enhanced YouTube Downloader by <a href="https://github.com/JrLordMoose" target="_blank" rel="noopener noreferrer">JrLordMoose</a>. Licensed under MIT License.</p>
+            <p>Design by <a href="https://www.thiinkmediagraphics.com/" target="_blank" rel="noopener noreferrer">Thiink Media Graphics</a></p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
