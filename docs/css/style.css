@@ -2855,7 +2855,6 @@ body.mobile-menu-open {
     text-align: center;
     max-width: 900px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
 }
 
 .hero-section .hero-title {
