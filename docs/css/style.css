@@ -254,9 +254,23 @@ img {
 }
 
 .nav-logo {
-    display: flex;
+    display: inline-flex; /* Changed from flex to inline-flex for <a> tag */
     align-items: center;
     gap: var(--spacing-sm);
+    text-decoration: none;
+    transition: var(--transition-base);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+}
+
+.nav-logo:hover {
+    transform: translateY(-2px);
+    opacity: 0.85;
+}
+
+.nav-logo:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .nav-logo .logo-icon {
@@ -289,8 +303,34 @@ img {
     touch-action: manipulation; /* Prevent touch delays */
     min-width: 48px; /* WCAG minimum touch target */
     min-height: 48px;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+}
+
+/* Hamburger spans for blog.html (direct span children) */
+.hamburger span {
+    display: block;
+    width: 28px;
+    height: 2px;
+    background: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    border-radius: 2px;
+}
+
+/* Hamburger active state - X icon animation */
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: scale(0);
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
 }
 
 .nav-toggle-icon {
@@ -337,8 +377,14 @@ img {
 
 /* Mobile navigation menu */
 @media (max-width: 768px) {
+    .hamburger,
     .nav-toggle {
-        display: block; /* Show on mobile */
+        display: flex; /* Show as flex on mobile to enable flex-direction column */
+    }
+
+    /* Reduce logo text size on mobile for better fit */
+    .nav-logo .logo-text {
+        font-size: clamp(1rem, 4vw, var(--font-lg));
     }
 
     .nav-links {
@@ -1437,11 +1483,17 @@ section {
     border-top: 1px solid var(--glass-border);
 }
 
-.footer-content {
+.footer-content,
+.footer-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-2xl);
     margin-bottom: var(--spacing-2xl);
+    max-width: min(1280px, 100vw);
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 var(--spacing-lg);
 }
 
 .footer-section h4 {
@@ -2997,6 +3049,28 @@ body.mobile-menu-open {
     font-size: 0.9em;
     border: 1px solid rgba(249, 168, 37, 0.2);
     font-weight: 600;
+    word-break: break-word; /* Allow long code to wrap on mobile */
+    overflow-wrap: break-word;
+}
+
+/* Code blocks (pre tags) */
+.blog-post-content pre {
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    overflow-x: auto; /* Enable horizontal scrolling */
+    margin: var(--spacing-lg) 0;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.blog-post-content pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    word-break: normal; /* Don't break code in pre blocks */
+    overflow-wrap: normal;
+    white-space: pre; /* Preserve formatting */
 }
 
 /* Blog Post Actions */
