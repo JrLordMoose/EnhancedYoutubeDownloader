@@ -1,5 +1,9 @@
 # Session Documentation Specialist Sub-Agent
 
+---
+session-documentation-agent
+---
+
 ## Quick Start
 When invoked at the END of a session, I will:
 1. **Analyze** all conversation context and work completed

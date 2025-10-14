@@ -148,11 +148,23 @@
 
                                             <!-- Title and Author -->
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                                                <TextBlock Text="{Binding Title}"
-                                                          FontSize="15"
-                                                          FontWeight="SemiBold"
-                                                          TextWrapping="Wrap"
-                                                          MaxLines="2"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="{Binding Title}"
+                                                              FontSize="15"
+                                                              FontWeight="SemiBold"
+                                                              TextWrapping="Wrap"
+                                                              MaxLines="2"/>
+                                                    <Border Background="#F9A825"
+                                                            CornerRadius="4"
+                                                            Padding="6,2"
+                                                            VerticalAlignment="Top"
+                                                            Margin="0,2,0,0">
+                                                        <TextBlock Text="{Binding PlatformDisplayName}"
+                                                                  FontSize="10"
+                                                                  FontWeight="SemiBold"
+                                                                  Foreground="#FFFFFF"/>
+                                                    </Border>
+                                                </StackPanel>
                                                 <TextBlock Text="{Binding Author}"
                                                           FontSize="13"
                                                           Opacity="0.65"

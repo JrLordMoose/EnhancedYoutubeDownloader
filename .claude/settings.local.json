@@ -59,7 +59,9 @@
       "Bash(python3:*)",
       "Bash(/dev/null)",
       "Bash(gh api:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.4.0\")",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

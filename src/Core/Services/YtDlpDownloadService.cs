@@ -45,7 +45,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     public IObservable<DownloadItem> DownloadStatusChanged => _downloadStatusChanged;
     public IObservable<double> OverallProgress => _overallProgress;
 
-    public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null)
+    public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null, PlatformType platform = PlatformType.YouTube)
     {
         Console.WriteLine($"[YTDLP] Creating download for: {video.Title}");
 
@@ -53,6 +53,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         {
             Video = video,
             FilePath = filePath,
+            Platform = platform,
             FormatProfile = profile ?? GetDefaultProfile(),
             Status = DownloadStatus.Queued,
             PartialFilePath = filePath + ".part",

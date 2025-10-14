@@ -5,7 +5,7 @@ namespace EnhancedYoutubeDownloader.Shared.Interfaces;
 
 public interface IDownloadService
 {
-    Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null);
+    Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null, PlatformType platform = PlatformType.YouTube);
     Task StartDownloadAsync(DownloadItem downloadItem);
     Task PauseDownloadAsync(DownloadItem downloadItem);
     Task ResumeDownloadAsync(DownloadItem downloadItem);

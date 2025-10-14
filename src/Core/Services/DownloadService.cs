@@ -35,12 +35,13 @@ public class DownloadService : IDownloadService, IDisposable
     public IObservable<DownloadItem> DownloadStatusChanged => _downloadStatusChanged;
     public IObservable<double> OverallProgress => _overallProgress;
 
-    public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null)
+    public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null, PlatformType platform = PlatformType.YouTube)
     {
         var downloadItem = new DownloadItem
         {
             Video = video,
             FilePath = filePath,
+            Platform = platform,
             Status = DownloadStatus.Queued,
             PartialFilePath = filePath + ".part"
         };

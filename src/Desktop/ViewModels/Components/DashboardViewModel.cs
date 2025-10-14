@@ -287,7 +287,8 @@ public partial class DashboardViewModel : ViewModelBase
             var downloadItem = await _downloadService.CreateDownloadAsync(
                 result.Video,
                 uniqueFilePath,
-                formatProfile
+                formatProfile,
+                result.Platform
             );
             Console.WriteLine($"[DEBUG] Download item created: {downloadItem.Id}");
 
@@ -351,7 +352,9 @@ public partial class DashboardViewModel : ViewModelBase
 
                     var downloadItem = await _downloadService.CreateDownloadAsync(
                         video,
-                        downloadPath
+                        downloadPath,
+                        null,
+                        result.Platform
                     );
                     Downloads.Add(downloadItem);
                     await _downloadService.StartDownloadAsync(downloadItem);

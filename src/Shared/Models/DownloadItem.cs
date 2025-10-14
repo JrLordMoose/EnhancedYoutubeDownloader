@@ -23,6 +23,10 @@ public partial class DownloadItem : ObservableObject
     private FormatProfile? _formatProfile;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PlatformDisplayName))]
+    private PlatformType _platform = PlatformType.YouTube;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStart))]
     [NotifyPropertyChangedFor(nameof(CanPause))]
     [NotifyPropertyChangedFor(nameof(CanResume))]
@@ -103,6 +107,15 @@ public partial class DownloadItem : ObservableObject
     public string? ThumbnailUrl => Video?.Thumbnails?.OrderByDescending(t => t.Resolution.Area).FirstOrDefault()?.Url;
     public double BytesProgress => TotalBytes > 0 ? (BytesDownloaded * 100.0 / TotalBytes) : 0;
     public bool IsCompleted => Status == DownloadStatus.Completed;
+    public string PlatformDisplayName => Platform switch
+    {
+        PlatformType.YouTube => "YouTube",
+        PlatformType.TikTok => "TikTok",
+        PlatformType.Instagram => "Instagram",
+        PlatformType.Twitter => "Twitter",
+        PlatformType.Generic => "Web",
+        _ => "Unknown"
+    };
 
     // Formatted properties for display
     public string FormattedSpeed => DownloadSpeed > 0 ? $"{FormatBytes((long)DownloadSpeed)}/s" : "--";
