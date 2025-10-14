@@ -37,7 +37,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                          Text="Enhanced YouTube Downloader"
+                          Text="Enhanced Video Downloader"
                           FontSize="24"
                           FontWeight="SemiBold"
                           VerticalAlignment="Center"/>
@@ -84,7 +84,7 @@
                         <TextBox Grid.Column="0"
                                  x:Name="QueryTextBox"
                                  Text="{Binding Dashboard.Query}"
-                                 Watermark="Enter YouTube URL, playlist, channel, or search query..."
+                                 Watermark="Enter video URL (YouTube, TikTok, Instagram, Twitter) or search query..."
                                  Classes="Outline"
                                  Margin="0,0,8,0"
                                  KeyDown="OnQueryTextBoxKeyDown"/>

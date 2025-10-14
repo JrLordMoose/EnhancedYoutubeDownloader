@@ -129,16 +129,22 @@ public partial class DashboardViewModel : ViewModelBase
         QueryError = null;
 
         // Check if it's a URL-like string or potential search query
-        if (query.StartsWith("#") || query.StartsWith("@") && !query.Contains("youtube.com"))
+        if (
+            query.StartsWith("#")
+            || query.StartsWith("@")
+                && !query.Contains("youtube.com")
+                && !query.Contains("instagram.com")
+                && !query.Contains("tiktok.com")
+        )
         {
-            QueryError = "Invalid URL. Please enter a valid YouTube URL or search term.";
+            QueryError = "Invalid URL. Please enter a valid video URL or search term.";
             return false;
         }
 
         // Check for very short random strings (less than 3 chars and no spaces)
         if (query.Length < 3 && !query.Contains(" "))
         {
-            QueryError = "Invalid input. Please enter a valid YouTube URL or search term.";
+            QueryError = "Invalid input. Please enter a valid video URL or search term.";
             return false;
         }
 
