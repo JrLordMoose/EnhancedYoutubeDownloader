@@ -5,6 +5,7 @@
         xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels"
         xmlns:components="using:EnhancedYoutubeDownloader.ViewModels.Components"
         xmlns:controls="using:EnhancedYoutubeDownloader.Controls"
+        xmlns:converters="using:EnhancedYoutubeDownloader.Converters"
         xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
         xmlns:models="using:EnhancedYoutubeDownloader.Shared.Models"
         xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -14,6 +15,10 @@
         Title="{Binding Title}"
         Icon="/favicon.ico"
         MinWidth="800" MinHeight="600">
+
+    <Window.Resources>
+        <converters:PlatformToIconConverter x:Key="PlatformToIconConverter"/>
+    </Window.Resources>
 
     <Design.DataContext>
         <vm:MainViewModel />
@@ -136,13 +141,18 @@
                                                            Stretch="UniformToFill"
                                                            HorizontalAlignment="Center"
                                                            VerticalAlignment="Center"/>
-                                                    <!-- Fallback -->
-                                                    <TextBlock Text="No Image"
-                                                              FontSize="11"
-                                                              Opacity="0.5"
+                                                    <!-- Fallback - Platform Icon -->
+                                                    <TextBlock FontSize="32"
+                                                              Opacity="0.4"
                                                               HorizontalAlignment="Center"
                                                               VerticalAlignment="Center"
-                                                              IsVisible="{Binding ThumbnailUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                                                              IsVisible="{Binding ThumbnailUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource PlatformToIconConverter}">
+                                                                <Binding Path="Platform"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
                                                 </Panel>
                                             </Border>
 
