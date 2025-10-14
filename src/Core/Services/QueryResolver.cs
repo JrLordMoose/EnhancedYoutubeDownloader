@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using EnhancedYoutubeDownloader.Core.Models;
 using EnhancedYoutubeDownloader.Shared.Interfaces;
 using EnhancedYoutubeDownloader.Shared.Models;
 using YoutubeExplode;
@@ -64,6 +65,20 @@ public class QueryResolver : IQueryResolver
 
         // Detect platform type
         var platform = DetectPlatform(query);
+
+        // For non-YouTube URLs, create a generic video stub and let yt-dlp handle it
+        if (platform != PlatformType.YouTube && platform != PlatformType.Unknown)
+        {
+            var genericVideo = new GenericVideo(query, $"Video from {platform}");
+            return new QueryResult
+            {
+                Kind = QueryResultKind.Video,
+                Platform = platform,
+                Video = genericVideo,
+                Title = genericVideo.Title,
+                Author = platform.ToString()
+            };
+        }
 
         // Try to resolve as video URL
         var videoId = ExtractVideoId(query);
