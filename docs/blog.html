@@ -63,10 +63,48 @@
     <!-- Blog Posts Grid -->
     <section class="section" style="padding: 60px 0;">
         <div class="container">
-            <!-- v0.4.0 Release -->
+            <!-- v0.4.1 Release -->
             <article class="blog-post-card">
                 <div class="blog-post-header">
                     <span class="badge-new">NEW</span>
+                    <h2 class="blog-post-title">Version 0.4.1: Multi-Platform Support</h2>
+                    <p class="blog-post-meta">Released: October 14, 2025</p>
+                </div>
+                <div class="blog-post-content">
+                    <p>🎉 Enhanced Video Downloader now supports <strong>multi-platform video downloads</strong>! Download videos from TikTok, Instagram, Twitter, and 1,800+ websites beyond YouTube.</p>
+
+                    <h3>What's New</h3>
+                    <ul>
+                        <li><strong>🌐 Multi-Platform Support</strong> - Download from TikTok, Instagram (Reels, Stories, Posts), Twitter/X, and 1,800+ additional sites via yt-dlp</li>
+                        <li><strong>🏷️ Platform Badges</strong> - Visual badges show the source platform next to each video title (YouTube, TikTok, Instagram, Twitter)</li>
+                        <li><strong>🎨 Platform Icons</strong> - Emoji icons serve as thumbnail placeholders for each platform (📺 YouTube, 🎵 TikTok, 📷 Instagram, 🐦 Twitter, 🎬 Generic)</li>
+                        <li><strong>🔍 Smart Platform Detection</strong> - Automatic URL pattern matching identifies video sources</li>
+                    </ul>
+
+                    <h3>Bug Fixes</h3>
+                    <ul>
+                        <li>Fixed non-YouTube URLs being incorrectly treated as search queries</li>
+                        <li>Fixed GenericVideo Author constructor error with invalid ChannelId</li>
+                        <li>Fixed yt-dlp .part file path issues (disabled .part files for compatibility)</li>
+                        <li>Fixed blog page hero section CSS styling</li>
+                    </ul>
+
+                    <h3>Why This Matters</h3>
+                    <p>With the rise of short-form content across TikTok, Instagram Reels, and Twitter videos, having a unified tool to download from all major platforms is essential. Whether you're archiving your own content, conducting research, or building a media library, Enhanced Video Downloader now provides a single solution for all your video downloading needs.</p>
+
+                    <h3>Technical Details</h3>
+                    <p>The update introduces a new <code>PlatformType</code> enum (Unknown, YouTube, TikTok, Instagram, Twitter, Generic) with intelligent URL pattern detection. We've implemented a <code>GenericVideo</code> stub class for non-YouTube platforms, integrating with yt-dlp via the YoutubeDLSharp C# wrapper. Platform-specific emoji icons provide visual feedback in the UI when video thumbnails aren't available.</p>
+
+                    <div class="blog-post-actions">
+                        <a href="https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/tag/v0.4.1" class="btn btn-primary" target="_blank" rel="noopener noreferrer">View Release Notes</a>
+                        <a href="index.html#download" class="btn btn-secondary">Download v0.4.1</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- v0.4.0 Release -->
+            <article class="blog-post-card">
+                <div class="blog-post-header">
                     <h2 class="blog-post-title">Version 0.4.0: YouTube Shorts Support</h2>
                     <p class="blog-post-meta">Released: October 14, 2025</p>
                 </div>
