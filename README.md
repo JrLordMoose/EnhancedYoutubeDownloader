@@ -5,7 +5,7 @@ An enhanced, production-ready version of YouTube Downloader that surpasses the o
 ## 🌐 [View Landing Page](https://jrlordmoose.github.io/EnhancedYoutubeDownloader/)
 
 <br>
-<img width="1332" height="836" alt="enhanced-video-downloader-landing-page-hero" src="guides-and-instructions/landing-page-images/app-preview-main-hero-image2.png" />
+<img width="1332" height="836" alt="app-preview-main-hero-image2" src="https://github.com/user-attachments/assets/95d56841-c67c-4926-afe3-a795ba48d032" />
 </br>
 <p>&nbsp;</p>
 
@@ -265,6 +265,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode) for YouTube API access
 - [Avalonia UI](https://avaloniaui.net/) for cross-platform UI
 - [Material Design](https://material.io/) for design system
+
 
 
 
