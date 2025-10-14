@@ -1,8 +1,8 @@
 # Session Index
 
-**Last Updated:** 2024-10-08
-**Total Sessions:** 26
-**Date Range:** Session 1 (Initial commit) to Session 26 (2024-10-08)
+**Last Updated:** 2025-10-14
+**Total Sessions:** 31
+**Date Range:** Session 1 (Initial commit) to Session 31 (2025-10-14)
 
 ---
 
@@ -18,6 +18,15 @@
 ---
 
 ## Sessions by Date
+
+### 2025
+
+#### October
+- **Session 31** (2025-10-14) - [Multi-Platform Support Phase 4-5: Platform Badges & GenericVideo Fix](#session-31)
+- **Session 30** (2025-10-13) - [Multi-Platform Support Phase 1-3: Landing Pages & Platform Detection](#session-30)
+- **Session 29** (2025-10-12) - [YouTube Shorts Support & v0.4.0 Release](#session-29)
+- **Session 28** (2025-10-11) - [Release Version Manager Agent](#session-28)
+- **Session 27** (2025-10-10) - [Session 27 Documentation](#session-27)
 
 ### 2024
 
@@ -40,6 +49,8 @@
 ## Sessions by Topic
 
 ### 🎨 UI/UX & Design
+- **Session 31**: Platform Badges UI (amber badges, Material Design)
+- **Session 30**: Multi-Platform Landing Page Updates (blog page, feature sections)
 - **Session 26**: Download Button Two-Line Layout (vertical stack, iPhone 15 fix, WCAG AA)
 - **Session 25**: Hero Image Interaction (3D tilt removal, static expansion, bouncy easing)
 - **Session 24**: Mobile Button Text Overflow (progressive font scaling, 4 breakpoints - FAILED)
@@ -50,6 +61,10 @@
 - **Session 19**: Landing Page Design (initial creation)
 
 ### 🔧 Features
+- **Session 31**: Multi-Platform Support Phase 4-5 (platform badges, GenericVideo stub)
+- **Session 30**: Multi-Platform Support Phase 1-3 (platform detection, PlatformType enum)
+- **Session 29**: YouTube Shorts Support (short URL patterns)
+- **Session 28**: Release Version Manager Agent
 - **Session 20**: Subtitle Burning Implementation (FFmpeg integration, WebVTT)
 - **Session 15**: MP3 Extension Fix
 - **Session 14**: yt-dlp Integration
@@ -57,6 +72,7 @@
 - **Session 11**: Windows Installer
 
 ### 🐛 Bug Fixes
+- **Session 31**: GenericVideo Fix (non-YouTube URLs treated as search queries)
 - **Session 18**: Critical Version Mismatch (v0.3.6 release)
 - **Session 17**: URL Validation and File Size Fixes
 - **Session 15**: MP3 Extension Mislabeling
@@ -81,6 +97,7 @@
 - **Session 21**: Touch Target Sizing
 
 ### 🚀 Releases
+- **Session 29**: v0.4.0 Release (YouTube Shorts support)
 - **Session 18**: v0.3.6 Release (Version fix)
 - **Session 16**: v0.3.2 Release (Installer improvements)
 - **Session 13**: v1.0.0 Release (Initial public release)
@@ -159,27 +176,35 @@
 - **font-scaling**: Sessions 26, 24
 
 ### G-I
+- **generic-video**: Session 31
 - **github-pages**: Sessions 26, 25, 23, 22, 21, 19
 - **hamburger-menu**: Session 23
 - **hero-image**: Session 25
 - **hero-section**: Sessions 25, 23, 21, 19
+- **instagram**: Session 31
 - **installer**: Sessions 16, 11
 - **indexing**: Session 23 (this session index creation)
 - **iphone-15**: Session 26
+- **ivideo-interface**: Session 31
 
 ### J-M
 - **javascript**: Sessions 23, 22, 21
-- **landing-page**: Sessions 26, 25, 24, 23, 22, 21, 19
+- **landing-page**: Sessions 30, 26, 25, 24, 23, 22, 21, 19
 - **lighthouse**: Session 26 (planned for Session 27)
 - **mobile**: Sessions 26, 24, 23, 21
 - **mobile-navigation**: Session 23
 - **mobile-optimization**: Sessions 26, 24, 23
+- **multi-platform**: Sessions 31, 30
 
 ### N-R
 - **navigation**: Session 23
 - **performance**: Sessions 22, 16, 12 _(some sessions)_
+- **platform-badges**: Session 31
+- **platform-detection**: Sessions 31, 30
+- **platformtype-enum**: Sessions 31, 30
+- **query-resolver**: Session 31
 - **queue**: Sessions 15, 8, 6 _(files available, not fully indexed)_
-- **release**: Sessions 18, 16, 15, 13, 11
+- **release**: Sessions 29, 18, 16, 15, 13, 11
 - **responsive-design**: Sessions 23, 21
 
 ### S-Z
@@ -187,9 +212,13 @@
 - **seo**: Sessions 25, 22, 19
 - **session-agent**: Session 23
 - **settings**: Sessions 9, 6 _(files available, not indexed yet)_
+- **shorts**: Session 29
 - **static-expansion**: Session 25
+- **stub-pattern**: Session 31
 - **subtitle**: Sessions 20, 16 _(some sessions)_
-- **testing**: Sessions 26, 23, 18, 14, 12 _(various)_
+- **testing**: Sessions 31, 26, 23, 18, 14, 12 _(various)_
+- **tiktok**: Session 31
+- **twitter**: Session 31
 - **3d-tilt**: Sessions 25 (removal), 23 (fix)
 - **touch-targets**: Sessions 26, 23, 21
 - **two-line-button**: Session 26
@@ -197,10 +226,62 @@
 - **ux-ui-designer-agent**: Sessions 26, 25
 - **vertical-stack**: Session 26
 - **wcag**: Sessions 26, 23, 22
+- **yt-dlp**: Sessions 31, 30, 14
+- **youtube-shorts**: Session 29
 
 ---
 
 ## Session Details
+
+### Session 31
+**Title:** Multi-Platform Support Phase 4-5: Platform Badges & GenericVideo Fix
+**Date:** 2025-10-14
+**Type:** Feature Development + Bug Fix
+**Status:** ✅ Complete (pending manual testing)
+**Branch:** feature/multi-platform-support
+
+**Summary:**
+Completed Phase 4 by adding platform badges to download UI (YouTube, TikTok, Instagram, Twitter) with amber Material Design styling. During Phase 5 testing, discovered critical bug where non-YouTube URLs were being treated as "Search" queries instead of "Video" queries, causing downloads to fail. Root cause: QueryResolver only extracted video IDs from YouTube-specific URL patterns, causing TikTok/Twitter URLs to fall through to wrong processing flow. Fixed by creating GenericVideo stub class implementing IVideo interface, allowing yt-dlp to handle platform-specific downloads while preserving UI badges and correct query result flow.
+
+**Key Accomplishments:**
+- ✅ Platform badges UI (amber #F9A825, next to video title, 10pt SemiBold)
+- ✅ PlatformDisplayName computed property (YouTube, TikTok, Instagram, Twitter, Web)
+- ✅ Updated IDownloadService, DownloadService, YtDlpDownloadService to accept platform parameter
+- ✅ Created GenericVideo stub class for non-YouTube platforms (implements IVideo interface)
+- ✅ Fixed QueryResolver to detect non-YouTube platforms early and return GenericVideo
+- ✅ Non-YouTube URLs now correctly identified as QueryResultKind.Video (not Search)
+- ✅ 2 commits, 0 build warnings
+
+**Keywords:** `multi-platform` `platform-badges` `generic-video` `stub-pattern` `ivideo-interface` `platform-detection` `query-resolver` `tiktok` `instagram` `twitter` `yt-dlp` `material-design` `amber-badges` `bug-fix` `search-query-bug` `platformtype-enum` `download-flow`
+
+**Related Sessions:**
+- Session 30 (predecessor: Phase 1-3 - platform detection, PlatformType enum)
+- Session 29 (context: YouTube Shorts support, v0.4.0 release)
+- Session 32 (planned: manual testing with real URLs)
+
+**Files Created:**
+- `src/Core/Models/GenericVideo.cs` (34 lines - IVideo stub implementation)
+
+**Files Modified:**
+- `src/Shared/Models/DownloadItem.cs` (lines 25-27, 110-118 - Platform property, PlatformDisplayName)
+- `src/Shared/Interfaces/IDownloadService.cs` (added platform parameter)
+- `src/Core/Services/DownloadService.cs` (sets platform on download creation)
+- `src/Core/Services/YtDlpDownloadService.cs` (sets platform on download creation)
+- `src/Desktop/ViewModels/Components/DashboardViewModel.cs` (passes platform from QueryResult)
+- `src/Desktop/Views/MainView.axaml` (lines 157-166 - platform badge UI)
+- `src/Core/Services/QueryResolver.cs` (lines 70-81 - GenericVideo logic)
+
+**Git Commits:**
+- `88b429c` - Add Phase 4: Platform badges in download UI
+- `a6f4ad5` - Fix: Add GenericVideo support for non-YouTube platforms
+
+**Next Steps:**
+1. Manual testing with real TikTok, Instagram, Twitter URLs (Session 32 - CRITICAL)
+2. Verify platform badges display correctly for all platforms
+3. Test error handling for invalid URLs
+4. Update README with multi-platform support documentation
+
+---
 
 ### Session 25
 **Title:** Hero Image Interaction & SEO Optimization
@@ -476,35 +557,35 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 ## Statistics
 
 ### Session Metrics
-- **Total Sessions:** 25 (documented)
-- **Average Duration:** ~2-3 hours per session
+- **Total Sessions:** 31 (documented)
+- **Average Duration:** ~1-2 hours per session
 - **Longest Session:** Session 12 (~4 hours - Complete Project Summary)
 - **Shortest Session:** Session 25 (~45 min - Hero image interaction + SEO)
-- **Most Recent:** Session 25 (2024-10-08)
+- **Most Recent:** Session 31 (2025-10-14)
 
 ### Work Distribution
-- **Feature Development:** ~52% (12+ sessions)
-- **Bug Fixes:** ~22% (5+ sessions)
-- **Refactoring:** ~13% (3+ sessions)
-- **Documentation:** ~17% (4+ sessions)
-- **Releases:** ~22% (5+ sessions)
+- **Feature Development:** ~55% (17+ sessions)
+- **Bug Fixes:** ~20% (6+ sessions)
+- **Refactoring:** ~10% (3+ sessions)
+- **Documentation:** ~15% (5+ sessions)
+- **Releases:** ~10% (3+ sessions)
 
 *(Note: Percentages > 100% because sessions often span multiple types)*
 
 ### Code Impact (Approximate)
-- **Total Commits:** 150+
-- **Lines Added:** 50,000+
-- **Lines Removed:** 10,000+
-- **Files Created:** 80+
-- **Files Modified:** 200+
-- **Releases:** 5+ versions (v0.3.1 → v0.3.9, v1.0.0)
+- **Total Commits:** 200+
+- **Lines Added:** 60,000+
+- **Lines Removed:** 12,000+
+- **Files Created:** 90+
+- **Files Modified:** 250+
+- **Releases:** 6+ versions (v0.3.1 → v0.4.0, v1.0.0)
 
 ### Documentation
-- **Session Docs:** 25 files
-- **Total Doc Size:** ~550KB+ markdown
-- **Average Doc Size:** ~20-25KB per session
+- **Session Docs:** 31 files
+- **Total Doc Size:** ~800KB+ markdown
+- **Average Doc Size:** ~25-30KB per session
 - **Implementation Guides:** 5+ guides
-- **Agent Configs:** 3 agents (UX/UI, SEO, Session Doc)
+- **Agent Configs:** 4 agents (UX/UI, SEO, Session Doc, Release Manager)
 
 ---
 
@@ -597,7 +678,7 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 
 ---
 
-**Index Version:** 1.2
+**Index Version:** 1.3
 **Created:** 2024-10-08
-**Last Updated:** 2024-10-08
-**Next Update:** After Session 27
+**Last Updated:** 2025-10-14
+**Next Update:** After Session 32
