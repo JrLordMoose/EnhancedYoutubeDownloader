@@ -16,5 +16,7 @@
   "EnableAISubtitles": true,
   "AISubtitleLanguage": "auto",
   "AskBeforeGeneratingSubtitles": true,
-  "SubtitleStyle": 1
+  "SubtitleStyle": 1,
+  "UseBrowserCookies": false,
+  "BrowserForCookies": "chrome"
 }

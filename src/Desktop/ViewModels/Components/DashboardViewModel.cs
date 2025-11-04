@@ -79,6 +79,23 @@ public partial class DashboardViewModel : ViewModelBase
                     );
                     OpenDownloadFolder(downloadItem);
                 }
+
+                // Check for 403 errors and offer to enable browser cookies
+                if (
+                    downloadItem.Status == DownloadStatus.Failed
+                    && !string.IsNullOrEmpty(downloadItem.ErrorMessage)
+                    && (
+                        downloadItem.ErrorMessage.Contains("403")
+                        || downloadItem.ErrorMessage.Contains("Forbidden")
+                    )
+                    && !_settingsService.UseBrowserCookies
+                )
+                {
+                    Console.WriteLine(
+                        $"[DASHBOARD] 403 error detected, showing browser cookie prompt"
+                    );
+                    _ = Show403BrowserCookiePromptAsync(downloadItem);
+                }
             })
         );
     }
@@ -745,6 +762,46 @@ public partial class DashboardViewModel : ViewModelBase
             default:
                 _snackbarManager.NotifyInfo($"Action '{actionKey}' not implemented yet");
                 break;
+        }
+    }
+
+    private async Task Show403BrowserCookiePromptAsync(DownloadItem downloadItem)
+    {
+        Console.WriteLine($"[403-PROMPT] Showing browser cookie prompt for {downloadItem.Id}");
+
+        var dialog = _viewModelManager.CreateMessageBoxViewModel();
+        dialog.Title = "Access Restricted (403 Forbidden)";
+        dialog.Message =
+            "This video requires authentication to download.\n\n"
+            + "Would you like to enable browser cookie authentication?\n"
+            + "This will use your logged-in YouTube session from Chrome.\n\n"
+            + "Make sure you're logged into YouTube in Chrome and close all browser windows before retrying.";
+        dialog.PrimaryButtonText = "Enable & Retry";
+        dialog.SecondaryButtonText = "Not Now";
+
+        var result = await _dialogManager.ShowDialogAsync(dialog);
+
+        if (result == true)
+        {
+            // User clicked "Enable & Retry"
+            Console.WriteLine($"[403-PROMPT] User chose to enable browser cookies");
+
+            _settingsService.UseBrowserCookies = true;
+            _settingsService.BrowserForCookies = "chrome"; // Default to Chrome
+            _settingsService.Save();
+
+            _snackbarManager.NotifySuccess("Browser cookies enabled! Retrying download...");
+
+            // Retry the download
+            await _downloadService.RestartDownloadAsync(downloadItem);
+        }
+        else
+        {
+            // User clicked "Not Now" or closed dialog
+            Console.WriteLine($"[403-PROMPT] User declined browser cookies");
+            _snackbarManager.NotifyInfo(
+                "You can enable this later in Settings > Advanced > Authentication"
+            );
         }
     }
 

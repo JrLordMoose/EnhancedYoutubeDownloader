@@ -61,7 +61,12 @@
       "Bash(gh api:*)",
       "WebFetch(domain:github.com)",
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.4.0\")",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(src/Desktop/bin/Debug/net9.0/yt-dlp.exe:*)",
+      "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/yt-dlp.exe:*)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File src/Desktop/Download-YtDlp.ps1 -OutputPath \"src/Desktop/bin/Debug/net9.0\")",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File src/Desktop/Download-YtDlp.ps1 -OutputPath \"src/Desktop/bin/Release/net9.0/win-x64/publish\")",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.4.2\")"
     ],
     "deny": [],
     "ask": []
