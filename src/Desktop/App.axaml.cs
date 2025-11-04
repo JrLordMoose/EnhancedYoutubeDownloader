@@ -115,7 +115,12 @@ public class App : Application, IDisposable
 
         services.AddSingleton<ISubtitleBurnInService, SubtitleBurnInService>();
         services.AddSingleton<ISubtitleGenerationService, SubtitleGenerationService>();
-        services.AddSingleton<IDownloadService, YtDlpDownloadService>();
+        services.AddSingleton<IDownloadService>(sp =>
+        {
+            var subtitleService = sp.GetRequiredService<ISubtitleBurnInService>();
+            var settings = sp.GetRequiredService<SettingsService>();
+            return new YtDlpDownloadService(subtitleService, settings);
+        });
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IQueryResolver, QueryResolver>();
         services.AddSingleton<IDependencyValidator, DependencyValidator>();

@@ -19,10 +19,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     private readonly SemaphoreSlim _downloadSemaphore;
     private readonly DownloadStateRepository _stateRepository;
     private readonly ISubtitleBurnInService _subtitleBurnInService;
+    private readonly object _settingsService;
 
-    public YtDlpDownloadService(ISubtitleBurnInService subtitleBurnInService, int maxConcurrentDownloads = 3)
+    public YtDlpDownloadService(ISubtitleBurnInService subtitleBurnInService, object settingsService, int maxConcurrentDownloads = 3)
     {
         _subtitleBurnInService = subtitleBurnInService ?? throw new ArgumentNullException(nameof(subtitleBurnInService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         // Initialize YoutubeDL with path to yt-dlp.exe
         var ytdlpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "yt-dlp.exe");
         var ffmpegPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
@@ -351,6 +353,24 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 // Audio extraction (for audio-only downloads)
                 ExtractAudio = isAudioOnly
             };
+
+            // Add browser cookies if enabled (helps with 403 errors and private videos)
+            try
+            {
+                dynamic settings = _settingsService;
+                if (settings.UseBrowserCookies && !string.IsNullOrEmpty(settings.BrowserForCookies))
+                {
+                    // Add custom argument for cookies-from-browser
+                    // YoutubeDLSharp doesn't have a direct property for this, so we use CustomOptions
+                    options.AddCustomOption("--cookies-from-browser", settings.BrowserForCookies);
+                    Console.WriteLine($"[YTDLP] Using browser cookies from: {settings.BrowserForCookies}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[YTDLP] Warning: Could not read browser cookie settings: {ex.Message}");
+                // Continue without browser cookies if settings can't be read
+            }
 
             // Only set AudioFormat if extracting audio
             if (isAudioOnly)

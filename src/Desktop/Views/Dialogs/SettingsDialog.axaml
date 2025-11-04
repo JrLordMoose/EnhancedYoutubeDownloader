@@ -403,6 +403,78 @@
 
                             <Separator Background="{DynamicResource MaterialDesignDivider}"/>
 
+                            <!-- Browser Cookies Authentication -->
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Authentication"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+
+                                <!-- Use Browser Cookies Toggle -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Use Browser Cookies"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Access private/age-restricted videos using browser login"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.UseBrowserCookies, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Browser Selection (visible only when enabled) -->
+                                <Grid ColumnDefinitions="*,200" IsVisible="{Binding Settings.UseBrowserCookies}">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Browser"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Select which browser to import cookies from"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1"
+                                             SelectedValue="{Binding Settings.BrowserForCookies, Mode=TwoWay}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Theme="{DynamicResource MaterialFilledComboBox}">
+                                        <ComboBoxItem Content="Chrome" Tag="chrome"/>
+                                        <ComboBoxItem Content="Firefox" Tag="firefox"/>
+                                        <ComboBoxItem Content="Edge" Tag="edge"/>
+                                        <ComboBoxItem Content="Opera" Tag="opera"/>
+                                        <ComboBoxItem Content="Brave" Tag="brave"/>
+                                        <ComboBoxItem Content="Chromium" Tag="chromium"/>
+                                    </ComboBox>
+                                </Grid>
+
+                                <!-- Info Box -->
+                                <Border Background="#F9A82520"
+                                        BorderBrush="#F9A825"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="12"
+                                        IsVisible="{Binding Settings.UseBrowserCookies}">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="ℹ️ How it works:"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="#F9A825"/>
+                                        <TextBlock TextWrapping="Wrap"
+                                                  FontSize="11"
+                                                  Foreground="{DynamicResource MaterialDesignBody}">
+                                            <Run Text="• Make sure you're logged into YouTube in your selected browser"/>
+                                            <LineBreak/>
+                                            <Run Text="• Close all browser windows before downloading"/>
+                                            <LineBreak/>
+                                            <Run Text="• This enables access to private, unlisted, and age-restricted videos"/>
+                                            <LineBreak/>
+                                            <Run Text="• Also helps prevent 403 Forbidden errors"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
                             <!-- Cache Management -->
                             <StackPanel Spacing="12">
                                 <TextBlock Text="Cache Management"

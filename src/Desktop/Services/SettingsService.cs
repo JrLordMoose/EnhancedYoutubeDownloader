@@ -104,6 +104,12 @@ public partial class SettingsService : SettingsBase, INotifyPropertyChanged
         }
     }
 
+    [DefaultValue(false)]
+    public bool UseBrowserCookies { get; set; } = false;
+
+    [DefaultValue("chrome")]
+    public string BrowserForCookies { get; set; } = "chrome";
+
     public SettingsService()
         : base(Program.Name) { }
 
