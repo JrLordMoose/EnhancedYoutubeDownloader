@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Version>0.4.1</Version>
+    <Version>0.4.2</Version>
     <Company>Enhanced YoutubeDownloader</Company>
     <Copyright>Copyright (C) Enhanced YoutubeDownloader Contributors</Copyright>
     <LangVersion>preview</LangVersion>
