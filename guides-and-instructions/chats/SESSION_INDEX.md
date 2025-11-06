@@ -1,8 +1,8 @@
 # Session Index
 
-**Last Updated:** 2025-11-04
-**Total Sessions:** 34
-**Date Range:** Session 1 (Initial commit) to Session 34 (2025-11-04)
+**Last Updated:** 2025-11-06
+**Total Sessions:** 35
+**Date Range:** Session 1 (Initial commit) to Session 35 (2025-11-06)
 
 ---
 
@@ -22,6 +22,7 @@
 ### 2025
 
 #### November
+- **Session 35** (2025-11-06) - [Automatic Updates & UI Improvements (Release v0.4.3)](#session-35)
 - **Session 34** (2025-11-04) - [Browser Cookie Authentication and Smart 403 Auto-Enable (Release v0.4.2)](#session-34)
 
 #### October
@@ -54,6 +55,8 @@
 ## Sessions by Topic
 
 ### 🎨 UI/UX & Design
+- **Session 35**: Scrollbar Fix (Auto to Visible, downloads list overflow detection)
+- **Session 35**: Navigation Link (General to Advanced tab, clickable text)
 - **Session 33**: Landing Page Badge Cleanup (NEW badge organization, CSS pseudo-element removal)
 - **Session 32**: Blog Page Navigation Fixes (logo clickable, mobile UX, hero title formatting)
 - **Session 31**: Platform Badges UI (amber badges, Material Design)
@@ -68,6 +71,7 @@
 - **Session 19**: Landing Page Design (initial creation)
 
 ### 🔧 Features
+- **Session 35**: Automatic Update System (Onova, manual check, ZIP downloads, restart)
 - **Session 34**: Browser Cookie Authentication (6 browsers, 403 error fixes)
 - **Session 34**: Smart 403 Auto-Enable (one-click solution for new users)
 - **Session 31**: Multi-Platform Support Phase 4-5 (platform badges, GenericVideo stub)
@@ -106,6 +110,7 @@
 - **Session 21**: Touch Target Sizing
 
 ### 🚀 Releases
+- **Session 35**: v0.4.3 Release (Automatic updates, navigation improvements, scrollbar fix)
 - **Session 34**: v0.4.2 Release (Browser cookie authentication, smart 403 auto-enable)
 - **Session 32**: v0.4.1 Release (Multi-platform support - TikTok, Instagram, Twitter, 1,800+ sites)
 - **Session 29**: v0.4.0 Release (YouTube Shorts support)
@@ -166,8 +171,10 @@
 ### A-C
 - **accessibility**: Sessions 26, 25, 23, 22, 21
 - **alt-text**: Session 25
+- **auto-update**: Session 35 (Onova, manual check, ZIP downloads)
 - **authentication**: Session 34 (browser cookies), Sessions 9, 6 _(files available, not indexed yet)_
 - **auto-enable-403**: Session 34
+- **avalonia-scrollviewer**: Session 35
 - **badge-cleanup**: Session 33
 - **badge-positioning**: Session 33
 - **blog-page**: Sessions 33, 32, 30
@@ -179,7 +186,9 @@
 - **button-overflow**: Sessions 26, 24
 - **chrome**: Session 34
 - **clickable-hero**: Session 25
+- **clickable-link**: Session 35
 - **clickable-logo**: Session 32
+- **clipto-bounds**: Session 35
 - **context-aware-errors**: Session 34
 - **cookies-from-browser**: Session 34
 - **css**: Sessions 33, 32, 26, 25, 23, 22, 21, 19
@@ -231,37 +240,47 @@
 - **multi-platform-faq**: Sessions 33, 32
 
 ### N-R
-- **navigation**: Sessions 32, 23
+- **navigation**: Sessions 35, 32, 23
 - **navigation-css-aliases**: Session 32
+- **navigation-link**: Session 35
 - **new-badge**: Session 33
+- **onova**: Session 35
 - **performance**: Sessions 22, 16, 12 _(some sessions)_
 - **platform-badges**: Session 31
 - **platform-detection**: Sessions 31, 30
 - **platformtype-enum**: Sessions 31, 30
 - **query-resolver**: Session 31
 - **queue**: Sessions 15, 8, 6 _(files available, not fully indexed)_
-- **release**: Sessions 32, 29, 18, 16, 15, 13, 11
+- **release**: Sessions 35, 32, 29, 18, 16, 15, 13, 11
 - **responsive-design**: Sessions 32, 23, 21
 
 ### S-Z
 - **schema-org**: Session 22
+- **scrollbar**: Session 35
+- **scrollbar-visibility**: Session 35
+- **selected-tab-index**: Session 35
 - **seo**: Sessions 25, 22, 19
 - **session-agent**: Session 23
-- **settings**: Session 34 (authentication), Sessions 9, 6 _(files available, not indexed yet)_
+- **settings**: Session 35 (auto-update UI), Session 34 (authentication), Sessions 9, 6 _(files available, not indexed yet)_
 - **settings-service**: Session 34
+- **settings-viewmodel**: Session 35
 - **shorts**: Session 29
 - **smart-auto-enable**: Session 34
 - **static-expansion**: Session 25
 - **stub-pattern**: Session 31
 - **subtitle**: Sessions 20, 16 _(some sessions)_
+- **tab-navigation**: Session 35
 - **testing**: Sessions 32, 31, 26, 23, 18, 14, 12 _(various)_
 - **tiktok**: Sessions 32, 31
 - **twitter**: Sessions 32, 31
 - **3d-tilt**: Sessions 25 (removal), 23 (fix)
 - **touch-targets**: Sessions 32, 26, 23, 21
 - **two-line-button**: Session 26
-- **ux-ui**: Sessions 33, 32, 26, 25, 23, 22, 21, 19
+- **update-check**: Session 35
+- **update-system**: Session 35
+- **ux-ui**: Sessions 35, 33, 32, 26, 25, 23, 22, 21, 19
 - **ux-ui-designer-agent**: Sessions 32, 26, 25
+- **v0.4.3**: Session 35
 - **v0.4.2**: Session 34
 - **v0.4.1**: Session 32
 - **vertical-stack**: Session 26
@@ -270,10 +289,76 @@
 - **yt-dlp**: Session 34 (update to October 2025), Sessions 32, 31, 30, 14
 - **yt-dlp-update**: Session 34
 - **youtube-shorts**: Session 29
+- **zip-package**: Session 35
 
 ---
 
 ## Session Details
+
+### Session 35
+**Title:** Automatic Updates & UI Improvements (Release v0.4.3)
+**Date:** 2025-11-06
+**Type:** Feature Development + Release + UI Enhancement
+**Status:** ✅ Complete
+**Version:** v0.4.3
+
+**Summary:**
+Implemented comprehensive automatic update system with Onova integration, allowing users to manually check for updates from Settings > Advanced. System displays current version from assembly, checks GitHub releases for newer ZIP packages, prompts user with Yes/No dialog, downloads update, and restarts application. Added clickable navigation link in General tab that switches to Advanced tab to improve update feature discoverability. Fixed downloads list scrollbar visibility by changing from Auto to Visible with ClipToBounds and margin adjustments to ensure reliable overflow detection. Released v0.4.3 with all version locations updated and both EXE (83 MB) and ZIP (108 MB) packages uploaded to GitHub release.
+
+**Key Accomplishments:**
+- ✅ Automatic update system with Onova integration (manual check button)
+- ✅ Displays current version dynamically from assembly metadata
+- ✅ Shows update status ("Checking...", "Available", "Up to date")
+- ✅ Downloads ZIP package from GitHub releases (Onova requirement)
+- ✅ Yes/No dialog before downloading/installing update
+- ✅ Automatic restart after update applied
+- ✅ Navigation link in General tab → Advanced tab (improved discoverability)
+- ✅ Clickable text with underline and hand cursor
+- ✅ SelectedTabIndex property for programmatic tab switching
+- ✅ Scrollbar fix: Changed Auto to Visible for downloads list
+- ✅ Added ClipToBounds=True and moved padding to margin
+- ✅ Released v0.4.3: Updated all 5 version locations
+- ✅ Built both EXE (83 MB) and ZIP (108 MB) packages
+- ✅ Created GitHub release with comprehensive notes
+- ✅ Uploaded both files for auto-update support
+- ✅ 4 commits: auto-update system, scrollbar fixes, version updates
+
+**Keywords:** `v0.4.3` `auto-update` `onova` `update-system` `update-check` `zip-package` `manual-update-check` `github-releases` `navigation-link` `clickable-link` `tab-navigation` `selected-tab-index` `settings-viewmodel` `scrollbar` `scrollbar-visibility` `avalonia-scrollviewer` `clipto-bounds` `layout-fix` `ux-ui` `release` `assembly-version` `restart-after-update` `yes-no-dialog` `general-to-advanced` `feature-discoverability`
+
+**Related Sessions:**
+- Session 34 (predecessor: v0.4.2 release, browser cookie authentication)
+- Session 28 (context: Release Version Manager Agent)
+- Session 32 (context: v0.4.1 multi-platform release)
+
+**Files Created:**
+- `src/Desktop/Converters/BoolToStringConverter.cs` (61 lines - dynamic button text converter, not used)
+- `src/Desktop/Views/Dialogs/SettingsDialog.axaml.cs` (28 lines - code-behind for navigation link)
+- `guides-and-instructions/chats/Session_35_Automatic_Updates_UI_Improvements.md` (documentation)
+
+**Files Modified:**
+- `src/Desktop/ViewModels/Dialogs/SettingsViewModel.cs` (lines 44-48, 235-288, 389-394 - update system, tab navigation)
+- `src/Desktop/Views/Dialogs/SettingsDialog.axaml` (lines 38, 79-101, 535-584 - navigation link, update check UI)
+- `src/Desktop/Views/MainView.axaml` (lines 115-118 - scrollbar visibility fix)
+- `Directory.Build.props` (line 4 - version 0.4.3)
+- `setup.iss` (line 5 - installer version)
+- `build-installer.ps1` (line 6 - build version)
+- `README.md` (lines 62, 207 - download links)
+- `docs/index.html` (10 locations - landing page version updates)
+
+**Git Commits:**
+- `ee3c158` - Add automatic update system with manual check and navigation link
+- `892babd` - Add automatic vertical scrollbar to downloads list
+- `3817064` - Fix scrollbar visibility for downloads list
+- `7978605` - Update version to 0.4.3
+
+**Next Steps:**
+1. Test auto-update flow from v0.4.2 to v0.4.3 (CRITICAL - verify ZIP downloads)
+2. Verify navigation link functionality in UI
+3. Confirm scrollbar appears with 3+ downloads
+4. Test update check with no internet connection (error handling)
+5. Monitor user feedback on update system
+
+---
 
 ### Session 34
 **Title:** Browser Cookie Authentication and Smart 403 Auto-Enable (Release v0.4.2)
@@ -751,11 +836,11 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 ## Statistics
 
 ### Session Metrics
-- **Total Sessions:** 34 (documented)
+- **Total Sessions:** 35 (documented)
 - **Average Duration:** ~1-2 hours per session
 - **Longest Session:** Session 12 (~4 hours - Complete Project Summary)
 - **Shortest Session:** Session 25 (~45 min - Hero image interaction + SEO)
-- **Most Recent:** Session 34 (2025-11-04)
+- **Most Recent:** Session 35 (2025-11-06)
 
 ### Work Distribution
 - **Feature Development:** ~55% (17+ sessions)
@@ -775,8 +860,8 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 - **Releases:** 6+ versions (v0.3.1 → v0.4.0, v1.0.0)
 
 ### Documentation
-- **Session Docs:** 34 files
-- **Total Doc Size:** ~900KB+ markdown
+- **Session Docs:** 35 files
+- **Total Doc Size:** ~930KB+ markdown
 - **Average Doc Size:** ~25-30KB per session
 - **Implementation Guides:** 5+ guides
 - **Agent Configs:** 4 agents (UX/UI, SEO, Session Doc, Release Manager)
@@ -872,7 +957,7 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 
 ---
 
-**Index Version:** 1.5
+**Index Version:** 1.6
 **Created:** 2024-10-08
-**Last Updated:** 2025-11-04
-**Next Update:** After Session 35
+**Last Updated:** 2025-11-06
+**Next Update:** After Session 36
