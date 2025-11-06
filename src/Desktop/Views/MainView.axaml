@@ -112,11 +112,10 @@
             </Border>
 
             <!-- Downloads List -->
-            <Grid Grid.Row="1">
-                <ScrollViewer Padding="16"
-                             VerticalScrollBarVisibility="Auto"
+            <Grid Grid.Row="1" ClipToBounds="True">
+                <ScrollViewer VerticalScrollBarVisibility="Visible"
                              HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Dashboard.Downloads}">
+                    <ItemsControl ItemsSource="{Binding Dashboard.Downloads}" Margin="16">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:DownloadItem">
                                 <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
