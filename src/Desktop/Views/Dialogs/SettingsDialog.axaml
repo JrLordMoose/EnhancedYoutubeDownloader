@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
+             xmlns:converters="using:EnhancedYoutubeDownloader.Converters"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.SettingsDialog"
              x:DataType="vm:SettingsViewModel"
@@ -34,7 +35,7 @@
             <ScrollViewer Grid.Row="1"
                          VerticalScrollBarVisibility="Auto"
                          HorizontalScrollBarVisibility="Disabled">
-                <TabControl Margin="0" Padding="0">
+                <TabControl Margin="0" Padding="0" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
 
                 <!-- General Tab -->
                 <TabItem Header="General">
@@ -75,18 +76,29 @@
                             <Separator Background="{DynamicResource MaterialDesignDivider}"/>
 
                             <!-- Auto-update Setting -->
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Grid.Column="0" Spacing="4">
-                                    <TextBlock Text="Automatic Updates"
-                                              FontSize="14"/>
-                                    <TextBlock Text="Check for updates on startup"
-                                              FontSize="12"
-                                              Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                </StackPanel>
-                                <ToggleSwitch Grid.Column="1"
-                                             IsChecked="{Binding Settings.IsAutoUpdateEnabled, Mode=TwoWay}"
-                                             VerticalAlignment="Center"/>
-                            </Grid>
+                            <StackPanel Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Automatic Updates"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Check for updates on startup"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.IsAutoUpdateEnabled, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Link to Check for Updates -->
+                                <TextBlock FontSize="12"
+                                          Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                          Cursor="Hand"
+                                          PointerPressed="UpdateLinkPressed">
+                                    <Run Text="→ "/>
+                                    <Run Text="Check for updates now" TextDecorations="Underline"/>
+                                </TextBlock>
+                            </StackPanel>
 
                         </StackPanel>
                     </Border>
@@ -542,16 +554,42 @@
                                         BorderThickness="1"
                                         CornerRadius="4"
                                         Padding="16">
-                                    <StackPanel Spacing="8">
-                                        <TextBlock Text="Enhanced YouTube Downloader"
-                                                  FontSize="14"
-                                                  FontWeight="Medium"/>
-                                        <TextBlock Text="Version 0.4.2"
-                                                  FontSize="13"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                        <TextBlock Text="Built with .NET 9.0 and Avalonia UI"
-                                                  FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    <StackPanel Spacing="12">
+                                        <!-- App Info -->
+                                        <StackPanel Spacing="8">
+                                            <TextBlock Text="Enhanced YouTube Downloader"
+                                                      FontSize="14"
+                                                      FontWeight="Medium"/>
+                                            <TextBlock Text="{Binding CurrentVersion, StringFormat='Version {0}'}"
+                                                      FontSize="13"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                            <TextBlock Text="Built with .NET 9.0 and Avalonia UI"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+
+                                        <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
+                                        <!-- Update Section -->
+                                        <StackPanel Spacing="8">
+                                            <TextBlock Text="Software Updates"
+                                                      FontSize="13"
+                                                      FontWeight="Medium"/>
+
+                                            <!-- Update Status -->
+                                            <TextBlock Text="{Binding UpdateStatus}"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+
+                                            <!-- Check for Updates Button -->
+                                            <Button x:Name="CheckForUpdatesButton"
+                                                   Content="{Binding IsCheckingForUpdates, Converter={x:Static converters:BoolToStringConverter.Instance}, ConverterParameter='Checking...;Check for Updates'}"
+                                                   Command="{Binding CheckForUpdatesCommand}"
+                                                   IsEnabled="{Binding !IsCheckingForUpdates}"
+                                                   Theme="{DynamicResource MaterialOutlineButton}"
+                                                   HorizontalAlignment="Left"
+                                                   MinWidth="150"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

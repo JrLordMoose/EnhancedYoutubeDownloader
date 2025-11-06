@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,6 +15,7 @@ public partial class SettingsViewModel : DialogViewModelBase
 {
     private readonly DialogManager _dialogManager;
     private readonly ICacheService _cacheService;
+    private readonly UpdateService? _updateService;
 
     [ObservableProperty]
     private SettingsService _settings;
@@ -34,6 +37,19 @@ public partial class SettingsViewModel : DialogViewModelBase
     [ObservableProperty]
     private string _cacheSize = "Calculating...";
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CheckForUpdatesCommand))]
+    private bool _isCheckingForUpdates = false;
+
+    [ObservableProperty]
+    private string _updateStatus = "No updates checked";
+
+    [ObservableProperty]
+    private int _selectedTabIndex = 0;
+
+    public string CurrentVersion =>
+        Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Unknown";
+
     public string ActualDownloadPath =>
         string.IsNullOrWhiteSpace(Settings.DefaultDownloadPath)
             ? Path.Combine(
@@ -53,12 +69,14 @@ public partial class SettingsViewModel : DialogViewModelBase
     public SettingsViewModel(
         SettingsService settingsService,
         DialogManager dialogManager,
-        ICacheService cacheService
+        ICacheService cacheService,
+        UpdateService? updateService = null
     )
     {
         _settings = settingsService;
         _dialogManager = dialogManager;
         _cacheService = cacheService;
+        _updateService = updateService;
 
         // Snapshot current settings for rollback on Cancel
         _originalDownloadPath = Settings.DefaultDownloadPath;
@@ -270,5 +288,108 @@ public partial class SettingsViewModel : DialogViewModelBase
         }
 
         await Task.CompletedTask;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCheckForUpdates))]
+    [SupportedOSPlatform("windows")]
+    private async Task CheckForUpdatesAsync()
+    {
+        if (_updateService == null)
+        {
+            UpdateStatus = "Update service not available";
+            Console.WriteLine("[SETTINGS] Update service is not available (Windows-only)");
+            return;
+        }
+
+        Console.WriteLine("[SETTINGS] Checking for updates...");
+        IsCheckingForUpdates = true;
+        UpdateStatus = "Checking for updates...";
+
+        try
+        {
+            var newVersion = await _updateService.CheckForUpdatesAsync();
+
+            if (newVersion == null)
+            {
+                Console.WriteLine("[SETTINGS] No updates available. Already on latest version.");
+                UpdateStatus = "You're on the latest version!";
+
+                // Show info dialog
+                var infoDialog = new MessageBoxViewModel
+                {
+                    Title = "No Updates Available",
+                    Message = $"You're already running the latest version ({CurrentVersion}).",
+                    PrimaryButtonText = "OK",
+                };
+                await _dialogManager.ShowDialogAsync(infoDialog);
+            }
+            else
+            {
+                Console.WriteLine($"[SETTINGS] Update available: v{newVersion}");
+                UpdateStatus = $"Update available: v{newVersion}";
+
+                // Show update prompt
+                var updatePrompt = new MessageBoxViewModel
+                {
+                    Title = "Update Available",
+                    Message =
+                        $"A new version is available!\n\nCurrent version: {CurrentVersion}\nNew version: {newVersion}\n\nWould you like to download and install the update? The application will restart.",
+                    PrimaryButtonText = "Yes, Update",
+                    SecondaryButtonText = "Not Now",
+                };
+
+                var result = await _dialogManager.ShowDialogAsync(updatePrompt);
+
+                if (result == true)
+                {
+                    Console.WriteLine(
+                        $"[SETTINGS] User accepted update. Preparing update v{newVersion}..."
+                    );
+                    UpdateStatus = "Downloading update...";
+
+                    // Download the update package
+                    await _updateService.PrepareUpdateAsync(newVersion);
+
+                    Console.WriteLine(
+                        "[SETTINGS] Update downloaded. Launching updater and restarting..."
+                    );
+                    UpdateStatus = "Restarting...";
+
+                    // Launch updater and restart
+                    _updateService.FinalizeUpdate(newVersion, restart: true);
+                }
+                else
+                {
+                    Console.WriteLine("[SETTINGS] User declined update.");
+                    UpdateStatus = $"Update available: v{newVersion}";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SETTINGS] Error checking for updates: {ex.Message}");
+            UpdateStatus = "Failed to check for updates";
+
+            var errorDialog = new MessageBoxViewModel
+            {
+                Title = "Update Check Failed",
+                Message = $"Failed to check for updates.\n\nError: {ex.Message}",
+                PrimaryButtonText = "OK",
+            };
+            await _dialogManager.ShowDialogAsync(errorDialog);
+        }
+        finally
+        {
+            IsCheckingForUpdates = false;
+        }
+    }
+
+    private bool CanCheckForUpdates() => !IsCheckingForUpdates && _updateService != null;
+
+    [RelayCommand]
+    private void GoToUpdateCheck()
+    {
+        Console.WriteLine("[SETTINGS] Navigating to Advanced tab (Update Check section)");
+        SelectedTabIndex = 2; // Advanced tab is index 2
     }
 }
