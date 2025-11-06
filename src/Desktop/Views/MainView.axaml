@@ -113,7 +113,9 @@
 
             <!-- Downloads List -->
             <Grid Grid.Row="1">
-                <ScrollViewer Padding="16">
+                <ScrollViewer Padding="16"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Dashboard.Downloads}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:DownloadItem">
