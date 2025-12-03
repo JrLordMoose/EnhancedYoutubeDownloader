@@ -1,8 +1,8 @@
 # Session Index
 
-**Last Updated:** 2025-11-06
-**Total Sessions:** 35
-**Date Range:** Session 1 (Initial commit) to Session 35 (2025-11-06)
+**Last Updated:** 2025-12-03
+**Total Sessions:** 36
+**Date Range:** Session 1 (Initial commit) to Session 36 (2025-12-03)
 
 ---
 
@@ -20,6 +20,9 @@
 ## Sessions by Date
 
 ### 2025
+
+#### December
+- **Session 36** (2025-12-03) - [Error Dialog & Update Check Fixes (Release v0.4.4)](#session-36)
 
 #### November
 - **Session 35** (2025-11-06) - [Automatic Updates & UI Improvements (Release v0.4.3)](#session-35)
