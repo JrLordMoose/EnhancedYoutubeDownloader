@@ -59,7 +59,7 @@ Experience our professional landing page featuring:
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.3.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.3/EnhancedYoutubeDownloader-Setup-v0.4.3.exe)** (~83 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.4.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.4/EnhancedYoutubeDownloader-Setup-v0.4.4.exe)** (~83 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
@@ -204,7 +204,7 @@ dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x6
 # 2. Build installer with Inno Setup
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.3.exe
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.4.exe
 ```
 
 **Installer Features:**

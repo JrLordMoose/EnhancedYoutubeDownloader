@@ -66,7 +66,10 @@
       "Bash(src/Desktop/bin/Release/net9.0/win-x64/publish/yt-dlp.exe:*)",
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File src/Desktop/Download-YtDlp.ps1 -OutputPath \"src/Desktop/bin/Debug/net9.0\")",
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File src/Desktop/Download-YtDlp.ps1 -OutputPath \"src/Desktop/bin/Release/net9.0/win-x64/publish\")",
-      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.4.2\")"
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.4.2\")",
+      "Bash(git log:*)",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"cd ''C:\\Users\\leore\\Downloads\\YoutubeDownloaderV2''; dotnet run --project src/Desktop/EnhancedYoutubeDownloader.csproj --no-build\")",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -File build-installer.ps1 -Version \"0.4.3\")"
     ],
     "deny": [],
     "ask": []

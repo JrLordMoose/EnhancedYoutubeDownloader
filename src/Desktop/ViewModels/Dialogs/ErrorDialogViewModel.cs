@@ -93,14 +93,12 @@ public partial class ErrorDialogViewModel : DialogViewModelBase
     private void ExecuteAction(string actionKey)
     {
         OnActionSelected?.Invoke(actionKey);
-        Close?.Invoke();
+        Close(true);
     }
 
     [RelayCommand]
     private void CloseDialog()
     {
-        Close?.Invoke();
+        Close(true);
     }
-
-    public Action? Close { get; set; }
 }

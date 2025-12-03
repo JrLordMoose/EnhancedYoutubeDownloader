@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -678,9 +680,15 @@ public partial class DashboardViewModel : ViewModelBase
             [
                 new ErrorAction
                 {
+                    Text = "Submit Feedback",
+                    ActionKey = "feedback_form",
+                    Description = "Submit feedback via our simple form",
+                },
+                new ErrorAction
+                {
                     Text = "Report Issue",
-                    ActionKey = "report",
-                    Description = "Report this issue to the developers",
+                    ActionKey = "report_github",
+                    Description = "Report on GitHub (for developers)",
                 },
             ],
         };
@@ -755,8 +763,24 @@ public partial class DashboardViewModel : ViewModelBase
                 _snackbarManager.NotifyWarning("Please verify the URL and try again");
                 break;
 
+            case "feedback_form":
+                OpenUrl(
+                    "https://docs.google.com/forms/d/e/1FAIpQLSfgvSuqvusqpGBs6UUbUImzUB10YzROqomsvGFZhnp41VTeRg/viewform"
+                );
+                _snackbarManager.NotifyInfo("Opening feedback form in browser...");
+                break;
+
+            case "report_github":
+                OpenUrl("https://github.com/JrLordMoose/EnhancedYoutubeDownloader/issues");
+                _snackbarManager.NotifyInfo("Opening GitHub issues in browser...");
+                break;
+
             case "report":
-                _snackbarManager.NotifyInfo("Error reporting feature coming soon");
+                // Legacy action key - redirect to feedback form
+                OpenUrl(
+                    "https://docs.google.com/forms/d/e/1FAIpQLSfgvSuqvusqpGBs6UUbUImzUB10YzROqomsvGFZhnp41VTeRg/viewform"
+                );
+                _snackbarManager.NotifyInfo("Opening feedback form in browser...");
                 break;
 
             default:
@@ -802,6 +826,33 @@ public partial class DashboardViewModel : ViewModelBase
             _snackbarManager.NotifyInfo(
                 "You can enable this later in Settings > Advanced > Authentication"
             );
+        }
+    }
+
+    /// <summary>
+    /// Opens a URL in the default browser (cross-platform)
+    /// </summary>
+    private static void OpenUrl(string url)
+    {
+        try
+        {
+            // Cross-platform URL opening
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", url);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", url);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DASHBOARD] Failed to open URL: {ex.Message}");
         }
     }
 
