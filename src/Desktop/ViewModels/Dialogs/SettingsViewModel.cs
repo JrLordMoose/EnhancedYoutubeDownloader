@@ -314,6 +314,9 @@ public partial class SettingsViewModel : DialogViewModelBase
                 Console.WriteLine("[SETTINGS] No updates available. Already on latest version.");
                 UpdateStatus = "You're on the latest version!";
 
+                // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
+                Close(false);
+
                 // Show info dialog
                 var infoDialog = new MessageBoxViewModel
                 {
@@ -327,6 +330,9 @@ public partial class SettingsViewModel : DialogViewModelBase
             {
                 Console.WriteLine($"[SETTINGS] Update available: v{newVersion}");
                 UpdateStatus = $"Update available: v{newVersion}";
+
+                // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
+                Close(false);
 
                 // Show update prompt
                 var updatePrompt = new MessageBoxViewModel
@@ -369,6 +375,9 @@ public partial class SettingsViewModel : DialogViewModelBase
         {
             Console.WriteLine($"[SETTINGS] Error checking for updates: {ex.Message}");
             UpdateStatus = "Failed to check for updates";
+
+            // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
+            Close(false);
 
             var errorDialog = new MessageBoxViewModel
             {
