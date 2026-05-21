@@ -156,9 +156,9 @@ public class SubtitleBurnInServiceTests
         // Act
         var escaped = CallEscapeSubtitlePath(path);
 
-        // Assert
-        // The drive letter colon should be escaped: C: → C\\:
-        escaped.Should().StartWith("C\\\\\\\\\\\\:", "drive letter colon should be escaped after quadruple backslash escaping");
+        // Assert: C:\ → C\\: (escaped drive colon) + quadruple-escaped path separators
+        escaped.Should().StartWith(@"C\\:", "drive letter colon should be escaped");
+        escaped.Should().Contain("Videos", "path segments should be preserved");
     }
 
     [Fact]

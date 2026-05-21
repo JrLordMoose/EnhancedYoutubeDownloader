@@ -11,9 +11,12 @@ using EnhancedYoutubeDownloader.Shared.Interfaces;
 
 namespace EnhancedYoutubeDownloader.ViewModels.Dialogs;
 
+using EnhancedYoutubeDownloader.Utils;
+
 public partial class SettingsViewModel : DialogViewModelBase
 {
     private readonly DialogManager _dialogManager;
+    private readonly ViewModelManager _viewModelManager;
     private readonly ICacheService _cacheService;
     private readonly UpdateService? _updateService;
 
@@ -69,12 +72,14 @@ public partial class SettingsViewModel : DialogViewModelBase
     public SettingsViewModel(
         SettingsService settingsService,
         DialogManager dialogManager,
+        ViewModelManager viewModelManager,
         ICacheService cacheService,
         UpdateService? updateService = null
     )
     {
         _settings = settingsService;
         _dialogManager = dialogManager;
+        _viewModelManager = viewModelManager;
         _cacheService = cacheService;
         _updateService = updateService;
 
@@ -92,9 +97,7 @@ public partial class SettingsViewModel : DialogViewModelBase
         _originalOpenFolder = Settings.OpenFolderAfterDownload;
         _originalLanguageAudio = Settings.ShouldInjectLanguageSpecificAudioStreams;
 
-        Console.WriteLine(
-            $"[SETTINGS] Settings dialog initialized. Current values snapshot taken."
-        );
+        TraceLog.Write($"[SETTINGS] Settings dialog initialized. Current values snapshot taken.");
 
         // Calculate cache size on startup
         _ = CalculateCacheSizeAsync();
@@ -103,16 +106,16 @@ public partial class SettingsViewModel : DialogViewModelBase
     [RelayCommand]
     private void Save()
     {
-        Console.WriteLine($"[SETTINGS] Saving settings to disk.");
+        TraceLog.Write($"[SETTINGS] Saving settings to disk.");
         Settings.Save();
-        Console.WriteLine($"[SETTINGS] Settings saved successfully.");
+        TraceLog.Write($"[SETTINGS] Settings saved successfully.");
         Close(true);
     }
 
     [RelayCommand]
     private void Cancel()
     {
-        Console.WriteLine($"[SETTINGS] Cancel clicked. Rolling back changes to original values.");
+        TraceLog.Write($"[SETTINGS] Cancel clicked. Rolling back changes to original values.");
 
         // Rollback all settings to original snapshot values
         Settings.DefaultDownloadPath = _originalDownloadPath ?? string.Empty;
@@ -128,7 +131,7 @@ public partial class SettingsViewModel : DialogViewModelBase
         Settings.OpenFolderAfterDownload = _originalOpenFolder;
         Settings.ShouldInjectLanguageSpecificAudioStreams = _originalLanguageAudio;
 
-        Console.WriteLine($"[SETTINGS] All settings rolled back to original state.");
+        TraceLog.Write($"[SETTINGS] All settings rolled back to original state.");
 
         Close(false);
     }
@@ -136,7 +139,7 @@ public partial class SettingsViewModel : DialogViewModelBase
     [RelayCommand]
     private async Task BrowseDefaultLocationAsync()
     {
-        Console.WriteLine($"[SETTINGS] Browse Default Download Location clicked.");
+        TraceLog.Write($"[SETTINGS] Browse Default Download Location clicked.");
         var selectedPath = await _dialogManager.PromptFolderPathAsync(
             "Select Default Download Location",
             Settings.DefaultDownloadPath
@@ -144,19 +147,19 @@ public partial class SettingsViewModel : DialogViewModelBase
 
         if (!string.IsNullOrWhiteSpace(selectedPath))
         {
-            Console.WriteLine($"[SETTINGS] Default download path set to: {selectedPath}");
+            TraceLog.Write($"[SETTINGS] Default download path set to: {selectedPath}");
             Settings.DefaultDownloadPath = selectedPath;
         }
         else
         {
-            Console.WriteLine($"[SETTINGS] Browse canceled, no path selected.");
+            TraceLog.Write($"[SETTINGS] Browse canceled, no path selected.");
         }
     }
 
     [RelayCommand]
     private async Task BrowseCacheLocationAsync()
     {
-        Console.WriteLine($"[SETTINGS] Browse Cache Location clicked.");
+        TraceLog.Write($"[SETTINGS] Browse Cache Location clicked.");
         var selectedPath = await _dialogManager.PromptFolderPathAsync(
             "Select Cache Location",
             Settings.DefaultCachePath
@@ -164,22 +167,22 @@ public partial class SettingsViewModel : DialogViewModelBase
 
         if (!string.IsNullOrWhiteSpace(selectedPath))
         {
-            Console.WriteLine($"[SETTINGS] Cache path set to: {selectedPath}");
+            TraceLog.Write($"[SETTINGS] Cache path set to: {selectedPath}");
             Settings.DefaultCachePath = selectedPath;
         }
         else
         {
-            Console.WriteLine($"[SETTINGS] Browse canceled, no path selected.");
+            TraceLog.Write($"[SETTINGS] Browse canceled, no path selected.");
         }
     }
 
     [RelayCommand]
     private void ResetCacheLocation()
     {
-        Console.WriteLine($"[SETTINGS] Reset Cache Location to default.");
+        TraceLog.Write($"[SETTINGS] Reset Cache Location to default.");
         Settings.DefaultCachePath = string.Empty;
         OnPropertyChanged(nameof(ActualCachePath));
-        Console.WriteLine($"[SETTINGS] Cache path reset to: {ActualCachePath}");
+        TraceLog.Write($"[SETTINGS] Cache path reset to: {ActualCachePath}");
     }
 
     [RelayCommand]
@@ -198,7 +201,7 @@ public partial class SettingsViewModel : DialogViewModelBase
 
         if (result == true)
         {
-            Console.WriteLine(
+            TraceLog.Write(
                 $"[SETTINGS] Reset All Settings confirmed. Resetting to default values."
             );
 
@@ -216,11 +219,11 @@ public partial class SettingsViewModel : DialogViewModelBase
             Settings.DefaultCachePath = string.Empty;
             Settings.ShouldInjectLanguageSpecificAudioStreams = true; // FIXED: Changed from false to true
 
-            Console.WriteLine($"[SETTINGS] All settings reset to defaults.");
+            TraceLog.Write($"[SETTINGS] All settings reset to defaults.");
 
             // Save settings
             Settings.Save();
-            Console.WriteLine($"[SETTINGS] Reset settings saved to disk.");
+            TraceLog.Write($"[SETTINGS] Reset settings saved to disk.");
 
             // Update computed properties
             OnPropertyChanged(nameof(ActualDownloadPath));
@@ -231,19 +234,19 @@ public partial class SettingsViewModel : DialogViewModelBase
         }
         else
         {
-            Console.WriteLine($"[SETTINGS] Reset All Settings canceled by user.");
+            TraceLog.Write($"[SETTINGS] Reset All Settings canceled by user.");
         }
     }
 
     [RelayCommand]
     private async Task ClearCacheAsync()
     {
-        Console.WriteLine($"[SETTINGS] Clear Cache clicked. Starting cache clear operation.");
+        TraceLog.Write($"[SETTINGS] Clear Cache clicked. Starting cache clear operation.");
         CacheSize = "Clearing...";
         await _cacheService.ClearCacheAsync();
-        Console.WriteLine($"[SETTINGS] Cache cleared successfully.");
+        TraceLog.Write($"[SETTINGS] Cache cleared successfully.");
         await CalculateCacheSizeAsync();
-        Console.WriteLine($"[SETTINGS] Cache size recalculated: {CacheSize}");
+        TraceLog.Write($"[SETTINGS] Cache size recalculated: {CacheSize}");
     }
 
     private async Task CalculateCacheSizeAsync()
@@ -297,11 +300,11 @@ public partial class SettingsViewModel : DialogViewModelBase
         if (_updateService == null)
         {
             UpdateStatus = "Update service not available";
-            Console.WriteLine("[SETTINGS] Update service is not available (Windows-only)");
+            TraceLog.Write("[SETTINGS] Update service is not available (Windows-only)");
             return;
         }
 
-        Console.WriteLine("[SETTINGS] Checking for updates...");
+        TraceLog.Write("[SETTINGS] Checking for updates...");
         IsCheckingForUpdates = true;
         UpdateStatus = "Checking for updates...";
 
@@ -311,7 +314,7 @@ public partial class SettingsViewModel : DialogViewModelBase
 
             if (newVersion == null)
             {
-                Console.WriteLine("[SETTINGS] No updates available. Already on latest version.");
+                TraceLog.Write("[SETTINGS] No updates available. Already on latest version.");
                 UpdateStatus = "You're on the latest version!";
 
                 // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
@@ -325,10 +328,11 @@ public partial class SettingsViewModel : DialogViewModelBase
                     PrimaryButtonText = "OK",
                 };
                 await _dialogManager.ShowDialogAsync(infoDialog);
+                await ReopenSettingsAsync();
             }
             else
             {
-                Console.WriteLine($"[SETTINGS] Update available: v{newVersion}");
+                TraceLog.Write($"[SETTINGS] Update available: v{newVersion}");
                 UpdateStatus = $"Update available: v{newVersion}";
 
                 // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
@@ -348,7 +352,7 @@ public partial class SettingsViewModel : DialogViewModelBase
 
                 if (result == true)
                 {
-                    Console.WriteLine(
+                    TraceLog.Write(
                         $"[SETTINGS] User accepted update. Preparing update v{newVersion}..."
                     );
                     UpdateStatus = "Downloading update...";
@@ -356,7 +360,7 @@ public partial class SettingsViewModel : DialogViewModelBase
                     // Download the update package
                     await _updateService.PrepareUpdateAsync(newVersion);
 
-                    Console.WriteLine(
+                    TraceLog.Write(
                         "[SETTINGS] Update downloaded. Launching updater and restarting..."
                     );
                     UpdateStatus = "Restarting...";
@@ -366,14 +370,15 @@ public partial class SettingsViewModel : DialogViewModelBase
                 }
                 else
                 {
-                    Console.WriteLine("[SETTINGS] User declined update.");
+                    TraceLog.Write("[SETTINGS] User declined update.");
                     UpdateStatus = $"Update available: v{newVersion}";
+                    await ReopenSettingsAsync();
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[SETTINGS] Error checking for updates: {ex.Message}");
+            TraceLog.Write($"[SETTINGS] Error checking for updates: {ex.Message}");
             UpdateStatus = "Failed to check for updates";
 
             // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
@@ -386,6 +391,7 @@ public partial class SettingsViewModel : DialogViewModelBase
                 PrimaryButtonText = "OK",
             };
             await _dialogManager.ShowDialogAsync(errorDialog);
+            await ReopenSettingsAsync();
         }
         finally
         {
@@ -393,12 +399,19 @@ public partial class SettingsViewModel : DialogViewModelBase
         }
     }
 
+    private async Task ReopenSettingsAsync()
+    {
+        var settings = _viewModelManager.CreateSettingsViewModel();
+        settings.SelectedTabIndex = 2;
+        await _dialogManager.ShowDialogAsync(settings);
+    }
+
     private bool CanCheckForUpdates() => !IsCheckingForUpdates && _updateService != null;
 
     [RelayCommand]
     private void GoToUpdateCheck()
     {
-        Console.WriteLine("[SETTINGS] Navigating to Advanced tab (Update Check section)");
+        TraceLog.Write("[SETTINGS] Navigating to Advanced tab (Update Check section)");
         SelectedTabIndex = 2; // Advanced tab is index 2
     }
 }

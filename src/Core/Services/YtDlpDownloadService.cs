@@ -8,6 +8,7 @@ using YoutubeDLSharp;
 using YoutubeDLSharp.Options;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
+using EnhancedYoutubeDownloader.Core.Utils;
 
 public class YtDlpDownloadService : IDownloadService, IDisposable
 {
@@ -29,8 +30,8 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         var ytdlpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "yt-dlp.exe");
         var ffmpegPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
 
-        Console.WriteLine($"[YTDLP] Initializing YoutubeDL with yt-dlp: {ytdlpPath}");
-        Console.WriteLine($"[YTDLP] FFmpeg path: {ffmpegPath}");
+        TraceLog.Write($"[YTDLP] Initializing YoutubeDL with yt-dlp: {ytdlpPath}");
+        TraceLog.Write($"[YTDLP] FFmpeg path: {ffmpegPath}");
 
         _ytdl = new YoutubeDL
         {
@@ -49,7 +50,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
     public Task<DownloadItem> CreateDownloadAsync(IVideo video, string filePath, FormatProfile? profile = null, PlatformType platform = PlatformType.YouTube)
     {
-        Console.WriteLine($"[YTDLP] Creating download for: {video.Title}");
+        TraceLog.Write($"[YTDLP] Creating download for: {video.Title}");
 
         var downloadItem = new DownloadItem
         {
@@ -69,7 +70,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         _downloads[downloadItem.Id] = downloadItem;
         _downloadStatusChanged.OnNext(downloadItem);
 
-        Console.WriteLine($"[YTDLP] Download item created: {downloadItem.Id} with profile: {downloadItem.FormatProfile.Quality} {downloadItem.FormatProfile.Container}");
+        TraceLog.Write($"[YTDLP] Download item created: {downloadItem.Id} with profile: {downloadItem.FormatProfile.Quality} {downloadItem.FormatProfile.Container}");
         return Task.FromResult(downloadItem);
     }
 
@@ -77,11 +78,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     {
         if (downloadItem.Status != DownloadStatus.Queued && downloadItem.Status != DownloadStatus.Paused)
         {
-            Console.WriteLine($"[YTDLP] Cannot start download {downloadItem.Id} - invalid status: {downloadItem.Status}");
+            TraceLog.Write($"[YTDLP] Cannot start download {downloadItem.Id} - invalid status: {downloadItem.Status}");
             return Task.CompletedTask;
         }
 
-        Console.WriteLine($"[YTDLP] Starting download: {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Starting download: {downloadItem.Id}");
 
         downloadItem.Status = DownloadStatus.Started;
         downloadItem.StartedAt = DateTime.UtcNow;
@@ -107,7 +108,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         if (downloadItem.Status != DownloadStatus.Started)
             return;
 
-        Console.WriteLine($"[YTDLP] Pausing download: {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Pausing download: {downloadItem.Id}");
 
         // Set status BEFORE canceling to avoid race condition
         downloadItem.Status = DownloadStatus.Paused;
@@ -126,12 +127,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         // Cancel the download operation AFTER status is set
         if (_cancellationTokens.TryGetValue(downloadItem.Id, out var cts))
         {
-            Console.WriteLine($"[YTDLP] Canceling download token for {downloadItem.Id}");
+            TraceLog.Write($"[YTDLP] Canceling download token for {downloadItem.Id}");
             cts.Cancel();
         }
 
         // Save state to repository
-        Console.WriteLine($"[YTDLP] Saving pause state for {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Saving pause state for {downloadItem.Id}");
         await _stateRepository.SaveStateAsync(downloadItem);
     }
 
@@ -140,7 +141,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         if (downloadItem.Status != DownloadStatus.Paused)
             return;
 
-        Console.WriteLine($"[YTDLP] Resuming download: {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Resuming download: {downloadItem.Id}");
 
         // Load saved state if available
         var savedState = await _stateRepository.LoadStateAsync(downloadItem.Id);
@@ -156,11 +157,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                     downloadItem.BytesDownloaded = savedState.BytesDownloaded;
                     downloadItem.TotalBytes = savedState.TotalBytes;
                     downloadItem.PartialFilePath = savedState.PartialFilePath;
-                    Console.WriteLine($"[YTDLP] Restored state: {downloadItem.BytesDownloaded}/{downloadItem.TotalBytes} bytes");
+                    TraceLog.Write($"[YTDLP] Restored state: {downloadItem.BytesDownloaded}/{downloadItem.TotalBytes} bytes");
                 }
                 else
                 {
-                    Console.WriteLine($"[YTDLP] File size mismatch, resetting state");
+                    TraceLog.Write($"[YTDLP] File size mismatch, resetting state");
                     // File size mismatch, reset
                     downloadItem.BytesDownloaded = 0;
                     if (File.Exists(savedState.PartialFilePath))
@@ -188,7 +189,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
     public async Task CancelDownloadAsync(DownloadItem downloadItem)
     {
-        Console.WriteLine($"[YTDLP] Canceling download: {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Canceling download: {downloadItem.Id}");
 
         // Cancel the download operation
         if (_cancellationTokens.TryGetValue(downloadItem.Id, out var cts))
@@ -220,7 +221,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
     public async Task RestartDownloadAsync(DownloadItem downloadItem)
     {
-        Console.WriteLine($"[YTDLP] Restarting download: {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Restarting download: {downloadItem.Id}");
 
         downloadItem.Status = DownloadStatus.Queued;
         downloadItem.Progress = 0;
@@ -255,7 +256,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
     public async Task DeleteDownloadAsync(DownloadItem downloadItem)
     {
-        Console.WriteLine($"[YTDLP] Deleting download: {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] Deleting download: {downloadItem.Id}");
 
         // Cancel if running
         if (_cancellationTokens.TryGetValue(downloadItem.Id, out var cts))
@@ -281,30 +282,30 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
     private async Task ProcessDownloadAsync(DownloadItem downloadItem, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"[YTDLP] ProcessDownloadAsync started for {downloadItem.Id}");
+        TraceLog.Write($"[YTDLP] ProcessDownloadAsync started for {downloadItem.Id}");
 
         try
         {
             // Move WaitAsync inside try block to ensure semaphore is released even on early cancellation
             await _downloadSemaphore.WaitAsync(cancellationToken);
-            Console.WriteLine($"[YTDLP] Semaphore acquired for {downloadItem.Id}");
+            TraceLog.Write($"[YTDLP] Semaphore acquired for {downloadItem.Id}");
 
             if (cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[YTDLP] Cancellation requested before start for {downloadItem.Id}");
+                TraceLog.Write($"[YTDLP] Cancellation requested before start for {downloadItem.Id}");
                 return;
             }
 
             // Validate download item
             if (downloadItem.Video == null)
             {
-                Console.WriteLine($"[YTDLP] ERROR: Video is null for download {downloadItem.Id}");
+                TraceLog.Write($"[YTDLP] ERROR: Video is null for download {downloadItem.Id}");
                 throw new InvalidOperationException($"Cannot download: Video is null for download {downloadItem.Id}");
             }
 
             if (string.IsNullOrWhiteSpace(downloadItem.FilePath))
             {
-                Console.WriteLine($"[YTDLP] ERROR: FilePath is null or empty for download {downloadItem.Id}");
+                TraceLog.Write($"[YTDLP] ERROR: FilePath is null or empty for download {downloadItem.Id}");
                 throw new InvalidOperationException($"Cannot download: FilePath is required for download {downloadItem.Id}");
             }
 
@@ -312,13 +313,13 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             var directory = Path.GetDirectoryName(downloadItem.FilePath);
             if (string.IsNullOrWhiteSpace(directory))
             {
-                Console.WriteLine($"[YTDLP] ERROR: Invalid directory path for {downloadItem.Id}");
+                TraceLog.Write($"[YTDLP] ERROR: Invalid directory path for {downloadItem.Id}");
                 throw new InvalidOperationException($"Cannot download: Invalid directory path for {downloadItem.FilePath}");
             }
 
             if (!Directory.Exists(directory))
             {
-                Console.WriteLine($"[YTDLP] Creating directory: {directory}");
+                TraceLog.Write($"[YTDLP] Creating directory: {directory}");
                 Directory.CreateDirectory(directory);
             }
 
@@ -363,12 +364,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                     // Add custom argument for cookies-from-browser
                     // YoutubeDLSharp doesn't have a direct property for this, so we use CustomOptions
                     options.AddCustomOption("--cookies-from-browser", settings.BrowserForCookies);
-                    Console.WriteLine($"[YTDLP] Using browser cookies from: {settings.BrowserForCookies}");
+                    TraceLog.Write($"[YTDLP] Using browser cookies from: {settings.BrowserForCookies}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[YTDLP] Warning: Could not read browser cookie settings: {ex.Message}");
+                TraceLog.Write($"[YTDLP] Warning: Could not read browser cookie settings: {ex.Message}");
                 // Continue without browser cookies if settings can't be read
             }
 
@@ -382,12 +383,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 }
             }
 
-            Console.WriteLine($"[YTDLP] Downloading video: {downloadItem.Video!.Url}");
-            Console.WriteLine($"[YTDLP] Format: {formatString}");
-            Console.WriteLine($"[YTDLP] Quality: {profile.Quality}, Container: {profile.Container}");
-            Console.WriteLine($"[YTDLP] Subtitles: {profile.IncludeSubtitles}, Style: {profile.SubtitleStyle}, Tags: {profile.IncludeTags}");
-            Console.WriteLine($"[YTDLP] Subtitle Settings - EmbedSubs: {shouldEmbedSubs}, WriteSubs: {shouldWriteSubs}");
-            Console.WriteLine($"[YTDLP] Output path: {downloadItem.FilePath}");
+            TraceLog.Write($"[YTDLP] Downloading video: {downloadItem.Video!.Url}");
+            TraceLog.Write($"[YTDLP] Format: {formatString}");
+            TraceLog.Write($"[YTDLP] Quality: {profile.Quality}, Container: {profile.Container}");
+            TraceLog.Write($"[YTDLP] Subtitles: {profile.IncludeSubtitles}, Style: {profile.SubtitleStyle}, Tags: {profile.IncludeTags}");
+            TraceLog.Write($"[YTDLP] Subtitle Settings - EmbedSubs: {shouldEmbedSubs}, WriteSubs: {shouldWriteSubs}");
+            TraceLog.Write($"[YTDLP] Output path: {downloadItem.FilePath}");
 
             // Set up progress reporting
             var progress = new Progress<DownloadProgress>(p =>
@@ -445,7 +446,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
                 if (downloadItem.Progress % 10 < 1) // Log every 10%
                 {
-                    Console.WriteLine($"[YTDLP] Progress: {downloadItem.Progress:F1}% • {downloadItem.FormattedSpeed} • ETA: {downloadItem.FormattedEta}");
+                    TraceLog.Write($"[YTDLP] Progress: {downloadItem.Progress:F1}% • {downloadItem.FormattedSpeed} • ETA: {downloadItem.FormattedEta}");
                 }
             });
 
@@ -459,15 +460,15 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
             if (!result.Success)
             {
-                Console.WriteLine($"[YTDLP] Download failed: {string.Join(", ", result.ErrorOutput)}");
+                TraceLog.Write($"[YTDLP] Download failed: {string.Join(", ", result.ErrorOutput)}");
                 throw new Exception($"yt-dlp download failed: {string.Join(", ", result.ErrorOutput)}");
             }
 
             // Download completed successfully
             if (!cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[YTDLP] Download completed, checking file location");
-                Console.WriteLine($"[YTDLP] Expected FilePath: {downloadItem.FilePath}");
+                TraceLog.Write($"[YTDLP] Download completed, checking file location");
+                TraceLog.Write($"[YTDLP] Expected FilePath: {downloadItem.FilePath}");
 
                 // yt-dlp may save to various locations, search for the actual file
                 string? actualFilePath = null;
@@ -476,7 +477,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 if (File.Exists(downloadItem.FilePath))
                 {
                     actualFilePath = downloadItem.FilePath;
-                    Console.WriteLine($"[YTDLP] File found at expected location: {actualFilePath}");
+                    TraceLog.Write($"[YTDLP] File found at expected location: {actualFilePath}");
                 }
                 // Check if yt-dlp added extension to the FilePath (e.g., .mp4.part.mp4)
                 else
@@ -491,14 +492,14 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                         .OrderByDescending(f => new FileInfo(f).Length)
                         .ToList();
 
-                    Console.WriteLine($"[YTDLP] Searching directory: {searchDir}");
-                    Console.WriteLine($"[YTDLP] Base filename: {baseFileName}");
-                    Console.WriteLine($"[YTDLP] Found {possibleFiles.Count} possible files");
+                    TraceLog.Write($"[YTDLP] Searching directory: {searchDir}");
+                    TraceLog.Write($"[YTDLP] Base filename: {baseFileName}");
+                    TraceLog.Write($"[YTDLP] Found {possibleFiles.Count} possible files");
 
                     if (possibleFiles.Any())
                     {
                         actualFilePath = possibleFiles.First();
-                        Console.WriteLine($"[YTDLP] Found actual file: {actualFilePath}");
+                        TraceLog.Write($"[YTDLP] Found actual file: {actualFilePath}");
 
                         // If it's not at the expected location, move it
                         if (actualFilePath != downloadItem.FilePath && !string.IsNullOrEmpty(downloadItem.FilePath))
@@ -509,12 +510,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                             }
                             File.Move(actualFilePath, downloadItem.FilePath!);
                             actualFilePath = downloadItem.FilePath;
-                            Console.WriteLine($"[YTDLP] File moved to expected location: {actualFilePath}");
+                            TraceLog.Write($"[YTDLP] File moved to expected location: {actualFilePath}");
                         }
                     }
                     else
                     {
-                        Console.WriteLine($"[YTDLP] ERROR: No matching files found!");
+                        TraceLog.Write($"[YTDLP] ERROR: No matching files found!");
                     }
                 }
 
@@ -522,11 +523,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 if (!string.IsNullOrEmpty(actualFilePath))
                 {
                     downloadItem.FilePath = actualFilePath;
-                    Console.WriteLine($"[YTDLP] Final FilePath: {downloadItem.FilePath}");
+                    TraceLog.Write($"[YTDLP] Final FilePath: {downloadItem.FilePath}");
                 }
                 else
                 {
-                    Console.WriteLine($"[YTDLP] ERROR: Could not locate downloaded file!");
+                    TraceLog.Write($"[YTDLP] ERROR: Could not locate downloaded file!");
                 }
 
                 // Post-processing: Burn in subtitles if requested
@@ -545,7 +546,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                     var fileInfo = new FileInfo(downloadItem.FilePath);
                     downloadItem.TotalBytes = fileInfo.Length;
                     downloadItem.BytesDownloaded = fileInfo.Length;
-                    Console.WriteLine($"[YTDLP] Set file size from completed file: {fileInfo.Length} bytes");
+                    TraceLog.Write($"[YTDLP] Set file size from completed file: {fileInfo.Length} bytes");
                 }
 
                 downloadItem.CanPause = false;
@@ -554,28 +555,28 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 downloadItem.CanRestart = true;
                 downloadItem.CanOpen = true;
 
-                Console.WriteLine($"[YTDLP] Setting CanOpen=true for completed download");
-                Console.WriteLine($"[YTDLP] FilePath: {downloadItem.FilePath}");
+                TraceLog.Write($"[YTDLP] Setting CanOpen=true for completed download");
+                TraceLog.Write($"[YTDLP] FilePath: {downloadItem.FilePath}");
 
                 // Delete saved state
                 await _stateRepository.DeleteStateAsync(downloadItem.Id);
 
                 _downloadStatusChanged.OnNext(downloadItem);
-                Console.WriteLine($"[YTDLP] Status updated to Completed");
+                TraceLog.Write($"[YTDLP] Status updated to Completed");
             }
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine($"[YTDLP] OperationCanceledException for {downloadItem.Id}");
+            TraceLog.Write($"[YTDLP] OperationCanceledException for {downloadItem.Id}");
             // Download was paused or canceled - state already updated by Pause/Cancel methods
             return;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[YTDLP] EXCEPTION in ProcessDownloadAsync for {downloadItem.Id}");
-            Console.WriteLine($"[YTDLP] Exception type: {ex.GetType().Name}");
-            Console.WriteLine($"[YTDLP] Exception message: {ex.Message}");
-            Console.WriteLine($"[YTDLP] Stack trace: {ex.StackTrace}");
+            TraceLog.Write($"[YTDLP] EXCEPTION in ProcessDownloadAsync for {downloadItem.Id}");
+            TraceLog.Write($"[YTDLP] Exception type: {ex.GetType().Name}");
+            TraceLog.Write($"[YTDLP] Exception message: {ex.Message}");
+            TraceLog.Write($"[YTDLP] Stack trace: {ex.StackTrace}");
 
             // Build detailed error message with context
             var errorMessage = BuildDetailedErrorMessage(ex, downloadItem);
@@ -588,12 +589,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             downloadItem.CanRestart = true;
             downloadItem.CanOpen = false;
             _downloadStatusChanged.OnNext(downloadItem);
-            Console.WriteLine($"[YTDLP] Status updated to Failed");
+            TraceLog.Write($"[YTDLP] Status updated to Failed");
         }
         finally
         {
             _downloadSemaphore.Release();
-            Console.WriteLine($"[YTDLP] Semaphore released for {downloadItem.Id}");
+            TraceLog.Write($"[YTDLP] Semaphore released for {downloadItem.Id}");
             _cancellationTokens.TryRemove(downloadItem.Id, out _);
         }
     }
@@ -604,7 +605,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         {
             if (string.IsNullOrEmpty(downloadItem.FilePath) || !File.Exists(downloadItem.FilePath))
             {
-                Console.WriteLine($"[BURN-IN] Video file not found: {downloadItem.FilePath}");
+                TraceLog.Write($"[BURN-IN] Video file not found: {downloadItem.FilePath}");
                 return;
             }
 
@@ -638,16 +639,16 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
             if (subtitlePath == null)
             {
-                Console.WriteLine($"[BURN-IN] Subtitle file not found. Searched for:");
+                TraceLog.Write($"[BURN-IN] Subtitle file not found. Searched for:");
                 foreach (var pattern in searchPatterns)
                 {
-                    Console.WriteLine($"[BURN-IN]   - {pattern}");
+                    TraceLog.Write($"[BURN-IN]   - {pattern}");
                 }
                 return;
             }
 
-            Console.WriteLine($"[BURN-IN] Found subtitle file: {subtitlePath}");
-            Console.WriteLine($"[BURN-IN] Starting subtitle burn-in process...");
+            TraceLog.Write($"[BURN-IN] Found subtitle file: {subtitlePath}");
+            TraceLog.Write($"[BURN-IN] Starting subtitle burn-in process...");
 
             // Update download item status to show burn-in is in progress
             downloadItem.Progress = 0;
@@ -667,7 +668,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
                 if ((int)downloadItem.Progress % 10 == 0) // Log every 10%
                 {
-                    Console.WriteLine($"[BURN-IN] Progress: {downloadItem.Progress:F0}%");
+                    TraceLog.Write($"[BURN-IN] Progress: {downloadItem.Progress:F0}%");
                 }
             });
 
@@ -682,7 +683,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
             if (!success)
             {
-                Console.WriteLine($"[BURN-IN] Failed to burn in subtitles");
+                TraceLog.Write($"[BURN-IN] Failed to burn in subtitles");
                 downloadItem.ErrorMessage = "Failed to burn in subtitles, continuing with original video";
                 _downloadStatusChanged.OnNext(downloadItem);
 
@@ -694,7 +695,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 return;
             }
 
-            Console.WriteLine($"[BURN-IN] Burn-in successful, replacing original video");
+            TraceLog.Write($"[BURN-IN] Burn-in successful, replacing original video");
 
             // Replace original video with burned version
             var originalFilePath = downloadItem.FilePath;
@@ -711,11 +712,11 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 // Delete backup
                 File.Delete(backupPath);
 
-                Console.WriteLine($"[BURN-IN] Video replaced successfully: {originalFilePath}");
+                TraceLog.Write($"[BURN-IN] Video replaced successfully: {originalFilePath}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[BURN-IN] Error replacing file: {ex.Message}");
+                TraceLog.Write($"[BURN-IN] Error replacing file: {ex.Message}");
 
                 // Restore backup if move failed
                 if (File.Exists(backupPath) && !File.Exists(originalFilePath))
@@ -732,12 +733,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 if (File.Exists(subtitlePath))
                 {
                     File.Delete(subtitlePath);
-                    Console.WriteLine($"[BURN-IN] Cleaned up subtitle file: {subtitlePath}");
+                    TraceLog.Write($"[BURN-IN] Cleaned up subtitle file: {subtitlePath}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[BURN-IN] Warning: Could not delete subtitle file: {ex.Message}");
+                TraceLog.Write($"[BURN-IN] Warning: Could not delete subtitle file: {ex.Message}");
                 // Non-critical, continue
             }
 
@@ -747,22 +748,22 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 var fileInfo = new FileInfo(downloadItem.FilePath);
                 downloadItem.TotalBytes = fileInfo.Length;
                 downloadItem.BytesDownloaded = fileInfo.Length;
-                Console.WriteLine($"[BURN-IN] Updated file size: {fileInfo.Length} bytes");
+                TraceLog.Write($"[BURN-IN] Updated file size: {fileInfo.Length} bytes");
             }
 
             downloadItem.Progress = 100;
             downloadItem.ErrorMessage = null;
-            Console.WriteLine($"[BURN-IN] Subtitle burn-in process completed successfully");
+            TraceLog.Write($"[BURN-IN] Subtitle burn-in process completed successfully");
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine($"[BURN-IN] Burn-in process was canceled");
+            TraceLog.Write($"[BURN-IN] Burn-in process was canceled");
             throw;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BURN-IN] Error during burn-in process: {ex.Message}");
-            Console.WriteLine($"[BURN-IN] Stack trace: {ex.StackTrace}");
+            TraceLog.Write($"[BURN-IN] Error during burn-in process: {ex.Message}");
+            TraceLog.Write($"[BURN-IN] Stack trace: {ex.StackTrace}");
             downloadItem.ErrorMessage = $"Subtitle burn-in failed: {ex.Message}";
             _downloadStatusChanged.OnNext(downloadItem);
             // Don't throw - we have the video, just without burned subtitles

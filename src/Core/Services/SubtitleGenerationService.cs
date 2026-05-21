@@ -5,6 +5,7 @@ using Whisper.net;
 using Whisper.net.Ggml;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
+using EnhancedYoutubeDownloader.Core.Utils;
 
 /// <summary>
 /// Service for generating subtitles using OpenAI Whisper via Whisper.net
@@ -99,7 +100,7 @@ public class SubtitleGenerationService : ISubtitleGenerationService, IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to generate subtitles: {ex.Message}");
+            TraceLog.Write($"Failed to generate subtitles: {ex.Message}");
             return false;
         }
     }
@@ -162,7 +163,7 @@ public class SubtitleGenerationService : ISubtitleGenerationService, IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to download Whisper model: {ex.Message}");
+            TraceLog.Write($"Failed to download Whisper model: {ex.Message}");
             throw;
         }
     }

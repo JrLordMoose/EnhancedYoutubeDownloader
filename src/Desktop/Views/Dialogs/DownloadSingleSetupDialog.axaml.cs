@@ -5,6 +5,8 @@ using EnhancedYoutubeDownloader.ViewModels.Dialogs;
 
 namespace EnhancedYoutubeDownloader.Views.Dialogs;
 
+using EnhancedYoutubeDownloader.Utils;
+
 public partial class DownloadSingleSetupDialog : UserControl
 {
     public DownloadSingleSetupDialog()
@@ -50,21 +52,21 @@ public partial class DownloadSingleSetupDialog : UserControl
         // Return true to indicate user confirmed download
         if (DataContext is DownloadSingleSetupViewModel viewModel)
         {
-            Console.WriteLine("[DIALOG] Download button clicked");
-            Console.WriteLine($"[DIALOG] FilePath: {viewModel.FilePath}");
-            Console.WriteLine($"[DIALOG] Video: {viewModel.Video?.Title}");
+            TraceLog.Write("[DIALOG] Download button clicked");
+            TraceLog.Write($"[DIALOG] FilePath: {viewModel.FilePath}");
+            TraceLog.Write($"[DIALOG] Video: {viewModel.Video?.Title}");
 
             if (string.IsNullOrWhiteSpace(viewModel.FilePath))
             {
-                Console.WriteLine("[DIALOG] ERROR: FilePath is empty!");
+                TraceLog.Write("[DIALOG] ERROR: FilePath is empty!");
             }
 
             viewModel.CloseCommand.Execute(true);
-            Console.WriteLine("[DIALOG] CloseCommand executed with true");
+            TraceLog.Write("[DIALOG] CloseCommand executed with true");
         }
         else
         {
-            Console.WriteLine("[DIALOG] ERROR: DataContext is not DownloadSingleSetupViewModel!");
+            TraceLog.Write("[DIALOG] ERROR: DataContext is not DownloadSingleSetupViewModel!");
         }
     }
 

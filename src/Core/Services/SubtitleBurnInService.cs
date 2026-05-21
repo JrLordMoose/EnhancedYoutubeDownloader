@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using EnhancedYoutubeDownloader.Shared.Interfaces;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
+using EnhancedYoutubeDownloader.Core.Utils;
 
 /// <summary>
 /// Service for burning professional-styled subtitles into videos using FFmpeg
@@ -62,8 +63,8 @@ public class SubtitleBurnInService : ISubtitleBurnInService
             // Build FFmpeg command
             var arguments = $"-i \"{videoPath}\" -vf \"{subtitleFilter}\" -c:a copy -y \"{outputPath}\"";
 
-            Console.WriteLine($"[BURN-SUBS] Starting FFmpeg process...");
-            Console.WriteLine($"[BURN-SUBS] Command: {_ffmpegPath} {arguments}");
+            TraceLog.Write($"[BURN-SUBS] Starting FFmpeg process...");
+            TraceLog.Write($"[BURN-SUBS] Command: {_ffmpegPath} {arguments}");
 
             var processInfo = new ProcessStartInfo
             {
@@ -106,7 +107,7 @@ public class SubtitleBurnInService : ISubtitleBurnInService
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"[BURN-SUBS] Failed to parse progress: {ex.Message}");
+                            TraceLog.Write($"[BURN-SUBS] Failed to parse progress: {ex.Message}");
                         }
                     }
                 };
@@ -122,12 +123,12 @@ public class SubtitleBurnInService : ISubtitleBurnInService
 
                 if (process.ExitCode != 0)
                 {
-                    Console.WriteLine($"[BURN-SUBS] FFmpeg exited with code: {process.ExitCode}");
+                    TraceLog.Write($"[BURN-SUBS] FFmpeg exited with code: {process.ExitCode}");
                     return false;
                 }
 
                 progress?.Report(1.0);
-                Console.WriteLine($"[BURN-SUBS] Subtitles burned successfully: {outputPath}");
+                TraceLog.Write($"[BURN-SUBS] Subtitles burned successfully: {outputPath}");
                 return true;
             }
             catch (OperationCanceledException)
@@ -137,12 +138,12 @@ public class SubtitleBurnInService : ISubtitleBurnInService
                     if (process != null && !process.HasExited)
                     {
                         process.Kill(entireProcessTree: true);
-                        Console.WriteLine($"[BURN-SUBS] FFmpeg process killed due to cancellation");
+                        TraceLog.Write($"[BURN-SUBS] FFmpeg process killed due to cancellation");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[BURN-SUBS] Failed to kill process: {ex.Message}");
+                    TraceLog.Write($"[BURN-SUBS] Failed to kill process: {ex.Message}");
                 }
                 throw;
             }
@@ -153,7 +154,7 @@ public class SubtitleBurnInService : ISubtitleBurnInService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BURN-SUBS] Error: {ex.Message}");
+            TraceLog.Write($"[BURN-SUBS] Error: {ex.Message}");
             return false;
         }
     }
@@ -167,7 +168,7 @@ public class SubtitleBurnInService : ISubtitleBurnInService
         {
             if (!File.Exists(_ffprobePath))
             {
-                Console.WriteLine($"[BURN-SUBS] ffprobe not found at {_ffprobePath}, progress reporting disabled");
+                TraceLog.Write($"[BURN-SUBS] ffprobe not found at {_ffprobePath}, progress reporting disabled");
                 return 0;
             }
 
@@ -195,7 +196,7 @@ public class SubtitleBurnInService : ISubtitleBurnInService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BURN-SUBS] Failed to get video duration: {ex.Message}");
+            TraceLog.Write($"[BURN-SUBS] Failed to get video duration: {ex.Message}");
             return 0;
         }
     }

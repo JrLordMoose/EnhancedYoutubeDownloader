@@ -10,6 +10,8 @@ using EnhancedYoutubeDownloader.Shared.Models;
 
 namespace EnhancedYoutubeDownloader.ViewModels.Dialogs;
 
+using EnhancedYoutubeDownloader.Utils;
+
 /// <summary>
 /// ViewModel for the error dialog with Material Design styling
 /// </summary>
@@ -38,13 +40,13 @@ public partial class ErrorDialogViewModel : DialogViewModelBase
     {
         if (ErrorInfo == null)
         {
-            Console.WriteLine("[ERROR_DIALOG] CopyErrorDetails called but ErrorInfo is null.");
+            TraceLog.Write("[ERROR_DIALOG] CopyErrorDetails called but ErrorInfo is null.");
             return;
         }
 
         try
         {
-            Console.WriteLine("[ERROR_DIALOG] Attempting to copy error details to clipboard.");
+            TraceLog.Write("[ERROR_DIALOG] Attempting to copy error details to clipboard.");
 
             // Get the main window from Application
             var mainWindow = Application.Current?.ApplicationLifetime
@@ -54,14 +56,14 @@ public partial class ErrorDialogViewModel : DialogViewModelBase
 
             if (mainWindow == null)
             {
-                Console.WriteLine("[ERROR_DIALOG] Main window is not available.");
+                TraceLog.Write("[ERROR_DIALOG] Main window is not available.");
                 return;
             }
 
             var clipboard = mainWindow.Clipboard;
             if (clipboard == null)
             {
-                Console.WriteLine("[ERROR_DIALOG] Clipboard is not available.");
+                TraceLog.Write("[ERROR_DIALOG] Clipboard is not available.");
                 return;
             }
 
@@ -75,11 +77,11 @@ public partial class ErrorDialogViewModel : DialogViewModelBase
 
             // Copy to clipboard
             await clipboard.SetTextAsync(errorText);
-            Console.WriteLine("[ERROR_DIALOG] Error details copied to clipboard successfully.");
+            TraceLog.Write("[ERROR_DIALOG] Error details copied to clipboard successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ERROR_DIALOG] Failed to copy to clipboard: {ex.Message}");
+            TraceLog.Write($"[ERROR_DIALOG] Failed to copy to clipboard: {ex.Message}");
         }
     }
 

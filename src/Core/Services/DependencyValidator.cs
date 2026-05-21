@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace EnhancedYoutubeDownloader.Core.Services;
+using EnhancedYoutubeDownloader.Core.Utils;
 
 public interface IDependencyValidator
 {
@@ -43,23 +44,23 @@ public class DependencyValidator : IDependencyValidator
                 DownloadUrl = "https://github.com/yt-dlp/yt-dlp/releases",
                 IsRequired = true
             });
-            Console.WriteLine($"[DEPENDENCY] MISSING: yt-dlp.exe at {ytdlpPath}");
+            TraceLog.Write($"[DEPENDENCY] MISSING: yt-dlp.exe at {ytdlpPath}");
         }
         else
         {
             var fileInfo = new FileInfo(ytdlpPath);
             var sizeMB = fileInfo.Length / 1024.0 / 1024.0;
-            Console.WriteLine($"[DEPENDENCY] ✓ yt-dlp found: {sizeMB:F2} MB at {ytdlpPath}");
+            TraceLog.Write($"[DEPENDENCY] ✓ yt-dlp found: {sizeMB:F2} MB at {ytdlpPath}");
 
             // Try to get version
             try
             {
                 var versionInfo = await GetYtDlpVersionAsync(ytdlpPath);
-                Console.WriteLine($"[DEPENDENCY] yt-dlp version: {versionInfo}");
+                TraceLog.Write($"[DEPENDENCY] yt-dlp version: {versionInfo}");
             }
             catch
             {
-                Console.WriteLine("[DEPENDENCY] Could not retrieve yt-dlp version");
+                TraceLog.Write("[DEPENDENCY] Could not retrieve yt-dlp version");
             }
         }
 
@@ -74,33 +75,33 @@ public class DependencyValidator : IDependencyValidator
                 DownloadUrl = "https://www.gyan.dev/ffmpeg/builds/",
                 IsRequired = true
             });
-            Console.WriteLine($"[DEPENDENCY] MISSING: ffmpeg.exe at {ffmpegPath}");
+            TraceLog.Write($"[DEPENDENCY] MISSING: ffmpeg.exe at {ffmpegPath}");
         }
         else
         {
             var fileInfo = new FileInfo(ffmpegPath);
             var sizeMB = fileInfo.Length / 1024.0 / 1024.0;
-            Console.WriteLine($"[DEPENDENCY] ✓ FFmpeg found: {sizeMB:F2} MB at {ffmpegPath}");
+            TraceLog.Write($"[DEPENDENCY] ✓ FFmpeg found: {sizeMB:F2} MB at {ffmpegPath}");
 
             // Try to get version
             try
             {
                 var versionInfo = await GetFFmpegVersionAsync(ffmpegPath);
-                Console.WriteLine($"[DEPENDENCY] FFmpeg version: {versionInfo}");
+                TraceLog.Write($"[DEPENDENCY] FFmpeg version: {versionInfo}");
             }
             catch
             {
-                Console.WriteLine("[DEPENDENCY] Could not retrieve FFmpeg version");
+                TraceLog.Write("[DEPENDENCY] Could not retrieve FFmpeg version");
             }
         }
 
         if (result.IsValid)
         {
-            Console.WriteLine("[DEPENDENCY] ✓ All dependencies validated successfully");
+            TraceLog.Write("[DEPENDENCY] ✓ All dependencies validated successfully");
         }
         else
         {
-            Console.WriteLine($"[DEPENDENCY] ✗ Validation failed: {result.MissingDependencies.Count} missing dependencies");
+            TraceLog.Write($"[DEPENDENCY] ✗ Validation failed: {result.MissingDependencies.Count} missing dependencies");
         }
 
         return result;

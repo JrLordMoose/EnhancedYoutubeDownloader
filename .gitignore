@@ -68,3 +68,6 @@ release/
 # Misc
 *.swp
 *.swo
+
+# Windows reserved device name (accidentally created by `> NUL` redirects)
+NUL

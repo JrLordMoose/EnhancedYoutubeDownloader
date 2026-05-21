@@ -3,165 +3,61 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="650"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="420"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.AuthSetupDialog"
              x:DataType="vm:AuthSetupViewModel"
-             Width="700" Height="650">
-
-    <Design.DataContext>
-        <vm:AuthSetupViewModel />
-    </Design.DataContext>
+             Width="560" Height="420">
 
     <Border Background="{DynamicResource MaterialDesignPaper}"
             CornerRadius="8"
-            Padding="0"
+            Padding="24"
             BoxShadow="0 8 16 0 #40000000">
 
-        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+        <StackPanel Spacing="16">
+            <TextBlock Text="Authentication"
+                       FontSize="20"
+                       FontWeight="SemiBold"/>
 
-            <!-- Header -->
-            <Border Grid.Row="0"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
-                    BorderThickness="0,0,0,1"
-                    Padding="20,16">
-                <TextBlock Text="Google Authentication"
-                          FontSize="18"
-                          FontWeight="SemiBold"/>
-            </Border>
+            <TextBlock TextWrapping="Wrap" FontSize="14">
+                Sign in with Google inside the app is not available yet. For private, unlisted, or age-restricted videos, enable browser cookie authentication in Settings.
+            </TextBlock>
 
-            <!-- Instructions -->
-            <Border Grid.Row="1"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
-                    BorderThickness="0,0,0,1"
-                    Padding="20,14">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="Sign in with your Google account"
-                              FontSize="16"
-                              FontWeight="Medium"/>
-                    <TextBlock TextWrapping="Wrap"
-                              FontSize="13"
-                              Foreground="{DynamicResource MaterialDesignBodyLight}">
-                        <Run Text="Authentication allows you to access:"/>
-                        <LineBreak/>
-                        <Run Text="• Private and unlisted videos"/>
-                        <LineBreak/>
-                        <Run Text="• Age-restricted content"/>
-                        <LineBreak/>
-                        <Run Text="• Premium-only videos (if subscribed)"/>
+            <Border Background="#FFF3E0"
+                    BorderBrush="#FFB74D"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="12">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Recommended: Browser cookies"
+                              FontWeight="Medium"
+                              Foreground="#E65100"/>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="#E65100">
+                        Uses cookies from Chrome, Firefox, Edge, Brave, Opera, or Chromium on this PC. Credentials stay local and are never sent to third-party servers.
                     </TextBlock>
-                    <Border Background="#FFF3E0"
-                            BorderBrush="#FFB74D"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="12">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="Privacy Notice"
-                                      FontSize="13"
-                                      FontWeight="Medium"
-                                      Foreground="#E65100"/>
-                            <TextBlock Text="Your credentials are only stored locally on your device and are never sent to any third-party servers."
-                                      FontSize="12"
-                                      Foreground="#E65100"
-                                      TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </Border>
                 </StackPanel>
             </Border>
 
-            <!-- WebView Content -->
-            <Border Grid.Row="2"
-                    Background="{DynamicResource MaterialDesignBackground}"
-                    Margin="0">
-                <Grid>
-                    <!-- WebView Placeholder - actual WebView implementation would go here -->
-                    <Border Background="White"
-                            BorderBrush="{DynamicResource MaterialDesignDivider}"
-                            BorderThickness="0">
-                        <Panel>
-                            <!-- WebView control will be added here via code-behind or Avalonia.WebView package -->
-                            <TextBlock Text="WebView will be embedded here"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"
-                                      FontSize="14"
-                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+            <StackPanel Spacing="4">
+                <TextBlock Text="{Binding Status}" FontWeight="Medium"/>
+                <TextBlock Text="{Binding BrowserLabel, StringFormat='Browser: {0}'}"
+                           Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+            </StackPanel>
 
-                            <!-- Loading Indicator -->
-                            <Border x:Name="LoadingPanel"
-                                    Background="#F0FFFFFF"
-                                    IsVisible="False">
-                                <StackPanel HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           Spacing="16">
-                                    <ProgressBar IsIndeterminate="True"
-                                                Width="200"/>
-                                    <TextBlock Text="Loading Google Sign-In..."
-                                              FontSize="14"
-                                              HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                        </Panel>
-                    </Border>
-                </Grid>
-            </Border>
-
-            <!-- Status Bar -->
-            <Border Grid.Row="3"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
-                    BorderThickness="0,1,0,0"
-                    Padding="20,10">
-                <Grid ColumnDefinitions="Auto,*">
-                    <TextBlock Grid.Column="0"
-                              Text="Status:"
-                              FontSize="12"
-                              Foreground="{DynamicResource MaterialDesignBodyLight}"
-                              VerticalAlignment="Center"
-                              Margin="0,0,8,0"/>
-                    <TextBlock Grid.Column="1"
-                              Text="{Binding Status}"
-                              FontSize="12"
-                              FontWeight="Medium"
-                              VerticalAlignment="Center"/>
-                </Grid>
-            </Border>
-
-            <!-- Action Buttons -->
-            <Border Grid.Row="4"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
-                    BorderThickness="0,1,0,0"
-                    Padding="20,14">
-                <Grid ColumnDefinitions="*,Auto">
-                    <!-- Help Text -->
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="Having trouble signing in?"
-                                  FontSize="12"
-                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                        <TextBlock FontSize="12"
-                                  Foreground="{DynamicResource MaterialDesignBodyLight}">
-                            <Run Text="Try clearing your browser cache or use an incognito window."/>
-                        </TextBlock>
-                    </StackPanel>
-
-                    <!-- Buttons -->
-                    <StackPanel Grid.Column="1"
-                               Orientation="Horizontal"
-                               Spacing="12">
-                        <Button x:Name="ClearAuthButton"
-                               Content="Clear Auth"
-                               Theme="{DynamicResource MaterialOutlineButton}"
-                               MinWidth="100"/>
-                        <Button x:Name="CloseButton"
-                               Content="Close"
-                               Theme="{DynamicResource MaterialOutlineButton}"
-                               MinWidth="100"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-
-        </Grid>
+            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+                <Button Content="Clear cookies"
+                        Command="{Binding ClearBrowserCookiesCommand}"
+                        IsEnabled="{Binding IsBrowserCookiesEnabled}"
+                        Theme="{DynamicResource MaterialOutlineButton}"
+                        MinWidth="120"/>
+                <Button Content="Open Settings"
+                        Command="{Binding OpenAuthenticationSettingsCommand}"
+                        Theme="{DynamicResource MaterialRaisedButton}"
+                        MinWidth="120"/>
+                <Button Content="Close"
+                        Command="{Binding CloseDialogCommand}"
+                        Theme="{DynamicResource MaterialOutlineButton}"
+                        MinWidth="100"/>
+            </StackPanel>
+        </StackPanel>
     </Border>
-
 </UserControl>

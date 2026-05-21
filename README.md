@@ -29,19 +29,18 @@ Experience our professional landing page featuring:
 - ✅ Multiple quality and format options
 - ✅ Subtitle support
 - ✅ Metadata tagging
-- ⚠️ Authentication for private content (not fully implemented - do not modify auth settings)
+- ✅ **Browser cookie authentication** - For private, age-restricted, and 403-blocked content (Settings → Advanced)
 
 ### Enhanced Features
 - 🚀 **Unified Queue Management** - Single pane for all download states
 - 🚀 **Pause/Resume Functionality** - State persistence and recovery
 - 🚀 **Enhanced Error Handling** - User-friendly messages with actions
 - 🚀 **Metadata Caching** - SQLite-based cache with invalidation
-- 🚀 **Drag-and-Drop Support** - URLs anywhere in UI
-- 🚀 **Batch Operations** - Multi-select and apply settings
-- 🚀 **Download Scheduling** - Time-based queue execution
+- 🚀 **Multi-Platform Downloads** - YouTube, TikTok, Instagram, Twitter, and 1,800+ sites via yt-dlp
 - 🚀 **Format Profiles** - Quick presets for common scenarios
+- 🚀 **Automatic Updates** - Check for updates from Settings (Windows)
 - 🚀 **Better Feedback** - Toast notifications and loading states
-- 🚀 **Performance Optimization** - Parallel downloads, chunking, retry logic
+- 🚀 **Performance Optimization** - Parallel downloads and retry logic
 
 ## Technology Stack
 
@@ -59,7 +58,7 @@ Experience our professional landing page featuring:
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.4.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.4/EnhancedYoutubeDownloader-Setup-v0.4.4.exe)** (~83 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.5.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.5/EnhancedYoutubeDownloader-Setup-v0.4.5.exe)** (~83 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
@@ -204,7 +203,7 @@ dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x6
 # 2. Build installer with Inno Setup
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.4.exe
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.5.exe
 ```
 
 **Installer Features:**

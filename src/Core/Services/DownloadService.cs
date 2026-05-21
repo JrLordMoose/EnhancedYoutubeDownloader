@@ -223,25 +223,25 @@ public class DownloadService : IDownloadService, IDisposable
 
     private async Task ProcessDownloadAsync(DownloadItem downloadItem, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"[DOWNLOAD] ProcessDownloadAsync started for {downloadItem.Id}");
+        TraceLog.Write($"[DOWNLOAD] ProcessDownloadAsync started for {downloadItem.Id}");
         await _downloadSemaphore.WaitAsync(cancellationToken);
-        Console.WriteLine($"[DOWNLOAD] Semaphore acquired for {downloadItem.Id}");
+        TraceLog.Write($"[DOWNLOAD] Semaphore acquired for {downloadItem.Id}");
 
         try
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[DOWNLOAD] Cancellation requested before start for {downloadItem.Id}");
+                TraceLog.Write($"[DOWNLOAD] Cancellation requested before start for {downloadItem.Id}");
                 return;
             }
 
             // Get stream manifest
-            Console.WriteLine($"[DOWNLOAD] Getting stream manifest for video: {downloadItem.Video!.Id}");
+            TraceLog.Write($"[DOWNLOAD] Getting stream manifest for video: {downloadItem.Video!.Id}");
             var manifest = await _youtubeClient.Videos.Streams.GetManifestAsync(
                 downloadItem.Video!.Id,
                 cancellationToken
             );
-            Console.WriteLine($"[DOWNLOAD] Manifest retrieved. Muxed streams: {manifest.GetMuxedStreams().Count()}");
+            TraceLog.Write($"[DOWNLOAD] Manifest retrieved. Muxed streams: {manifest.GetMuxedStreams().Count()}");
 
             // Select best muxed stream (video + audio combined)
             var streamInfo = manifest
@@ -254,19 +254,19 @@ public class DownloadService : IDownloadService, IDisposable
             // which handles this automatically with FFmpeg
             if (streamInfo == null)
             {
-                Console.WriteLine($"[DOWNLOAD] No muxed stream found, using converter method");
+                TraceLog.Write($"[DOWNLOAD] No muxed stream found, using converter method");
                 await DownloadWithConverterAsync(downloadItem, manifest, cancellationToken);
             }
             else
             {
-                Console.WriteLine($"[DOWNLOAD] Using muxed stream: {streamInfo.VideoQuality} - {streamInfo.Container}");
+                TraceLog.Write($"[DOWNLOAD] Using muxed stream: {streamInfo.VideoQuality} - {streamInfo.Container}");
                 await DownloadChunkedAsync(downloadItem, streamInfo, cancellationToken);
             }
 
             // Download completed successfully
             if (!cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[DOWNLOAD] Download completed, moving file from .part");
+                TraceLog.Write($"[DOWNLOAD] Download completed, moving file from .part");
                 // Move .part file to final location
                 if (!string.IsNullOrEmpty(downloadItem.PartialFilePath) &&
                     File.Exists(downloadItem.PartialFilePath))
@@ -276,7 +276,7 @@ public class DownloadService : IDownloadService, IDisposable
                         File.Delete(downloadItem.FilePath);
                     }
                     File.Move(downloadItem.PartialFilePath, downloadItem.FilePath!);
-                    Console.WriteLine($"[DOWNLOAD] File moved to: {downloadItem.FilePath}");
+                    TraceLog.Write($"[DOWNLOAD] File moved to: {downloadItem.FilePath}");
                 }
 
                 downloadItem.Status = DownloadStatus.Completed;
@@ -291,21 +291,21 @@ public class DownloadService : IDownloadService, IDisposable
                 await _stateRepository.DeleteStateAsync(downloadItem.Id);
 
                 _downloadStatusChanged.OnNext(downloadItem);
-                Console.WriteLine($"[DOWNLOAD] Status updated to Completed");
+                TraceLog.Write($"[DOWNLOAD] Status updated to Completed");
             }
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine($"[DOWNLOAD] OperationCanceledException for {downloadItem.Id}");
+            TraceLog.Write($"[DOWNLOAD] OperationCanceledException for {downloadItem.Id}");
             // Download was paused or canceled - state already updated by Pause/Cancel methods
             return;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[DOWNLOAD] EXCEPTION in ProcessDownloadAsync for {downloadItem.Id}");
-            Console.WriteLine($"[DOWNLOAD] Exception type: {ex.GetType().Name}");
-            Console.WriteLine($"[DOWNLOAD] Exception message: {ex.Message}");
-            Console.WriteLine($"[DOWNLOAD] Stack trace: {ex.StackTrace}");
+            TraceLog.Write($"[DOWNLOAD] EXCEPTION in ProcessDownloadAsync for {downloadItem.Id}");
+            TraceLog.Write($"[DOWNLOAD] Exception type: {ex.GetType().Name}");
+            TraceLog.Write($"[DOWNLOAD] Exception message: {ex.Message}");
+            TraceLog.Write($"[DOWNLOAD] Stack trace: {ex.StackTrace}");
 
             downloadItem.Status = DownloadStatus.Failed;
             downloadItem.ErrorMessage = ex.Message;
@@ -314,12 +314,12 @@ public class DownloadService : IDownloadService, IDisposable
             downloadItem.CanCancel = false;
             downloadItem.CanRestart = true;
             _downloadStatusChanged.OnNext(downloadItem);
-            Console.WriteLine($"[DOWNLOAD] Status updated to Failed");
+            TraceLog.Write($"[DOWNLOAD] Status updated to Failed");
         }
         finally
         {
             _downloadSemaphore.Release();
-            Console.WriteLine($"[DOWNLOAD] Semaphore released for {downloadItem.Id}");
+            TraceLog.Write($"[DOWNLOAD] Semaphore released for {downloadItem.Id}");
             _cancellationTokens.TryRemove(downloadItem.Id, out _);
         }
     }
@@ -330,27 +330,27 @@ public class DownloadService : IDownloadService, IDisposable
         CancellationToken cancellationToken
     )
     {
-        Console.WriteLine($"[CHUNKED] Starting chunked download for {downloadItem.Id}");
+        TraceLog.Write($"[CHUNKED] Starting chunked download for {downloadItem.Id}");
         var partialFilePath = downloadItem.PartialFilePath!;
         var startByte = downloadItem.BytesDownloaded;
         downloadItem.TotalBytes = streamInfo.Size.Bytes;
-        Console.WriteLine($"[CHUNKED] File: {partialFilePath}, Start byte: {startByte}, Total bytes: {downloadItem.TotalBytes}");
+        TraceLog.Write($"[CHUNKED] File: {partialFilePath}, Start byte: {startByte}, Total bytes: {downloadItem.TotalBytes}");
 
         // Create request with Range header for resume support
         var request = new HttpRequestMessage(HttpMethod.Get, streamInfo.Url);
         if (startByte > 0)
         {
             request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(startByte, null);
-            Console.WriteLine($"[CHUNKED] Resuming from byte {startByte}");
+            TraceLog.Write($"[CHUNKED] Resuming from byte {startByte}");
         }
 
-        Console.WriteLine($"[CHUNKED] Sending HTTP request to {streamInfo.Url}");
+        TraceLog.Write($"[CHUNKED] Sending HTTP request to {streamInfo.Url}");
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken
         );
-        Console.WriteLine($"[CHUNKED] HTTP response: {response.StatusCode}");
+        TraceLog.Write($"[CHUNKED] HTTP response: {response.StatusCode}");
         response.EnsureSuccessStatusCode();
 
         // Ensure directory exists
@@ -358,11 +358,11 @@ public class DownloadService : IDownloadService, IDisposable
         if (!string.IsNullOrEmpty(directory))
         {
             Directory.CreateDirectory(directory);
-            Console.WriteLine($"[CHUNKED] Directory ensured: {directory}");
+            TraceLog.Write($"[CHUNKED] Directory ensured: {directory}");
         }
 
         // Open file in append mode if resuming, otherwise create new
-        Console.WriteLine($"[CHUNKED] Opening file stream");
+        TraceLog.Write($"[CHUNKED] Opening file stream");
         using var fileStream = new FileStream(
             partialFilePath,
             startByte > 0 ? FileMode.Append : FileMode.Create,
@@ -373,7 +373,7 @@ public class DownloadService : IDownloadService, IDisposable
         );
 
         using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        Console.WriteLine($"[CHUNKED] Starting download loop");
+        TraceLog.Write($"[CHUNKED] Starting download loop");
 
         var buffer = new byte[8192];
         int bytesRead;
@@ -396,10 +396,10 @@ public class DownloadService : IDownloadService, IDisposable
             _downloadStatusChanged.OnNext(downloadItem);
         }
 
-        Console.WriteLine($"[CHUNKED] Download loop completed. Total bytes read: {totalRead}");
+        TraceLog.Write($"[CHUNKED] Download loop completed. Total bytes read: {totalRead}");
         // Final state save
         await _stateRepository.SaveStateAsync(downloadItem);
-        Console.WriteLine($"[CHUNKED] Final state saved");
+        TraceLog.Write($"[CHUNKED] Final state saved");
     }
 
     private async Task DownloadWithConverterAsync(
@@ -408,22 +408,22 @@ public class DownloadService : IDownloadService, IDisposable
         CancellationToken cancellationToken
     )
     {
-        Console.WriteLine($"[CONVERTER] Starting converter download for {downloadItem.Id}");
+        TraceLog.Write($"[CONVERTER] Starting converter download for {downloadItem.Id}");
         // For streams that need conversion (separate video/audio), use YoutubeExplode.Converter
         // Note: This doesn't support pause/resume natively, but we can still cancel it
         var videoStream = manifest.GetVideoOnlyStreams().GetWithHighestVideoQuality();
         var audioStream = manifest.GetAudioOnlyStreams().GetWithHighestBitrate();
-        Console.WriteLine($"[CONVERTER] Video stream: {videoStream?.VideoQuality}, Audio stream bitrate: {audioStream?.Bitrate}");
+        TraceLog.Write($"[CONVERTER] Video stream: {videoStream?.VideoQuality}, Audio stream bitrate: {audioStream?.Bitrate}");
 
         if (videoStream == null || audioStream == null)
         {
-            Console.WriteLine($"[CONVERTER] ERROR: No suitable streams found");
+            TraceLog.Write($"[CONVERTER] ERROR: No suitable streams found");
             throw new InvalidOperationException("No suitable streams found");
         }
 
         var streamInfos = new List<IStreamInfo> { videoStream, audioStream };
         downloadItem.TotalBytes = videoStream.Size.Bytes + audioStream.Size.Bytes;
-        Console.WriteLine($"[CONVERTER] Total bytes: {downloadItem.TotalBytes}");
+        TraceLog.Write($"[CONVERTER] Total bytes: {downloadItem.TotalBytes}");
 
         var progressHandler = new Progress<double>(p =>
         {
@@ -431,22 +431,22 @@ public class DownloadService : IDownloadService, IDisposable
             downloadItem.BytesDownloaded = (long)(downloadItem.TotalBytes * p);
             _downloadStatusChanged.OnNext(downloadItem);
             if (p % 0.1 < 0.01) // Log every 10%
-                Console.WriteLine($"[CONVERTER] Progress: {p * 100:F1}%");
+                TraceLog.Write($"[CONVERTER] Progress: {p * 100:F1}%");
         });
 
         // Download directly to partial file path using converter
-        Console.WriteLine($"[CONVERTER] Output file: {downloadItem.PartialFilePath}");
+        TraceLog.Write($"[CONVERTER] Output file: {downloadItem.PartialFilePath}");
         var conversionRequest = new ConversionRequestBuilder(downloadItem.PartialFilePath!)
             .Build();
 
-        Console.WriteLine($"[CONVERTER] Starting YoutubeExplode.Converter download (requires FFmpeg)");
+        TraceLog.Write($"[CONVERTER] Starting YoutubeExplode.Converter download (requires FFmpeg)");
         await _youtubeClient.Videos.DownloadAsync(
             streamInfos,
             conversionRequest,
             progressHandler,
             cancellationToken
         );
-        Console.WriteLine($"[CONVERTER] Download completed successfully");
+        TraceLog.Write($"[CONVERTER] Download completed successfully");
     }
 
     public void Dispose()

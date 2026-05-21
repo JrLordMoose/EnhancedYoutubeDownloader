@@ -47,7 +47,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         // Explicitly initialize IsBusy to false
         IsBusy = false;
-        Console.WriteLine($"[DASHBOARD] Constructor: IsBusy initialized to {IsBusy}");
+        TraceLog.Write($"[DASHBOARD] Constructor: IsBusy initialized to {IsBusy}");
 
         // Force property change notification to ensure UI updates
         OnPropertyChanged(nameof(IsBusy));
@@ -64,7 +64,7 @@ public partial class DashboardViewModel : ViewModelBase
         _eventRoot.Add(
             _downloadService.DownloadStatusChanged.Subscribe(downloadItem =>
             {
-                Console.WriteLine(
+                TraceLog.Write(
                     $"[DASHBOARD] Download status changed: {downloadItem.Id} - {downloadItem.Status} - {downloadItem.Progress:F1}%"
                 );
                 // No need to trigger collection change - DownloadItem already implements INotifyPropertyChanged
@@ -76,7 +76,7 @@ public partial class DashboardViewModel : ViewModelBase
                     && _settingsService.OpenFolderAfterDownload
                 )
                 {
-                    Console.WriteLine(
+                    TraceLog.Write(
                         $"[DASHBOARD] Download completed, auto-opening folder (setting enabled)"
                     );
                     OpenDownloadFolder(downloadItem);
@@ -93,7 +93,7 @@ public partial class DashboardViewModel : ViewModelBase
                     && !_settingsService.UseBrowserCookies
                 )
                 {
-                    Console.WriteLine(
+                    TraceLog.Write(
                         $"[DASHBOARD] 403 error detected, showing browser cookie prompt"
                     );
                     _ = Show403BrowserCookiePromptAsync(downloadItem);
@@ -183,55 +183,55 @@ public partial class DashboardViewModel : ViewModelBase
             return;
         }
 
-        Console.WriteLine("[DEBUG] ProcessQueryAsync: Starting");
-        Console.WriteLine($"[DEBUG] IsBusy before: {IsBusy}");
+        TraceLog.Write("[DEBUG] ProcessQueryAsync: Starting");
+        TraceLog.Write($"[DEBUG] IsBusy before: {IsBusy}");
         IsBusy = true;
-        Console.WriteLine($"[DEBUG] IsBusy after setting true: {IsBusy}");
+        TraceLog.Write($"[DEBUG] IsBusy after setting true: {IsBusy}");
 
         try
         {
             // Clear any previous errors
             QueryError = null;
 
-            Console.WriteLine($"[DEBUG] Resolving query: {Query}");
+            TraceLog.Write($"[DEBUG] Resolving query: {Query}");
             _snackbarManager.Notify($"Resolving: {Query}");
 
             // Resolve the query using QueryResolver
             var result = await _queryResolver.ResolveAsync(Query);
-            Console.WriteLine($"[DEBUG] Query resolved: Kind={result.Kind}");
+            TraceLog.Write($"[DEBUG] Query resolved: Kind={result.Kind}");
 
             // Handle the result based on its kind
             switch (result.Kind)
             {
                 case QueryResultKind.Video:
-                    Console.WriteLine("[DEBUG] Processing single video");
+                    TraceLog.Write("[DEBUG] Processing single video");
                     await ProcessSingleVideoAsync(result);
                     break;
 
                 case QueryResultKind.Playlist:
                 case QueryResultKind.Channel:
                 case QueryResultKind.Search:
-                    Console.WriteLine("[DEBUG] Processing multiple videos");
+                    TraceLog.Write("[DEBUG] Processing multiple videos");
                     await ProcessMultipleVideosAsync(result);
                     break;
             }
 
             // Clear the query after successful processing
             Query = null;
-            Console.WriteLine("[DEBUG] Query cleared successfully");
+            TraceLog.Write("[DEBUG] Query cleared successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[DEBUG] Exception caught: {ex.GetType().Name} - {ex.Message}");
-            Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
+            TraceLog.Write($"[DEBUG] Exception caught: {ex.GetType().Name} - {ex.Message}");
+            TraceLog.Write($"[DEBUG] Stack trace: {ex.StackTrace}");
             _snackbarManager.NotifyError($"Failed to resolve query: {ex.Message}");
             await ShowErrorDialogAsync(ex, "Query Resolution Failed");
         }
         finally
         {
-            Console.WriteLine($"[DEBUG] Finally block: Setting IsBusy to false");
+            TraceLog.Write($"[DEBUG] Finally block: Setting IsBusy to false");
             IsBusy = false;
-            Console.WriteLine($"[DEBUG] IsBusy after finally: {IsBusy}");
+            TraceLog.Write($"[DEBUG] IsBusy after finally: {IsBusy}");
         }
     }
 
@@ -239,15 +239,15 @@ public partial class DashboardViewModel : ViewModelBase
     {
         try
         {
-            Console.WriteLine("[DEBUG] ProcessSingleVideoAsync: Starting");
+            TraceLog.Write("[DEBUG] ProcessSingleVideoAsync: Starting");
 
             if (result.Video == null)
             {
-                Console.WriteLine("[DEBUG] result.Video is null, returning");
+                TraceLog.Write("[DEBUG] result.Video is null, returning");
                 return;
             }
 
-            Console.WriteLine($"[DEBUG] Video: {result.Video.Title}");
+            TraceLog.Write($"[DEBUG] Video: {result.Video.Title}");
 
             // Show download setup dialog
             var setupDialog = _viewModelManager.CreateDownloadSingleSetupViewModel();
@@ -265,19 +265,19 @@ public partial class DashboardViewModel : ViewModelBase
                 defaultPath,
                 $"{sanitizedTitle}.{defaultExtension}"
             );
-            Console.WriteLine($"[DEBUG] Default download path set to: {setupDialog.FilePath}");
+            TraceLog.Write($"[DEBUG] Default download path set to: {setupDialog.FilePath}");
 
             var dialogResult = await _dialogManager.ShowDialogAsync(setupDialog);
 
             // Check if user cancelled the dialog
             if (dialogResult != true || string.IsNullOrWhiteSpace(setupDialog.FilePath))
             {
-                Console.WriteLine("[DEBUG] User cancelled download dialog");
+                TraceLog.Write("[DEBUG] User cancelled download dialog");
                 _snackbarManager.NotifyInfo("Download cancelled");
                 return;
             }
 
-            Console.WriteLine($"[DEBUG] Download path: {setupDialog.FilePath}");
+            TraceLog.Write($"[DEBUG] Download path: {setupDialog.FilePath}");
 
             // Ensure unique file path to prevent overwriting existing files
             var uniqueFilePath = DownloadSingleSetupViewModel.GetUniqueFilePath(
@@ -285,9 +285,7 @@ public partial class DashboardViewModel : ViewModelBase
             );
             if (uniqueFilePath != setupDialog.FilePath)
             {
-                Console.WriteLine(
-                    $"[DEBUG] File already exists, using unique path: {uniqueFilePath}"
-                );
+                TraceLog.Write($"[DEBUG] File already exists, using unique path: {uniqueFilePath}");
             }
 
             // Create FormatProfile from dialog settings
@@ -297,46 +295,46 @@ public partial class DashboardViewModel : ViewModelBase
                 setupDialog.DownloadSubtitles,
                 setupDialog.InjectTags
             );
-            Console.WriteLine(
+            TraceLog.Write(
                 $"[DEBUG] Format profile: {formatProfile.Quality} {formatProfile.Container}, Subs={formatProfile.IncludeSubtitles}, Tags={formatProfile.IncludeTags}"
             );
 
             // Create download item
-            Console.WriteLine("[DEBUG] Creating download item");
+            TraceLog.Write("[DEBUG] Creating download item");
             var downloadItem = await _downloadService.CreateDownloadAsync(
                 result.Video,
                 uniqueFilePath,
                 formatProfile,
                 result.Platform
             );
-            Console.WriteLine($"[DEBUG] Download item created: {downloadItem.Id}");
+            TraceLog.Write($"[DEBUG] Download item created: {downloadItem.Id}");
 
             Downloads.Add(downloadItem);
-            Console.WriteLine("[DEBUG] Added to Downloads collection");
+            TraceLog.Write("[DEBUG] Added to Downloads collection");
 
             // Start download based on settings
-            Console.WriteLine(
+            TraceLog.Write(
                 $"[DEBUG] AutoStartDownload setting: {_settingsService.AutoStartDownload}"
             );
             if (_settingsService.AutoStartDownload)
             {
-                Console.WriteLine("[DEBUG] Calling StartDownloadAsync...");
+                TraceLog.Write("[DEBUG] Calling StartDownloadAsync...");
                 await _downloadService.StartDownloadAsync(downloadItem);
-                Console.WriteLine("[DEBUG] Download started automatically");
+                TraceLog.Write("[DEBUG] Download started automatically");
                 _snackbarManager.Notify($"Downloading: {result.Video.Title}");
             }
             else
             {
-                Console.WriteLine("[DEBUG] Download queued, waiting for manual start");
+                TraceLog.Write("[DEBUG] Download queued, waiting for manual start");
                 _snackbarManager.Notify($"Ready to download: {result.Video.Title}");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine(
+            TraceLog.Write(
                 $"[DEBUG] Exception in ProcessSingleVideoAsync: {ex.GetType().Name} - {ex.Message}"
             );
-            Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
+            TraceLog.Write($"[DEBUG] Stack trace: {ex.StackTrace}");
             _snackbarManager.NotifyError($"Failed to start download: {ex.Message}");
             await ShowErrorDialogAsync(ex, "Download Failed");
         }
@@ -493,7 +491,7 @@ public partial class DashboardViewModel : ViewModelBase
             SubtitleStyle = _settingsService.SubtitleStyle,
         };
 
-        Console.WriteLine(
+        TraceLog.Write(
             $"[FORMAT] Created profile with subtitle settings: Style={profile.SubtitleStyle}"
         );
 
@@ -503,21 +501,21 @@ public partial class DashboardViewModel : ViewModelBase
     [RelayCommand]
     private void OpenDownloadFolder(DownloadItem download)
     {
-        Console.WriteLine($"[OPEN] OpenDownloadFolder called for {download.Id}");
-        Console.WriteLine($"[OPEN] FilePath: {download.FilePath}");
-        Console.WriteLine($"[OPEN] CanOpen: {download.CanOpen}");
-        Console.WriteLine($"[OPEN] Status: {download.Status}");
+        TraceLog.Write($"[OPEN] OpenDownloadFolder called for {download.Id}");
+        TraceLog.Write($"[OPEN] FilePath: {download.FilePath}");
+        TraceLog.Write($"[OPEN] CanOpen: {download.CanOpen}");
+        TraceLog.Write($"[OPEN] Status: {download.Status}");
 
         if (string.IsNullOrWhiteSpace(download.FilePath) || !File.Exists(download.FilePath))
         {
-            Console.WriteLine($"[OPEN] File not found or FilePath is null/empty");
+            TraceLog.Write($"[OPEN] File not found or FilePath is null/empty");
             _snackbarManager.NotifyWarning("File not found");
             return;
         }
 
         try
         {
-            Console.WriteLine($"[OPEN] Opening file location: {download.FilePath}");
+            TraceLog.Write($"[OPEN] Opening file location: {download.FilePath}");
 
             // Cross-platform folder opening with proper ProcessStartInfo
             if (OperatingSystem.IsWindows())
@@ -529,7 +527,7 @@ public partial class DashboardViewModel : ViewModelBase
                     UseShellExecute = true,
                 };
                 System.Diagnostics.Process.Start(startInfo);
-                Console.WriteLine("[OPEN] Explorer launched successfully");
+                TraceLog.Write("[OPEN] Explorer launched successfully");
             }
             else if (OperatingSystem.IsMacOS())
             {
@@ -558,8 +556,8 @@ public partial class DashboardViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[OPEN] Error: {ex.GetType().Name}: {ex.Message}");
-            Console.WriteLine($"[OPEN] Stack trace: {ex.StackTrace}");
+            TraceLog.Write($"[OPEN] Error: {ex.GetType().Name}: {ex.Message}");
+            TraceLog.Write($"[OPEN] Stack trace: {ex.StackTrace}");
             _snackbarManager.NotifyError($"Failed to open folder: {ex.Message}");
         }
     }
@@ -791,7 +789,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     private async Task Show403BrowserCookiePromptAsync(DownloadItem downloadItem)
     {
-        Console.WriteLine($"[403-PROMPT] Showing browser cookie prompt for {downloadItem.Id}");
+        TraceLog.Write($"[403-PROMPT] Showing browser cookie prompt for {downloadItem.Id}");
 
         var dialog = _viewModelManager.CreateMessageBoxViewModel();
         dialog.Title = "Access Restricted (403 Forbidden)";
@@ -808,7 +806,7 @@ public partial class DashboardViewModel : ViewModelBase
         if (result == true)
         {
             // User clicked "Enable & Retry"
-            Console.WriteLine($"[403-PROMPT] User chose to enable browser cookies");
+            TraceLog.Write($"[403-PROMPT] User chose to enable browser cookies");
 
             _settingsService.UseBrowserCookies = true;
             _settingsService.BrowserForCookies = "chrome"; // Default to Chrome
@@ -822,7 +820,7 @@ public partial class DashboardViewModel : ViewModelBase
         else
         {
             // User clicked "Not Now" or closed dialog
-            Console.WriteLine($"[403-PROMPT] User declined browser cookies");
+            TraceLog.Write($"[403-PROMPT] User declined browser cookies");
             _snackbarManager.NotifyInfo(
                 "You can enable this later in Settings > Advanced > Authentication"
             );
@@ -852,7 +850,7 @@ public partial class DashboardViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[DASHBOARD] Failed to open URL: {ex.Message}");
+            TraceLog.Write($"[DASHBOARD] Failed to open URL: {ex.Message}");
         }
     }
 

@@ -6,6 +6,8 @@ using EnhancedYoutubeDownloader.Framework;
 
 namespace EnhancedYoutubeDownloader.ViewModels.Dialogs;
 
+using EnhancedYoutubeDownloader.Utils;
+
 /// <summary>
 /// ViewModel for the Tutorial/Help dialog
 /// </summary>
@@ -55,7 +57,7 @@ Need help or found a bug? Use the buttons below!";
     {
         try
         {
-            Console.WriteLine("[TUTORIAL] Opening GitHub page...");
+            TraceLog.Write("[TUTORIAL] Opening GitHub page...");
             Process.Start(
                 new ProcessStartInfo
                 {
@@ -66,7 +68,7 @@ Need help or found a bug? Use the buttons below!";
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[TUTORIAL] Failed to open GitHub: {ex.Message}");
+            TraceLog.Write($"[TUTORIAL] Failed to open GitHub: {ex.Message}");
         }
     }
 
@@ -75,7 +77,7 @@ Need help or found a bug? Use the buttons below!";
     {
         try
         {
-            Console.WriteLine("[TUTORIAL] Opening bug report form...");
+            TraceLog.Write("[TUTORIAL] Opening bug report form...");
             Process.Start(
                 new ProcessStartInfo
                 {
@@ -86,7 +88,7 @@ Need help or found a bug? Use the buttons below!";
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[TUTORIAL] Failed to open bug report: {ex.Message}");
+            TraceLog.Write($"[TUTORIAL] Failed to open bug report: {ex.Message}");
         }
     }
 

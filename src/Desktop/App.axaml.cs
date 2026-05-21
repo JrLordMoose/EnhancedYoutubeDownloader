@@ -47,19 +47,19 @@ public class App : Application, IDisposable
         _settingsService = _host.Services.GetRequiredService<SettingsService>();
 
         // Ensure AutoStartDownload is enabled (fixes issue where it was persisted as false)
-        Console.WriteLine(
+        TraceLog.Write(
             $"[APP] Initial AutoStartDownload value: {_settingsService.AutoStartDownload}"
         );
         if (!_settingsService.AutoStartDownload)
         {
-            Console.WriteLine("[APP] AutoStartDownload is false, setting to true");
+            TraceLog.Write("[APP] AutoStartDownload is false, setting to true");
             _settingsService.AutoStartDownload = true;
             _settingsService.Save();
-            Console.WriteLine("[APP] AutoStartDownload reset to true and saved");
+            TraceLog.Write("[APP] AutoStartDownload reset to true and saved");
         }
         else
         {
-            Console.WriteLine("[APP] AutoStartDownload is already true");
+            TraceLog.Write("[APP] AutoStartDownload is already true");
         }
 
         _mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
@@ -194,7 +194,7 @@ public class App : Application, IDisposable
     {
         try
         {
-            Console.WriteLine("[APP] Starting dependency validation...");
+            TraceLog.Write("[APP] Starting dependency validation...");
 
             // Get dependency validator service
             var dependencyValidator = _host.Services.GetRequiredService<IDependencyValidator>();
@@ -205,7 +205,7 @@ public class App : Application, IDisposable
             // If validation failed, show error dialog
             if (!validationResult.IsValid)
             {
-                Console.WriteLine(
+                TraceLog.Write(
                     $"[APP] Dependency validation failed: {validationResult.MissingDependencies.Count} missing"
                 );
 
@@ -217,12 +217,12 @@ public class App : Application, IDisposable
             }
             else
             {
-                Console.WriteLine("[APP] Dependency validation completed successfully");
+                TraceLog.Write("[APP] Dependency validation completed successfully");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[APP] Error during dependency validation: {ex.Message}");
+            TraceLog.Write($"[APP] Error during dependency validation: {ex.Message}");
         }
     }
 
@@ -289,7 +289,7 @@ public class App : Application, IDisposable
 
                     if (missingDep != null)
                     {
-                        Console.WriteLine(
+                        TraceLog.Write(
                             $"[APP] Opening download URL for {missingDep.Name}: {missingDep.DownloadUrl}"
                         );
 
@@ -304,7 +304,7 @@ public class App : Application, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[APP] Failed to open URL: {ex.Message}");
+                    TraceLog.Write($"[APP] Failed to open URL: {ex.Message}");
                 }
             };
 
@@ -313,19 +313,19 @@ public class App : Application, IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[APP] Failed to show dependency error dialog: {ex.Message}");
+            TraceLog.Write($"[APP] Failed to show dependency error dialog: {ex.Message}");
 
             // Fallback: show console message
-            Console.WriteLine("\n========================================");
-            Console.WriteLine("MISSING DEPENDENCIES:");
-            Console.WriteLine("========================================");
+            TraceLog.Write("\n========================================");
+            TraceLog.Write("MISSING DEPENDENCIES:");
+            TraceLog.Write("========================================");
             foreach (var missing in validationResult.MissingDependencies)
             {
-                Console.WriteLine($"\n{missing.Name}:");
-                Console.WriteLine($"  Location: {missing.ExpectedPath}");
-                Console.WriteLine($"  Download: {missing.DownloadUrl}");
+                TraceLog.Write($"\n{missing.Name}:");
+                TraceLog.Write($"  Location: {missing.ExpectedPath}");
+                TraceLog.Write($"  Download: {missing.DownloadUrl}");
             }
-            Console.WriteLine("========================================\n");
+            TraceLog.Write("========================================\n");
         }
     }
 

@@ -26,6 +26,6 @@ public static class Http
 
     static Http()
     {
-        Console.WriteLine($"[HTTP] Custom HttpClient initialized with User-Agent: EnhancedYoutubeDownloader/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0"}");
+        TraceLog.Write($"[HTTP] Custom HttpClient initialized with User-Agent: EnhancedYoutubeDownloader/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0"}");
     }
 }
