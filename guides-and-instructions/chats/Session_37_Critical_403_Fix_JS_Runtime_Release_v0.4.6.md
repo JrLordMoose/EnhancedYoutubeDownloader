@@ -20,7 +20,7 @@
 | Last Action | Verified live landing page serves v0.4.6 |
 | Release Assets | EXE 83.6 MB + ZIP 108.5 MB (both uploaded & verified 200) |
 | Tests | 56/56 passing |
-| Known Timing | ~10–20s before a download starts — **expected**, benchmarked, not a regression ([details](#️-performance-1020s-per-download-is-expected)) |
+| Known Timing | First download ~12–16s, subsequent ~6–8s. QuickJS is ~5.6s slower than Deno at the challenge solve, but it's cached per player version — keeping QuickJS. ([details](#️-performance-first-download-1216s-then-68s)) |
 
 ### Immediate Next Actions
 
@@ -81,6 +81,7 @@ Compounding factor: the bundled yt-dlp was **5 months stale** (`2026.03.17`).
 - **Validated across**: standard video, music video, YouTube Shorts, and a merged video+audio download.
 - **Not a lock-in**: yt-dlp still auto-detects and *prefers* a system Deno/Node/Bun when one exists — verified that precedence works. QuickJS is only the bundled fallback.
 - **Result**: installer grew just ~0.5 MB (83.1 → 83.6 MB).
+- **Speed caveat (found later in this session)**: QuickJS solves the JS challenge in ~6.9s vs Deno's ~1.3s — it is a non-JIT interpreter. The decision still holds because the solve is **cached per player version**, making the ~5.6s penalty occasional rather than per-download. See [Performance](#️-performance-first-download-1216s-then-68s).
 
 ### Wire up yt-dlp self-update on startup
 
@@ -131,52 +132,56 @@ Compounding factor: the bundled yt-dlp was **5 months stale** (`2026.03.17`).
 
 ---
 
-## ⏱️ Performance: ~10–20s Per Download Is Expected
+## ⏱️ Performance: First Download ~12–16s, Then ~6–8s
 
-User reported downloads now take **10–20 seconds to start**. Benchmarked this rather than guessing — it is **expected behaviour, not a regression**, and **not** a cost of choosing QuickJS.
+User reported downloads taking 10–20s before transfer starts. Benchmarked it — and **got it wrong the first time**. Corrected findings below.
 
-### Measurements (same video, `bv*+ba/b`)
+### ⚠️ Correction to an earlier claim in this session
 
-| Scenario | Time |
-|---|---|
-| yt-dlp bare startup (`--version`, no network) | **1.9s** |
-| Full extraction — **QuickJS**, cold cache | **10.74s** |
-| Full extraction — **Deno**, cold cache | **10.79s** |
-| Full extraction — warm cache | **10.5s** |
-| Actual file transfer (11 MB) | **<1s** |
+An initial benchmark compared total wall-clock of two `--simulate` runs (QuickJS 10.74s vs Deno 10.79s) and concluded the runtimes were equivalent. **That was wrong.** Total wall-clock is dominated by variable network I/O, which buried the real difference. Measuring the solve phase directly tells a different story:
 
-**QuickJS vs Deno differ by ~50ms.** The 97 MB runtime would buy nothing. The size/speed tradeoff was free.
+| Run | QuickJS solve | Deno solve |
+|---|---|---|
+| 1 | 6776 ms | 1267 ms |
+| 2 | 7031 ms | 1214 ms |
+| 3 | 6806 ms | 1328 ms |
 
-### Where the time actually goes
+**QuickJS is ~5.6s slower than Deno** at the challenge solve — QuickJS is a non-JIT interpreter, Deno has V8.
 
-Sequential network round-trips in yt-dlp's YouTube pipeline, none of which are ours:
+### Real phase breakdown (timestamped, full app flags, cold cache)
 
-1. `Downloading webpage`
-2. `Downloading visionos player API JSON`
-3. `Downloading m3u8 information`
-4. `Downloading player 2574220e-main` (~2 MB of player JS)
-5. `Solving JS challenges using quickjs`
+| Phase | Elapsed | Duration |
+|---|---|---|
+| yt-dlp PyInstaller startup | 0 → 1945 ms | **1.9s** |
+| Webpage + player API + m3u8 | 1945 → 3553 ms | 1.6s |
+| **JS challenge solve (QuickJS)** | 3553 → 11536 ms | **8.0s** |
+| Subtitle + format selection | 11536 → 11831 ms | 0.3s |
+| File transfer (29 MB + 3 MB) | 11831 → 15754 ms | 3.9s |
+| Merge + embed | 15886 → 16245 ms | 0.4s |
 
-Plus ~1.9s of PyInstaller self-extraction on every `yt-dlp.exe` invocation.
+### The mitigating fact: the solve is cached per player version
 
-The challenge solve **re-runs per video** — the `youtube-sigfuncs` cache does not eliminate it, confirmed by an identical warm-cache timing.
+| Video (same cache) | Total | Solver invoked? |
+|---|---|---|
+| 1st (cold) | 12271 ms | ✅ yes |
+| 2nd | 8351 ms | ❌ no |
+| 3rd | 5862 ms | ❌ no |
 
-### Why it feels new
+Cache persists at `~/.cache/yt-dlp` across app restarts (the app sets no `--cache-dir`).
 
-Before v0.4.6 the app returned a 403 almost instantly. It was fast because it was **instantly failing**. The 10s is the cost of the now-mandatory challenge pipeline that makes downloads work at all.
+**So in practice:** first download after YouTube rotates its player ≈ **12–16s**; every download after that ≈ **6–8s**. The user's "10–20s" was almost certainly the first download on a cold cache after installing v0.4.6.
 
-### Optimisations evaluated and rejected
+### Decision: keep QuickJS — but for a corrected reason
 
-| Attempt | Result |
-|---|---|
-| Pin `player_client=web_safari` | No speed gain; **degrades** to a single HLS format |
-| Pin `player_client=web` | No speed gain; **drops to 360p** |
-| Pin `player_client=tv` | **Errors**: "The page needs to be reloaded" |
-| `--extractor-args youtube:skip=hls` | ~0.9s saved (near noise); adds a knob that risks live/subtitle edge cases — **not shipped** |
+Deno would save ~5.6s **only on the first download per player rotation** (every few days/weeks), in exchange for **+95 MB of installer permanently**. Bad trade. Revisit only if YouTube starts rotating players daily.
 
-This is a second, independent confirmation that dropping the `player_client` pin from the prior WIP was correct: it gives no speed benefit **and** actively degrades quality.
+### Ruled out by measurement
 
-**Conclusion:** no code change. If this ever needs to improve, the real lever is avoiding the ~1.9s PyInstaller startup (invoke yt-dlp as a Python library instead of the one-file exe), not swapping the JS runtime.
+- **Browser cookies** — hypothesised as a per-download cost, but user's setting is `UseBrowserCookies: false`. Not a factor.
+- **Subtitles / tags / thumbnail embedding** — within noise (a run *with* them finished faster than one without, which is what exposed the noise problem).
+- **Player-client pinning** — no speed gain, degrades quality (`web` → 360p, `web_safari` → single HLS, `tv` → error). Confirms dropping that pin was right.
+
+**Only remaining lever**: the ~1.9s PyInstaller startup, paid on *every* download unlike the solve. Would require invoking yt-dlp as a Python library rather than the one-file exe. Not done.
 
 ---
 

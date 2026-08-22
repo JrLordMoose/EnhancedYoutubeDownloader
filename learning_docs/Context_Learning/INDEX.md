@@ -1,6 +1,6 @@
 # Context Learning Index
 
-**Last Updated**: 2026-08-22 19:40 · **Total**: 2 · **Critical**: 1
+**Last Updated**: 2026-08-22 20:15 · **Total**: 2 · **Critical**: 1
 
 ---
 
@@ -17,7 +17,7 @@
 | Date | Title | Category | Key Takeaway |
 |---|---|---|---|
 | 2026-08-22 | [yt-dlp Requires a Bundled JavaScript Runtime](August%202026/2026-08-22_Context_Session_37.md) | build | Also: update-yt-dlp and add-JS-runtime must be tested as **separate variables**; updating alone produces a convincing false fix. |
-| 2026-08-22 | [~10s Download Startup Is Inherent to yt-dlp](August%202026/2026-08-22_Context_Session_37b.md) | process | ~10s before a download starts is **expected**, not a bug. QuickJS vs Deno differ by ~50ms — never swap runtimes to chase speed. |
+| 2026-08-22 | [Download Latency — Measure Phases, Not Wall-Clock](August%202026/2026-08-22_Context_Session_37b.md) | process | First download ~12–16s, then ~6–8s. QuickJS is **~5.6s slower than Deno** at the solve, but it's cached per player version — keeping QuickJS. **Never compare implementations by wall-clock when network I/O dominates.** |
 
 ---
 
@@ -34,11 +34,14 @@
 
 ### Process
 
-- [2026-08-22 — ~10s Download Startup Is Inherent to yt-dlp](August%202026/2026-08-22_Context_Session_37b.md)
-  - Baseline is ~10.5–11s; benchmark before calling it a regression
-  - QuickJS ≈ Deno (~50ms apart) — swapping runtimes buys nothing but 95 MB
+- [2026-08-22 — Download Latency: Measure Phases, Not Wall-Clock](August%202026/2026-08-22_Context_Session_37b.md)
+  - **Methodology**: never compare two implementations by total wall-clock when network I/O dominates — isolate the phase. A first attempt here concluded "QuickJS ≈ Deno" and was wrong by ~5.6s.
+  - **Red flag**: if adding work makes something *faster*, the instrument is noise-dominated — change method, don't record the result.
+  - QuickJS solve ~6.9s vs Deno ~1.3s, but **cached per player version** → occasional, not per-download
+  - Keep QuickJS: Deno saves ~5.6s occasionally, costs +95 MB permanently
+  - First download ~12–16s; steady state ~6–8s
   - Never pin `youtube:player_client` for speed — no gain, degrades quality
-  - Measure before attributing a slowdown to a recent fix
+  - Only per-download lever left: ~1.9s PyInstaller startup
 
 ### API
 
