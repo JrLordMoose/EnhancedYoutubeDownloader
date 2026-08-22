@@ -2,7 +2,7 @@
 ; This script creates a Windows installer with desktop shortcut and launch options
 
 #define MyAppName "Enhanced YouTube Downloader"
-#define MyAppVersion "0.4.5"
+#define MyAppVersion "0.4.6"
 #define MyAppPublisher "JrLordMoose"
 #define MyAppURL "https://github.com/JrLordMoose/EnhancedYoutubeDownloader"
 #define MyAppExeName "EnhancedYoutubeDownloader.exe"

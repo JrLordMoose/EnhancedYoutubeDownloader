@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using EnhancedYoutubeDownloader.Core.Models;
+using EnhancedYoutubeDownloader.Core.Utils;
 using EnhancedYoutubeDownloader.Shared.Interfaces;
 using EnhancedYoutubeDownloader.Shared.Models;
 using YoutubeExplode;
@@ -52,7 +53,7 @@ public class QueryResolver : IQueryResolver
 
     public QueryResolver(ICacheService cacheService)
     {
-        _youtubeClient = new YoutubeClient();
+        _youtubeClient = new YoutubeClient(Http.Client);
         _cacheService = cacheService;
     }
 
@@ -84,15 +85,34 @@ public class QueryResolver : IQueryResolver
         var videoId = ExtractVideoId(query);
         if (videoId != null)
         {
-            var video = await GetVideoAsync(videoId);
-            return new QueryResult
+            try
             {
-                Kind = QueryResultKind.Video,
-                Platform = platform,
-                Video = video,
-                Title = video.Title,
-                Author = video.Author.ChannelTitle
-            };
+                var video = await GetVideoAsync(videoId);
+                return new QueryResult
+                {
+                    Kind = QueryResultKind.Video,
+                    Platform = platform,
+                    Video = video,
+                    Title = video.Title,
+                    Author = video.Author.ChannelTitle
+                };
+            }
+            catch (Exception ex)
+            {
+                TraceLog.Write($"[QUERY] YoutubeExplode metadata failed, falling back to yt-dlp: {ex.Message}");
+                var url = query.Contains("://", StringComparison.Ordinal)
+                    ? query
+                    : $"https://www.youtube.com/watch?v={videoId}";
+                var fallback = new GenericVideo(url, "YouTube video", videoId);
+                return new QueryResult
+                {
+                    Kind = QueryResultKind.Video,
+                    Platform = PlatformType.YouTube,
+                    Video = fallback,
+                    Title = fallback.Title,
+                    Author = "YouTube"
+                };
+            }
         }
 
         // Try to resolve as playlist URL

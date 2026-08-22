@@ -355,6 +355,8 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 ExtractAudio = isAudioOnly
             };
 
+            ApplyCompatibilityOptions(options);
+
             // Add browser cookies if enabled (helps with 403 errors and private videos)
             try
             {
@@ -857,6 +859,34 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             "flac" => YoutubeDLSharp.Options.AudioConversionFormat.Flac,
             _ => YoutubeDLSharp.Options.AudioConversionFormat.Best
         };
+    }
+
+    private static void ApplyCompatibilityOptions(OptionSet options)
+    {
+        // YouTube requires a JavaScript runtime to solve the EJS player challenges that
+        // produce signed media URLs. Without one, yt-dlp falls back to degraded clients
+        // and every download fails with HTTP 403 Forbidden. We ship QuickJS next to the
+        // executable; yt-dlp still auto-detects and prefers a system Deno/Node/Bun.
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        var quickJsPath = Path.Combine(baseDir, OperatingSystem.IsWindows() ? "qjs.exe" : "qjs");
+
+        if (File.Exists(quickJsPath))
+        {
+            options.AddCustomOption("--js-runtimes", $"quickjs:{quickJsPath}");
+            TraceLog.Write($"[YTDLP] Bundled QuickJS JS runtime registered: {quickJsPath}");
+        }
+        else
+        {
+            // Not fatal: a system runtime may still be on PATH, but warn loudly because
+            // this is the single most common cause of "every download fails".
+            TraceLog.Write(
+                "[YTDLP] WARNING: bundled QuickJS not found. Downloads will fail with "
+                    + "HTTP 403 unless Deno, Node or Bun is installed and on PATH."
+            );
+        }
+
+        options.AddCustomOption("--retries", "10");
+        options.AddCustomOption("--fragment-retries", "10");
     }
 
     private static string BuildDetailedErrorMessage(Exception ex, DownloadItem downloadItem)

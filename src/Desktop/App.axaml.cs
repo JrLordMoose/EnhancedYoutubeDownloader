@@ -188,6 +188,10 @@ public class App : Application, IDisposable
 
         // Validate dependencies asynchronously (don't block startup)
         _ = ValidateDependenciesAsync();
+
+        // Keep yt-dlp current so YouTube extractor changes don't break downloads
+        // between app releases (don't block startup)
+        _ = YtDlpSelfUpdater.TryUpdateAsync();
     }
 
     private async System.Threading.Tasks.Task ValidateDependenciesAsync()
