@@ -323,12 +323,15 @@ The app was completely non-functional — every download, on every supported sit
 - ✅ Dropped an unhelpful `player_client` pin from prior WIP after A/B testing
 - ✅ 56/56 tests passing; end-to-end download + merge verified
 - ✅ Released v0.4.6; landing page and both release assets verified live
+- ✅ Benchmarked the ~10-20s download startup users now see: **expected, not a regression**. QuickJS vs Deno differ by only ~50ms, so the small-runtime choice costs nothing. Time is spent in yt-dlp's sequential extraction round-trips plus ~1.9s PyInstaller startup. Pinning player clients gives no speed gain and degrades quality (web -> 360p, tv -> error).
 
-**Keywords:** 403, forbidden, yt-dlp, javascript runtime, quickjs, deno, EJS, player challenge, nsig, signature, downloads broken, v0.4.6, self-update
+**Keywords:** 403, forbidden, yt-dlp, javascript runtime, quickjs, deno, EJS, player challenge, nsig, signature, downloads broken, v0.4.6, self-update, slow download, 10 seconds, download startup latency, performance benchmark
 
 **Related Sessions:** Session 34 (a *different* 403 — cookie/auth related; same symptom, unrelated cause)
 
-**Learning Logged:** [2026-08-22 — yt-dlp Requires a Bundled JS Runtime](../../learning_docs/Context_Learning/August%202026/2026-08-22_Context_Session_37.md)
+**Learnings Logged:**
+- [2026-08-22 — yt-dlp Requires a Bundled JS Runtime](../../learning_docs/Context_Learning/August%202026/2026-08-22_Context_Session_37.md)
+- [2026-08-22 — ~10s Download Startup Is Inherent to yt-dlp](../../learning_docs/Context_Learning/August%202026/2026-08-22_Context_Session_37b.md)
 
 ---
 

@@ -1,6 +1,6 @@
 # Context Learning Index
 
-**Last Updated**: 2026-08-22 19:10 · **Total**: 1 · **Critical**: 1
+**Last Updated**: 2026-08-22 19:40 · **Total**: 2 · **Critical**: 1
 
 ---
 
@@ -17,6 +17,7 @@
 | Date | Title | Category | Key Takeaway |
 |---|---|---|---|
 | 2026-08-22 | [yt-dlp Requires a Bundled JavaScript Runtime](August%202026/2026-08-22_Context_Session_37.md) | build | Also: update-yt-dlp and add-JS-runtime must be tested as **separate variables**; updating alone produces a convincing false fix. |
+| 2026-08-22 | [~10s Download Startup Is Inherent to yt-dlp](August%202026/2026-08-22_Context_Session_37b.md) | process | ~10s before a download starts is **expected**, not a bug. QuickJS vs Deno differ by ~50ms — never swap runtimes to chase speed. |
 
 ---
 
@@ -30,6 +31,14 @@
   - Repo is **CRLF**; LF writes fail the build
   - GitHub token lacks `workflow` scope — isolate `.github/workflows/**` changes
   - Never silent-install the built EXE to verify (shared `AppId` overwrites the real install)
+
+### Process
+
+- [2026-08-22 — ~10s Download Startup Is Inherent to yt-dlp](August%202026/2026-08-22_Context_Session_37b.md)
+  - Baseline is ~10.5–11s; benchmark before calling it a regression
+  - QuickJS ≈ Deno (~50ms apart) — swapping runtimes buys nothing but 95 MB
+  - Never pin `youtube:player_client` for speed — no gain, degrades quality
+  - Measure before attributing a slowdown to a recent fix
 
 ### API
 
@@ -57,4 +66,4 @@ _(none yet)_
 
 ## 📈 Statistics
 
-Most common category: `build` (1) · Problem areas tracked: 3 · Last self-diagnosis: n/a
+Most common categories: `build` (1), `process` (1) · Problem areas tracked: 3 · Last self-diagnosis: n/a

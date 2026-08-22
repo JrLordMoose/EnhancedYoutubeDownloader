@@ -20,6 +20,7 @@
 | Last Action | Verified live landing page serves v0.4.6 |
 | Release Assets | EXE 83.6 MB + ZIP 108.5 MB (both uploaded & verified 200) |
 | Tests | 56/56 passing |
+| Known Timing | ~10–20s before a download starts — **expected**, benchmarked, not a regression ([details](#️-performance-1020s-per-download-is-expected)) |
 
 ### Immediate Next Actions
 
@@ -127,6 +128,55 @@ Compounding factor: the bundled yt-dlp was **5 months stale** (`2026.03.17`).
 | `error : Was not formatted` (build) | CSharpier enforces formatting on `.csproj` too | Put `<None>` entries on one line |
 | `error : Was not formatted` — *"different line endings"* | Wrote files with LF; repo is CRLF | Normalized all touched files to CRLF |
 | `remote rejected ... without workflow scope` | Token has `repo` but not `workflow`; commit included `.github/workflows/ci.yml` | Removed the unrelated CI file from the commit; left it on disk |
+
+---
+
+## ⏱️ Performance: ~10–20s Per Download Is Expected
+
+User reported downloads now take **10–20 seconds to start**. Benchmarked this rather than guessing — it is **expected behaviour, not a regression**, and **not** a cost of choosing QuickJS.
+
+### Measurements (same video, `bv*+ba/b`)
+
+| Scenario | Time |
+|---|---|
+| yt-dlp bare startup (`--version`, no network) | **1.9s** |
+| Full extraction — **QuickJS**, cold cache | **10.74s** |
+| Full extraction — **Deno**, cold cache | **10.79s** |
+| Full extraction — warm cache | **10.5s** |
+| Actual file transfer (11 MB) | **<1s** |
+
+**QuickJS vs Deno differ by ~50ms.** The 97 MB runtime would buy nothing. The size/speed tradeoff was free.
+
+### Where the time actually goes
+
+Sequential network round-trips in yt-dlp's YouTube pipeline, none of which are ours:
+
+1. `Downloading webpage`
+2. `Downloading visionos player API JSON`
+3. `Downloading m3u8 information`
+4. `Downloading player 2574220e-main` (~2 MB of player JS)
+5. `Solving JS challenges using quickjs`
+
+Plus ~1.9s of PyInstaller self-extraction on every `yt-dlp.exe` invocation.
+
+The challenge solve **re-runs per video** — the `youtube-sigfuncs` cache does not eliminate it, confirmed by an identical warm-cache timing.
+
+### Why it feels new
+
+Before v0.4.6 the app returned a 403 almost instantly. It was fast because it was **instantly failing**. The 10s is the cost of the now-mandatory challenge pipeline that makes downloads work at all.
+
+### Optimisations evaluated and rejected
+
+| Attempt | Result |
+|---|---|
+| Pin `player_client=web_safari` | No speed gain; **degrades** to a single HLS format |
+| Pin `player_client=web` | No speed gain; **drops to 360p** |
+| Pin `player_client=tv` | **Errors**: "The page needs to be reloaded" |
+| `--extractor-args youtube:skip=hls` | ~0.9s saved (near noise); adds a knob that risks live/subtitle edge cases — **not shipped** |
+
+This is a second, independent confirmation that dropping the `player_client` pin from the prior WIP was correct: it gives no speed benefit **and** actively degrades quality.
+
+**Conclusion:** no code change. If this ever needs to improve, the real lever is avoiding the ~1.9s PyInstaller startup (invoke yt-dlp as a Python library instead of the one-file exe), not swapping the JS runtime.
 
 ---
 
