@@ -1,8 +1,8 @@
 # Session Index
 
-**Last Updated:** 2025-12-03
-**Total Sessions:** 36
-**Date Range:** Session 1 (Initial commit) to Session 36 (2025-12-03)
+**Last Updated:** 2026-08-22
+**Total Sessions:** 37
+**Date Range:** Session 1 (Initial commit) to Session 37 (2026-08-22)
 
 ---
 
@@ -18,6 +18,11 @@
 ---
 
 ## Sessions by Date
+
+### 2026
+
+#### August
+- **Session 37** (2026-08-22) - [Critical 403 Fix: Bundled JS Runtime & Release v0.4.6](#session-37) ⭐ **CRITICAL FIX**
 
 ### 2025
 
@@ -297,6 +302,35 @@
 ---
 
 ## Session Details
+
+<a name="session-37"></a>
+### Session 37
+**Title:** Critical 403 Fix: Bundled JS Runtime & Release v0.4.6
+**Date:** 2026-08-22
+**Type:** Critical Bug Fix + Release
+**Status:** ✅ Complete (user-confirmed working)
+**Version:** v0.4.6
+
+**Summary:**
+The app was completely non-functional — every download, on every supported site, failed with `HTTP Error 403: Forbidden`. Root cause was not authentication or URL parsing: yt-dlp now requires a JavaScript runtime to solve YouTube's EJS player challenges (the step producing signed media URLs), and the app shipped without one, so yt-dlp fell back to degraded player clients whose URLs YouTube rejects. The bundled yt-dlp was also 5 months stale. Critically, updating yt-dlp alone did NOT fix it — verified by testing both variables separately. Fixed by bundling QuickJS (~2 MB, deliberately chosen over Deno's ~97 MB to keep the installer near its original size), updating yt-dlp to 2026.08.19, and wiring up the previously-dead `YtDlpSelfUpdater` to run `yt-dlp -U` on startup so extractor fixes land between releases. Released v0.4.6 with both EXE (83.6 MB) and ZIP (108.5 MB) assets verified downloadable.
+
+**Key Accomplishments:**
+- ✅ Diagnosed true root cause (missing JS runtime, not cookies/auth as in Session 34)
+- ✅ Proved yt-dlp update alone insufficient — avoided shipping a false fix
+- ✅ Bundled QuickJS: 2 MB vs Deno's 97 MB; installer grew only ~0.5 MB
+- ✅ yt-dlp updated 2026.03.17 → 2026.08.19
+- ✅ Startup self-update wired up (was dead code) — non-blocking, timeout-bounded, failure-safe
+- ✅ Dropped an unhelpful `player_client` pin from prior WIP after A/B testing
+- ✅ 56/56 tests passing; end-to-end download + merge verified
+- ✅ Released v0.4.6; landing page and both release assets verified live
+
+**Keywords:** 403, forbidden, yt-dlp, javascript runtime, quickjs, deno, EJS, player challenge, nsig, signature, downloads broken, v0.4.6, self-update
+
+**Related Sessions:** Session 34 (a *different* 403 — cookie/auth related; same symptom, unrelated cause)
+
+**Learning Logged:** [2026-08-22 — yt-dlp Requires a Bundled JS Runtime](../../learning_docs/Context_Learning/August%202026/2026-08-22_Context_Session_37.md)
+
+---
 
 ### Session 35
 **Title:** Automatic Updates & UI Improvements (Release v0.4.3)
@@ -963,4 +997,4 @@ Implemented professional subtitle burning feature with FFmpeg integration, custo
 **Index Version:** 1.6
 **Created:** 2024-10-08
 **Last Updated:** 2025-11-06
-**Next Update:** After Session 36
+**Next Update:** After Session 38
