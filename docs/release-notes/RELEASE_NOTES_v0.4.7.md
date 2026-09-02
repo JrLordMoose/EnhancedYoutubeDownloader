@@ -2,6 +2,13 @@
 
 **Date:** 2026-09-02
 
+## Download
+
+- **[Windows installer (recommended)](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.7/EnhancedYoutubeDownloader-Setup-v0.4.7.exe)**
+- **[Portable/auto-update ZIP](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.7/EnhancedYoutubeDownloader-0.4.7.zip)**
+
+Windows SmartScreen may appear because the installer is not code-signed. Select **More info**, then **Run anyway**.
+
 ## YouTube Playlist Downloads Fixed
 
 - Fixed the playlist dialog opening with `0 of 0 videos selected` even when YouTube returned playlist entries.
