@@ -353,31 +353,49 @@ public partial class DashboardViewModel : ViewModelBase
 
             // Show dialog for user to select videos and configure settings
             var dialog = _viewModelManager.CreateDownloadMultipleSetupViewModel();
-            // Set dialog properties with result.Videos, result.Title, etc.
+            dialog.Title = result.Title ?? "Select videos to download";
+            dialog.DownloadDirectory = !string.IsNullOrWhiteSpace(
+                _settingsService.DefaultDownloadPath
+            )
+                ? _settingsService.DefaultDownloadPath
+                : Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+            dialog.DownloadSubtitles = _settingsService.ShouldInjectSubtitles;
+            dialog.InjectTags = _settingsService.ShouldInjectTags;
+            dialog.SetVideos(result.Videos);
 
             var dialogResult = await _dialogManager.ShowDialogAsync(dialog);
 
             if (dialogResult == true)
             {
+                var formatProfile = CreateFormatProfile(
+                    dialog.SelectedQuality,
+                    dialog.SelectedFormat,
+                    dialog.DownloadSubtitles,
+                    dialog.InjectTags
+                );
+                var reservedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
                 // User confirmed, create downloads for selected videos
-                foreach (var video in result.Videos)
+                foreach (var video in dialog.SelectedVideos)
                 {
-                    var downloadPath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
-                        $"{video.Title}.mp4"
+                    var extension = dialog.SelectedFormat.ToLowerInvariant();
+                    var requestedPath = Path.Combine(
+                        dialog.DownloadDirectory,
+                        $"{SanitizeFileName(video.Title)}.{extension}"
                     );
+                    var downloadPath = GetUniqueBatchFilePath(requestedPath, reservedPaths);
 
                     var downloadItem = await _downloadService.CreateDownloadAsync(
                         video,
                         downloadPath,
-                        null,
+                        formatProfile,
                         result.Platform
                     );
                     Downloads.Add(downloadItem);
                     await _downloadService.StartDownloadAsync(downloadItem);
                 }
 
-                _snackbarManager.Notify($"Added {result.Videos.Count} videos to queue");
+                _snackbarManager.Notify($"Added {dialog.SelectedVideos.Count} videos to queue");
             }
         }
         catch (Exception ex)
@@ -385,6 +403,25 @@ public partial class DashboardViewModel : ViewModelBase
             _snackbarManager.NotifyError($"Failed to process videos: {ex.Message}");
             await ShowErrorDialogAsync(ex, "Multiple Download Failed");
         }
+    }
+
+    private static string GetUniqueBatchFilePath(
+        string requestedPath,
+        HashSet<string> reservedPaths
+    )
+    {
+        var candidate = DownloadSingleSetupViewModel.GetUniqueFilePath(requestedPath);
+        var directory = Path.GetDirectoryName(candidate) ?? string.Empty;
+        var fileName = Path.GetFileNameWithoutExtension(candidate);
+        var extension = Path.GetExtension(candidate);
+        var suffix = 1;
+
+        while (!reservedPaths.Add(candidate))
+        {
+            candidate = Path.Combine(directory, $"{fileName} ({suffix++}){extension}");
+        }
+
+        return candidate;
     }
 
     [RelayCommand]

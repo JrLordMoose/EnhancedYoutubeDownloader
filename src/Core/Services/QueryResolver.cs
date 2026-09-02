@@ -77,8 +77,16 @@ public class QueryResolver : IQueryResolver
                 Platform = platform,
                 Video = genericVideo,
                 Title = genericVideo.Title,
-                Author = platform.ToString()
+                Author = platform.ToString(),
             };
+        }
+
+        // A watch URL can also contain a playlist. Prefer the playlist whenever a
+        // list parameter is present so pasted watch-and-list URLs open batch selection.
+        var playlistId = ExtractPlaylistId(query);
+        if (playlistId != null)
+        {
+            return await ResolvePlaylistAsync(playlistId, platform);
         }
 
         // Try to resolve as video URL
@@ -94,12 +102,14 @@ public class QueryResolver : IQueryResolver
                     Platform = platform,
                     Video = video,
                     Title = video.Title,
-                    Author = video.Author.ChannelTitle
+                    Author = video.Author.ChannelTitle,
                 };
             }
             catch (Exception ex)
             {
-                TraceLog.Write($"[QUERY] YoutubeExplode metadata failed, falling back to yt-dlp: {ex.Message}");
+                TraceLog.Write(
+                    $"[QUERY] YoutubeExplode metadata failed, falling back to yt-dlp: {ex.Message}"
+                );
                 var url = query.Contains("://", StringComparison.Ordinal)
                     ? query
                     : $"https://www.youtube.com/watch?v={videoId}";
@@ -110,16 +120,9 @@ public class QueryResolver : IQueryResolver
                     Platform = PlatformType.YouTube,
                     Video = fallback,
                     Title = fallback.Title,
-                    Author = "YouTube"
+                    Author = "YouTube",
                 };
             }
-        }
-
-        // Try to resolve as playlist URL
-        var playlistId = ExtractPlaylistId(query);
-        if (playlistId != null)
-        {
-            return await ResolvePlaylistAsync(playlistId, platform);
         }
 
         // Try to resolve as channel URL
@@ -145,8 +148,8 @@ public class QueryResolver : IQueryResolver
         if (string.IsNullOrWhiteSpace(query))
             return false;
 
-        return query.Contains("youtube.com", StringComparison.OrdinalIgnoreCase) ||
-               query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase);
+        return query.Contains("youtube.com", StringComparison.OrdinalIgnoreCase)
+            || query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -160,30 +163,38 @@ public class QueryResolver : IQueryResolver
         query = query.Trim();
 
         // Check for YouTube URLs
-        if (query.Contains("youtube.com", StringComparison.OrdinalIgnoreCase) ||
-            query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase))
+        if (
+            query.Contains("youtube.com", StringComparison.OrdinalIgnoreCase)
+            || query.Contains("youtu.be", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return PlatformType.YouTube;
         }
 
         // Check for TikTok URLs
-        if (TikTokUrlRegex.IsMatch(query) ||
-            query.Contains("tiktok.com", StringComparison.OrdinalIgnoreCase))
+        if (
+            TikTokUrlRegex.IsMatch(query)
+            || query.Contains("tiktok.com", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return PlatformType.TikTok;
         }
 
         // Check for Instagram URLs
-        if (InstagramUrlRegex.IsMatch(query) ||
-            query.Contains("instagram.com", StringComparison.OrdinalIgnoreCase))
+        if (
+            InstagramUrlRegex.IsMatch(query)
+            || query.Contains("instagram.com", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return PlatformType.Instagram;
         }
 
         // Check for Twitter/X URLs
-        if (TwitterUrlRegex.IsMatch(query) ||
-            query.Contains("twitter.com", StringComparison.OrdinalIgnoreCase) ||
-            query.Contains("x.com", StringComparison.OrdinalIgnoreCase))
+        if (
+            TwitterUrlRegex.IsMatch(query)
+            || query.Contains("twitter.com", StringComparison.OrdinalIgnoreCase)
+            || query.Contains("x.com", StringComparison.OrdinalIgnoreCase)
+        )
         {
             return PlatformType.Twitter;
         }
@@ -257,13 +268,15 @@ public class QueryResolver : IQueryResolver
             Duration = video.Duration ?? TimeSpan.Zero,
             Description = video.Description,
             Keywords = video.Keywords.ToList(),
-            Thumbnails = video.Thumbnails.Select(t => new CachedThumbnail
-            {
-                Url = t.Url,
-                Width = t.Resolution.Width,
-                Height = t.Resolution.Height
-            }).ToList(),
-            UploadDate = video.UploadDate
+            Thumbnails = video
+                .Thumbnails.Select(t => new CachedThumbnail
+                {
+                    Url = t.Url,
+                    Width = t.Resolution.Width,
+                    Height = t.Resolution.Height,
+                })
+                .ToList(),
+            UploadDate = video.UploadDate,
         };
 
         await _cacheService.SetVideoMetadataAsync(videoId, cachedVideo, TimeSpan.FromHours(24));
@@ -288,7 +301,7 @@ public class QueryResolver : IQueryResolver
             Videos = videos,
             Title = playlist.Title,
             Description = playlist.Description,
-            Author = playlist.Author?.ChannelTitle
+            Author = playlist.Author?.ChannelTitle,
         };
     }
 
@@ -309,11 +322,14 @@ public class QueryResolver : IQueryResolver
             Videos = videos,
             Title = channel.Title,
             Description = null,
-            Author = channel.Title
+            Author = channel.Title,
         };
     }
 
-    private async Task<QueryResult> ResolveChannelByHandleAsync(string handle, PlatformType platform)
+    private async Task<QueryResult> ResolveChannelByHandleAsync(
+        string handle,
+        PlatformType platform
+    )
     {
         // YoutubeExplode supports handles via ChannelHandle
         var channelHandle = new ChannelHandle(handle);
@@ -332,7 +348,7 @@ public class QueryResolver : IQueryResolver
             Videos = videos,
             Title = channel.Title,
             Description = null,
-            Author = channel.Title
+            Author = channel.Title,
         };
     }
 
@@ -344,7 +360,8 @@ public class QueryResolver : IQueryResolver
         await foreach (var video in _youtubeClient.Search.GetVideosAsync(searchQuery))
         {
             videos.Add(video);
-            if (++count >= 20) break;
+            if (++count >= 20)
+                break;
         }
 
         return new QueryResult
@@ -354,7 +371,7 @@ public class QueryResolver : IQueryResolver
             Videos = videos,
             Title = $"Search results for: {searchQuery}",
             Description = null,
-            Author = null
+            Author = null,
         };
     }
 }

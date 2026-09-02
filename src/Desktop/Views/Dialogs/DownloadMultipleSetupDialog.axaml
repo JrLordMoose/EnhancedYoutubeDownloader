@@ -6,7 +6,8 @@
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="800"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.DownloadMultipleSetupDialog"
              x:DataType="vm:DownloadMultipleSetupViewModel"
-             MinWidth="600" MaxWidth="800">
+             MinWidth="600" MaxWidth="800"
+             Height="620" MaxHeight="720">
 
     <Design.DataContext>
         <vm:DownloadMultipleSetupViewModel />
@@ -47,18 +48,20 @@
                     <Grid ColumnDefinitions="*,Auto,Auto">
                         <TextBlock Grid.Column="0"
                                   x:Name="SelectionCountText"
-                                  Text="0 of 0 videos selected"
+                                  Text="{Binding SelectionSummary}"
                                   FontSize="14"
                                   VerticalAlignment="Center"
                                   FontWeight="Medium"/>
                         <Button Grid.Column="1"
                                x:Name="SelectAllButton"
                                Content="Select All"
+                               Command="{Binding SelectAllCommand}"
                                Theme="{DynamicResource MaterialOutlineButton}"
                                Margin="0,0,8,0"/>
                         <Button Grid.Column="2"
                                x:Name="SelectNoneButton"
                                Content="Select None"
+                               Command="{Binding SelectNoneCommand}"
                                Theme="{DynamicResource MaterialOutlineButton}"/>
                     </Grid>
                 </Border>
@@ -93,14 +96,14 @@
 
                 <!-- Video List -->
                 <ScrollViewer Grid.Row="2">
-                    <ItemsControl ItemsSource="{Binding Videos}">
+                    <ItemsControl ItemsSource="{Binding VideoItems}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="vm:PlaylistVideoSelection">
                                 <Border Background="{DynamicResource MaterialDesignCardBackground}"
                                         BorderBrush="{DynamicResource MaterialDesignDivider}"
                                         BorderThickness="0,0,0,1"
@@ -109,25 +112,25 @@
                                         <!-- Checkbox -->
                                         <CheckBox Grid.Column="0"
                                                  x:Name="VideoCheckBox"
-                                                 IsChecked="{Binding $parent[UserControl].DataContext.SelectAll}"
+                                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                  VerticalAlignment="Center"
                                                  Margin="0,0,16,0"/>
 
                                         <!-- Video Info -->
                                         <StackPanel Grid.Column="1" Spacing="4">
-                                            <TextBlock Text="{Binding Title}"
+                                            <TextBlock Text="{Binding Video.Title}"
                                                       FontSize="14"
                                                       TextWrapping="Wrap"
                                                       MaxLines="2"
                                                       FontWeight="Medium"/>
-                                            <TextBlock Text="{Binding Author.ChannelTitle}"
+                                            <TextBlock Text="{Binding Video.Author.ChannelTitle}"
                                                       FontSize="12"
                                                       Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                                         </StackPanel>
 
                                         <!-- Duration -->
                                         <TextBlock Grid.Column="2"
-                                                  Text="{Binding Duration}"
+                                                  Text="{Binding DurationText}"
                                                   FontSize="13"
                                                   VerticalAlignment="Center"
                                                   TextAlignment="Right"
@@ -157,15 +160,10 @@
                             <TextBlock Text="Quality"
                                       FontSize="13"
                                       Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            <ComboBox x:Name="QualityComboBox"
-                                     SelectedIndex="0"
+                            <ComboBox ItemsSource="{Binding QualityOptions}"
+                                     SelectedItem="{Binding SelectedQuality}"
                                      HorizontalAlignment="Stretch"
                                      Theme="{DynamicResource MaterialFilledComboBox}">
-                                <ComboBoxItem Content="Best Quality"/>
-                                <ComboBoxItem Content="1080p"/>
-                                <ComboBoxItem Content="720p"/>
-                                <ComboBoxItem Content="480p"/>
-                                <ComboBoxItem Content="Audio Only"/>
                             </ComboBox>
                         </StackPanel>
 
@@ -174,13 +172,10 @@
                             <TextBlock Text="Format"
                                       FontSize="13"
                                       Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            <ComboBox x:Name="FormatComboBox"
-                                     SelectedIndex="0"
+                            <ComboBox ItemsSource="{Binding FormatOptions}"
+                                     SelectedItem="{Binding SelectedFormat}"
                                      HorizontalAlignment="Stretch"
                                      Theme="{DynamicResource MaterialFilledComboBox}">
-                                <ComboBoxItem Content="MP4"/>
-                                <ComboBoxItem Content="WebM"/>
-                                <ComboBoxItem Content="MP3"/>
                             </ComboBox>
                         </StackPanel>
 
@@ -192,12 +187,14 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBox Grid.Column="0"
                                         x:Name="LocationTextBox"
+                                        Text="{Binding DownloadDirectory, Mode=TwoWay}"
                                         Watermark="Select folder for downloads..."
                                         Theme="{DynamicResource MaterialFilledTextBox}"
                                         Margin="0,0,8,0"/>
                                 <Button Grid.Column="1"
                                        x:Name="BrowseButton"
                                        Content="Browse"
+                                       Command="{Binding BrowseCommand}"
                                        Theme="{DynamicResource MaterialOutlineButton}"
                                        VerticalAlignment="Stretch"/>
                             </Grid>
@@ -218,10 +215,13 @@
                            Spacing="12">
                     <Button x:Name="CancelButton"
                            Content="Cancel"
+                           Command="{Binding CancelCommand}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>
                     <Button x:Name="DownloadButton"
                            Content="Download Selected"
+                           Command="{Binding ConfirmCommand}"
+                           IsEnabled="{Binding CanDownload}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="150"/>
                 </StackPanel>

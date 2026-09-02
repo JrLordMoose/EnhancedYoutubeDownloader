@@ -1,6 +1,6 @@
 # Context Learning Index
 
-**Last Updated**: 2026-08-22 20:15 · **Total**: 2 · **Critical**: 1
+**Last Updated**: 2026-09-02 15:35 · **Total**: 3 · **Critical**: 1
 
 ---
 
@@ -8,6 +8,7 @@
 
 | Date | Title | Category | Key Takeaway |
 |---|---|---|---|
+| 2026-09-02 | [Visible Dialog, Broken Data Handoff](September%202026/2026-09-02_Context_Session_38.md) | ui | Test the full state transition, not merely whether a dialog opens. Wire required data, commands, selected subset, and downstream settings. |
 | 2026-08-22 | [yt-dlp Requires a Bundled JavaScript Runtime](August%202026/2026-08-22_Context_Session_37.md) | build | A yt-dlp `403` is a **missing JS runtime** until proven otherwise. Run the bundled `yt-dlp.exe` manually and read stderr before touching C# code. Ship QuickJS alongside it. |
 
 ---
@@ -43,6 +44,12 @@
   - Never pin `youtube:player_client` for speed — no gain, degrades quality
   - Only per-download lever left: ~1.9s PyInstaller startup
 
+### UI
+
+- [2026-09-02 - A Visible Dialog Can Still Have a Broken Data Handoff](September%202026/2026-09-02_Context_Session_38.md)
+  - Verify resolved data reaches the dialog view model.
+  - Exercise every command and confirm only selected items reach downstream work.
+
 ### API
 
 _(none yet)_
@@ -51,7 +58,7 @@ _(none yet)_
 
 - See the **cross-reference warning** in the build learning: Session 34's cookie/auth 403 fix is a *different* bug from the Session 37 JS-runtime 403. Same symptom, unrelated cause.
 
-### Database / UI / Testing / Config / Process
+### Database / Testing / Config
 
 _(none yet)_
 
@@ -63,7 +70,8 @@ _(none yet)_
 |---|---|
 | `src/Core/Services/YtDlpDownloadService.cs` | External runtime dependency (JS engine). Downloads fail app-wide with a misleading 403 if `qjs.exe` is missing from the output directory. |
 | `src/Desktop/yt-dlp.exe` | Goes stale and breaks against YouTube within months. Startup self-update now mitigates this — do not remove it. |
-| `.github/workflows/` | Pushes rejected — token lacks `workflow` scope. |
+| `.github/workflows/` | Pushes rejected - token lacks `workflow` scope. |
+| `src/Desktop/ViewModels/Dialogs/DownloadMultipleSetupViewModel.cs` | Batch UI was historically scaffold-only; test full state handoff when changing playlist, channel, or search workflows. |
 
 ---
 

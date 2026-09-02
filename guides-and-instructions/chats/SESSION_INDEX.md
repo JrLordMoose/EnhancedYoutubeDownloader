@@ -1,8 +1,8 @@
 # Session Index
 
-**Last Updated:** 2026-08-22
-**Total Sessions:** 37
-**Date Range:** Session 1 (Initial commit) to Session 37 (2026-08-22)
+**Last Updated:** 2026-09-02
+**Total Sessions:** 38
+**Date Range:** Session 1 (Initial commit) to Session 38 (2026-09-02)
 
 ---
 
@@ -20,6 +20,9 @@
 ## Sessions by Date
 
 ### 2026
+
+#### September
+- **Session 38** (2026-09-02) - [YouTube Playlist Download Fix and Release v0.4.7](#session-38)
 
 #### August
 - **Session 37** (2026-08-22) - [Critical 403 Fix: Bundled JS Runtime & Release v0.4.6](#session-37) ⭐ **CRITICAL FIX**
@@ -302,6 +305,22 @@
 ---
 
 ## Session Details
+
+<a name="session-38"></a>
+### Session 38
+**Title:** YouTube Playlist Download Fix and Release v0.4.7
+**Date:** 2026-09-02
+**Type:** Bug Fix + Workflow Completion + Release
+**Status:** Complete
+**Version:** v0.4.7
+
+**Summary:** Fixed the batch dialog displaying zero videos even though playlist resolution succeeded. Completed all playlist-selection controls, honored selected videos and settings, fixed cancellation, verified the reported 12-video playlist, and released both required v0.4.7 artifacts.
+
+**Keywords:** playlist, 0 of 0, batch download, selection, YouTube playlist, v0.4.7, dialog binding
+
+**Session Log:** [Session 38](Session_38_YouTube_Playlist_Download_Fix_Release_v0.4.7.md)
+
+---
 
 <a name="session-37"></a>
 ### Session 37
