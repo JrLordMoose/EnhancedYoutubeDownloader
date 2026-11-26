@@ -52,9 +52,7 @@ public class UpdateCoordinator
         // when a local test package folder is configured, so real GitHub updates always ask.
         if (
             Environment.GetEnvironmentVariable("EYD_UPDATE_AUTOACCEPT") == "1"
-            && !string.IsNullOrWhiteSpace(
-                Environment.GetEnvironmentVariable(UpdateService.LocalSourceVariable)
-            )
+            && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("EYD_UPDATE_SOURCE"))
         )
         {
             return true;

@@ -955,6 +955,8 @@ public partial class DashboardViewModel : ViewModelBase
                     + "that file to retry. Your cookies stay on this computer.";
             dialog.PrimaryButtonText = useFirefox ? "Use Firefox & Retry" : "Choose cookies.txt";
             dialog.SecondaryButtonText = "Not Now";
+            dialog.HelpLinkText = "How do I get a cookies.txt file? (step-by-step guide)";
+            dialog.HelpLinkUrl = BrowserCookieHelper.GuideUrl;
 
             var result = await _dialogManager.ShowDialogAsync(dialog);
             if (result != true)

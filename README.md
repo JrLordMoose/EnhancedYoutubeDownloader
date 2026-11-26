@@ -30,7 +30,7 @@ Experience our professional landing page featuring:
 - ✅ Subtitles in your language: embedded, burned-in, or a separate .srt file
 - ✅ Optional AI-generated subtitles (Whisper) when a video has none
 - ✅ Metadata tagging and thumbnails
-- ✅ **Sign-in support (cookies)** - Choose a `cookies.txt` file (or use Firefox's cookies) in Settings → Advanced → Authentication. Needed for private/age-restricted videos, Instagram, Reddit, and YouTube's "Sign in to confirm you're not a bot" check. On Windows, Chrome/Edge/Brave cookies can't be read directly, so export a `cookies.txt` instead.
+- ✅ **Sign-in support (cookies)** - Choose a `cookies.txt` file (or use Firefox's cookies) in Settings → Advanced → Authentication. Needed for private/age-restricted videos, Instagram, Reddit, and YouTube's "Sign in to confirm you're not a bot" check. On Windows, Chrome/Edge/Brave cookies can't be read directly, so export a `cookies.txt` instead. **[Step-by-step cookies guide](COOKIES_GUIDE.md)** (what it is, when you need it, setup, and fixes).
 
 ### Enhanced Features
 - 🚀 **Unified Queue Management** - Single pane for all download states
@@ -41,6 +41,47 @@ Experience our professional landing page featuring:
 - 🚀 **Light and Dark Themes** - Follows Windows automatically or pick one
 - 🚀 **Better Feedback** - Notifications when downloads finish, selectable/copyable text
 - 🚀 **Performance Optimization** - Parallel downloads and retry logic
+
+## 📘 How to Use
+
+1. **Paste a link (or search).** Paste a video, Short, playlist or channel link from any supported site, or type words to search YouTube, then press Enter or **Download**. The app fetches the real title and thumbnail first.
+2. **Pick quality, format and where to save.** MP4 is video that plays everywhere, WebM is smaller video, and MP3 is audio only. Choose a quality (Best, 1080p, 720p, 480p, 360p or Audio Only), subtitles and tags. For playlists, tick the videos you want.
+3. **Manage downloads.** Each one shows progress, speed and time left. You can Pause, Resume (restarts that download), Cancel, Restart, Delete, or **Open** the finished file. Select any title or error and right-click › **Copy**.
+4. **If a site asks you to sign in,** the app asks automatically. Choose a `cookies.txt` file. See the **[🍪 Cookies Guide](COOKIES_GUIDE.md)**.
+
+### Supported Platforms
+
+| | Platforms |
+|---|---|
+| ✅ **Works out of the box** | YouTube (videos, Shorts, playlists, channels, youtu.be and m.youtube.com links), TikTok, X / Twitter, Facebook, Dailymotion, Twitch clips, SoundCloud (audio), direct video links (.mp4) |
+| 🔐 **Needs sign-in (cookies.txt)** | Instagram, Reddit, Vimeo, and YouTube videos that are private, age-restricted or blocked by "Sign in to confirm you're not a bot" |
+| ➕ **Also** | 1,800+ other sites supported by yt-dlp. Paste the link and try it. DRM-protected videos (paid streaming) can't be downloaded. |
+
+### Settings Explained
+
+| Tab | Setting | What it does |
+|---|---|---|
+| **General** | Theme | Light, Dark, or Auto (follows Windows) |
+| | Automatic Updates | Checks for a new version at startup and asks before installing. **Check for updates now** checks any time. |
+| **Downloads** | Parallel Downloads | How many download at once (the rest wait in line) |
+| | Default Quality / Format / MP3 Quality | What the download window starts with; MP3 Quality sets the audio bitrate (Best VBR, 320, 192, 128 kbps) |
+| | Subtitles / Subtitle Language / Style | Download subtitles in your language: **Embedded** (toggle in your player), **Burned-In** (always visible) or a separate **.srt** file |
+| | AI Subtitles | Creates subtitles with Whisper when a video has none (slower; downloads a ~74 MB model once) |
+| | Tags | Adds title, artist and cover art to the file |
+| | Auto-start / Open Folder / Notify When Done | Start downloads right away, open the folder when one finishes, show a notification |
+| | Storage | Default download folder, and where the app keeps its cache (restart after changing) |
+| **Advanced** | Authentication | A **cookies.txt** file for sites that need sign-in (recommended), or browser cookies (only Firefox works on Windows). See the [Cookies Guide](COOKIES_GUIDE.md). |
+| | Cache Management | Shows the size of saved video info and clears it |
+| | Installation | Where the app is installed (updates go here), with **Open in Explorer** and **Uninstall** |
+| | Reset / About | Restore every setting to default, see your version, check for updates |
+
+### Updating
+
+The app checks for updates at startup and asks **Update Now / Later**. Update Now shows the download progress and the install folder, then the app closes, installs and reopens by itself (about 10–20 seconds). Later installs it the next time you close the app.
+
+> **On v0.4.8 or older?** Those versions can't finish an automatic update. Download and run the latest installer from [Releases](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/latest). It updates in place and keeps your downloads. On **v0.4.9**, choose **Update Now** (not Later) when prompted.
+
+---
 
 ## Technology Stack
 
@@ -58,7 +99,7 @@ Experience our professional landing page featuring:
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.10.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.10/EnhancedYoutubeDownloader-Setup-v0.4.10.exe)** (~84 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.11.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.11/EnhancedYoutubeDownloader-Setup-v0.4.11.exe)** (~84 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
@@ -205,7 +246,7 @@ dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x6
 # 2. Build installer with Inno Setup
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.10.exe
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.11.exe
 ```
 
 **Installer Features:**

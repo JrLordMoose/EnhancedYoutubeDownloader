@@ -246,3 +246,20 @@ public class Session39ClassifierWarningTests
         format.Should().StartWith("bestvideo[height<=720][ext=mp4][vcodec^=avc1]+bestaudio[ext=m4a]");
     }
 }
+
+public class Session39CookieRetryTests
+{
+    [Fact]
+    public void RemoveBrowserCookieOption_StripsOnlyBrowserCookies()
+    {
+        var options = new YoutubeDLSharp.Options.OptionSet { NoPlaylist = true };
+        options.AddCustomOption("--cookies-from-browser", "brave");
+        options.AddCustomOption("--cookies", @"C:\c.txt");
+
+        YtDlpDownloadService.RemoveBrowserCookieOption(options).Should().BeTrue();
+
+        options.ToString().Should().NotContain("--cookies-from-browser");
+        options.ToString().Should().Contain("--cookies");
+        YtDlpDownloadService.RemoveBrowserCookieOption(options).Should().BeFalse();
+    }
+}

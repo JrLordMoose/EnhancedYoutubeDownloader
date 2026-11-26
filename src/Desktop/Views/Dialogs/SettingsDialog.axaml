@@ -496,6 +496,13 @@
                                                Theme="{DynamicResource MaterialOutlineButton}"
                                                VerticalAlignment="Stretch"/>
                                     </Grid>
+                                    <Button Content="How do I get a cookies.txt file? (step-by-step guide)"
+                                            Command="{Binding OpenCookiesGuideCommand}"
+                                            Theme="{DynamicResource MaterialFlatButton}"
+                                            Foreground="{DynamicResource AppAccentTextBrush}"
+                                            HorizontalAlignment="Left"
+                                            Padding="0"
+                                            Margin="0,4,0,0"/>
                                 </StackPanel>
 
                                 <!-- Use Browser Cookies Toggle -->
@@ -526,12 +533,12 @@
                                              HorizontalAlignment="Stretch"
                                              VerticalAlignment="Center"
                                              Theme="{DynamicResource MaterialFilledComboBox}">
-                                        <ComboBoxItem Content="Chrome" Tag="chrome"/>
-                                        <ComboBoxItem Content="Firefox" Tag="firefox"/>
-                                        <ComboBoxItem Content="Edge" Tag="edge"/>
-                                        <ComboBoxItem Content="Opera" Tag="opera"/>
-                                        <ComboBoxItem Content="Brave" Tag="brave"/>
-                                        <ComboBoxItem Content="Chromium" Tag="chromium"/>
+                                        <ComboBoxItem Content="Chrome (blocked on Windows)" Tag="chrome"/>
+                                        <ComboBoxItem Content="Firefox (recommended)" Tag="firefox"/>
+                                        <ComboBoxItem Content="Edge (blocked on Windows)" Tag="edge"/>
+                                        <ComboBoxItem Content="Opera (blocked on Windows)" Tag="opera"/>
+                                        <ComboBoxItem Content="Brave (blocked on Windows)" Tag="brave"/>
+                                        <ComboBoxItem Content="Chromium (blocked on Windows)" Tag="chromium"/>
                                     </ComboBox>
                                 </Grid>
 

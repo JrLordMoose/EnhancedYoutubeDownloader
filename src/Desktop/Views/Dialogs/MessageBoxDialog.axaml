@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="300"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.MessageBoxDialog"
              x:DataType="vm:MessageBoxViewModel"
-             MinWidth="300" MaxWidth="600">
+             Width="560">
 
     <Design.DataContext>
         <vm:MessageBoxViewModel />
@@ -47,13 +47,26 @@
             </Border>
 
             <!-- Message Content -->
+            <!-- Width is fixed on the control and horizontal scrolling disabled so the text is
+                 measured at the width it's drawn at (it was clipped mid-sentence before). -->
             <ScrollViewer Grid.Row="1"
                          MaxHeight="400"
+                         HorizontalScrollBarVisibility="Disabled"
+                         VerticalScrollBarVisibility="Auto"
                          Padding="24,20">
-                <SelectableTextBlock Text="{Binding Message}"
-                          FontSize="14"
-                          TextWrapping="Wrap"
-                          LineHeight="24"/>
+                <StackPanel Spacing="12">
+                    <SelectableTextBlock Text="{Binding Message}"
+                              FontSize="14"
+                              TextWrapping="Wrap"/>
+                    <!-- Optional "learn more" link, e.g. the cookies guide -->
+                    <Button Content="{Binding HelpLinkText}"
+                            Command="{Binding OpenHelpLinkCommand}"
+                            IsVisible="{Binding HelpLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            Theme="{DynamicResource MaterialFlatButton}"
+                            Foreground="{DynamicResource AppAccentTextBrush}"
+                            HorizontalAlignment="Left"
+                            Padding="0"/>
+                </StackPanel>
             </ScrollViewer>
 
             <!-- Action Buttons -->

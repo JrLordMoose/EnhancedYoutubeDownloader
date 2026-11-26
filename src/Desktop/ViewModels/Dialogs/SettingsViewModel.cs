@@ -278,6 +278,24 @@ public partial class SettingsViewModel : DialogViewModelBase
     public bool CanUninstall => OperatingSystem.IsWindows() && File.Exists(UninstallerPath);
 
     [RelayCommand]
+    private void OpenCookiesGuide()
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo(BrowserCookieHelper.GuideUrl)
+                {
+                    UseShellExecute = true,
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            TraceLog.Write($"[SETTINGS] Could not open cookies guide: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private void OpenInstallFolder()
     {
         try

@@ -512,6 +512,21 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 overrideOptions: options
             );
 
+            // Browser cookies couldn't be read (Chrome/Edge/Brave on Windows): that shouldn't
+            // fail a download that may not need sign-in at all. Retry once without them.
+            if (!result.Success
+                && YtDlpErrorClassifier.Classify(string.Join(", ", result.ErrorOutput)) == YtDlpErrorKind.CookieReadFailed
+                && RemoveBrowserCookieOption(options))
+            {
+                TraceLog.Write("[YTDLP] Browser cookies unreadable; retrying without them");
+                result = await _ytdl.RunVideoDownload(
+                    downloadItem.Video!.Url,
+                    progress: progress,
+                    ct: cancellationToken,
+                    overrideOptions: options
+                );
+            }
+
             if (!result.Success)
             {
                 TraceLog.Write($"[YTDLP] Download failed: {string.Join(", ", result.ErrorOutput)}");
@@ -1203,6 +1218,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             ApplyCookieOptions(options);
 
             var result = await _ytdl.RunVideoDataFetch(url, timeout.Token, flat: false, overrideOptions: options);
+            if (!result.Success
+                && YtDlpErrorClassifier.Classify(string.Join(", ", result.ErrorOutput ?? [])) == YtDlpErrorKind.CookieReadFailed
+                && RemoveBrowserCookieOption(options))
+            {
+                result = await _ytdl.RunVideoDataFetch(url, timeout.Token, flat: false, overrideOptions: options);
+            }
             if (!result.Success || result.Data == null || string.IsNullOrWhiteSpace(result.Data.Title))
             {
                 TraceLog.Write($"[YTDLP] Metadata fetch failed: {string.Join(", ", result.ErrorOutput ?? [])}");
@@ -1272,6 +1293,16 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         {
             _activeDownloads = Math.Max(0, _activeDownloads - 1);
         }
+    }
+
+    /// <summary>Removes --cookies-from-browser if present. Returns true when something was removed.</summary>
+    internal static bool RemoveBrowserCookieOption(OptionSet options)
+    {
+        if (!options.ToString().Contains("--cookies-from-browser", StringComparison.Ordinal))
+            return false;
+
+        options.DeleteCustomOption("--cookies-from-browser");
+        return !options.ToString().Contains("--cookies-from-browser", StringComparison.Ordinal);
     }
 
     private void ApplyCookieOptions(OptionSet options)
