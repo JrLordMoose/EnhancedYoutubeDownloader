@@ -17,13 +17,22 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     private readonly Subject<DownloadItem> _downloadStatusChanged = new();
     private readonly Subject<double> _overallProgress = new();
     private readonly YoutubeDL _ytdl;
-    private readonly SemaphoreSlim _downloadSemaphore;
+    private readonly object _slotLock = new();
+    private readonly int _defaultParallelLimit;
+    private int _activeDownloads;
+    private readonly ISubtitleGenerationService? _subtitleGenerationService;
     private readonly DownloadStateRepository _stateRepository;
     private readonly ISubtitleBurnInService _subtitleBurnInService;
     private readonly object _settingsService;
 
-    public YtDlpDownloadService(ISubtitleBurnInService subtitleBurnInService, object settingsService, int maxConcurrentDownloads = 3)
+    public YtDlpDownloadService(
+        ISubtitleBurnInService subtitleBurnInService,
+        object settingsService,
+        int maxConcurrentDownloads = 3,
+        ISubtitleGenerationService? subtitleGenerationService = null,
+        DownloadStateRepository? stateRepository = null)
     {
+        _subtitleGenerationService = subtitleGenerationService;
         _subtitleBurnInService = subtitleBurnInService ?? throw new ArgumentNullException(nameof(subtitleBurnInService));
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         // Initialize YoutubeDL with path to yt-dlp.exe
@@ -38,11 +47,16 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             YoutubeDLPath = ytdlpPath,
             FFmpegPath = ffmpegPath,
             OutputFolder = Path.GetTempPath(),
-            OverwriteFiles = false
+            // Pause/resume and Restart re-run yt-dlp on the same path. Without overwriting,
+            // yt-dlp saw the cut-off file from the earlier run, said "already downloaded"
+            // and the item showed Completed with a truncated video. Paths are made unique
+            // when the download is created, so this only ever replaces our own partial file.
+            OverwriteFiles = true
         };
 
-        _downloadSemaphore = new SemaphoreSlim(maxConcurrentDownloads, maxConcurrentDownloads);
-        _stateRepository = new DownloadStateRepository();
+        _defaultParallelLimit = Math.Max(1, maxConcurrentDownloads);
+        // Use the DI instance so a custom cache folder is honoured
+        _stateRepository = stateRepository ?? new DownloadStateRepository();
     }
 
     public IObservable<DownloadItem> DownloadStatusChanged => _downloadStatusChanged;
@@ -213,6 +227,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             File.Delete(downloadItem.PartialFilePath);
         }
 
+        // Remove the cut-off output and per-stream fragments of the stopped run
+        DeletePartialOutputs(downloadItem);
+
         // Delete saved state
         await _stateRepository.DeleteStateAsync(downloadItem.Id);
 
@@ -273,6 +290,13 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             File.Delete(downloadItem.PartialFilePath);
         }
 
+        // Remove what an unfinished run left behind (a cut-off file, per-stream fragments).
+        // A completed download is the user's file and is never deleted here.
+        if (downloadItem.Status != DownloadStatus.Completed)
+        {
+            DeletePartialOutputs(downloadItem);
+        }
+
         // Delete saved state
         await _stateRepository.DeleteStateAsync(downloadItem.Id);
 
@@ -284,11 +308,22 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     {
         TraceLog.Write($"[YTDLP] ProcessDownloadAsync started for {downloadItem.Id}");
 
+        var slotAcquired = false;
+        var outputComplete = false;
         try
         {
-            // Move WaitAsync inside try block to ensure semaphore is released even on early cancellation
-            await _downloadSemaphore.WaitAsync(cancellationToken);
-            TraceLog.Write($"[YTDLP] Semaphore acquired for {downloadItem.Id}");
+            // Only release a slot we actually hold: canceling while queued must not free a slot.
+            downloadItem.IsWaitingForSlot = true;
+            try
+            {
+                await AcquireSlotAsync(cancellationToken);
+            }
+            finally
+            {
+                downloadItem.IsWaitingForSlot = false;
+            }
+            slotAcquired = true;
+            TraceLog.Write($"[YTDLP] Download slot acquired for {downloadItem.Id}");
 
             if (cancellationToken.IsCancellationRequested)
             {
@@ -330,8 +365,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
             // For BurnedIn subtitles, we need to write .srt file but NOT embed it
             // We'll burn it in post-processing with FFmpeg
-            var shouldEmbedSubs = profile.IncludeSubtitles && profile.SubtitleStyle != SubtitleStyle.BurnedIn;
-            var shouldWriteSubs = profile.IncludeSubtitles; // Always write if subtitles enabled
+            // External keeps the .srt next to the video instead of embedding it.
+            // Audio-only downloads never carry subtitles.
+            var shouldWriteSubs = profile.IncludeSubtitles && !isAudioOnly;
+            var shouldEmbedSubs = shouldWriteSubs && profile.SubtitleStyle == SubtitleStyle.Embedded;
 
             var options = new OptionSet
             {
@@ -344,7 +381,7 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 WriteSubs = shouldWriteSubs,
                 WriteAutoSubs = shouldWriteSubs, // Also download auto-generated captions
                 EmbedSubs = shouldEmbedSubs,
-                SubLangs = "en",
+                SubLangs = ReadSetting("SubtitleLanguage", "en"),
                 SubFormat = shouldWriteSubs ? "srt/best" : null, // Convert to SRT for compatibility
 
                 // Metadata and thumbnail embedding (not supported by WebM)
@@ -357,22 +394,28 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
 
             ApplyCompatibilityOptions(options);
 
-            // Add browser cookies if enabled (helps with 403 errors and private videos)
-            try
+            if (shouldWriteSubs)
             {
-                dynamic settings = _settingsService;
-                if (settings.UseBrowserCookies && !string.IsNullOrEmpty(settings.BrowserForCookies))
-                {
-                    // Add custom argument for cookies-from-browser
-                    // YoutubeDLSharp doesn't have a direct property for this, so we use CustomOptions
-                    options.AddCustomOption("--cookies-from-browser", settings.BrowserForCookies);
-                    TraceLog.Write($"[YTDLP] Using browser cookies from: {settings.BrowserForCookies}");
-                }
+                // --sub-format only *prefers* srt; convert so burn-in/external always get an .srt
+                options.AddCustomOption("--convert-subs", "srt");
             }
-            catch (Exception ex)
+
+            if (!isAudioOnly && profile.Container is "mp4" or "webm")
             {
-                TraceLog.Write($"[YTDLP] Warning: Could not read browser cookie settings: {ex.Message}");
-                // Continue without browser cookies if settings can't be read
+                // Fallback formats can pick streams in another container; keep the requested one
+                options.AddCustomOption("--merge-output-format", profile.Container);
+            }
+
+            // Authentication: a cookies.txt file wins over reading a browser's cookie store,
+            // because Chromium browsers on Windows encrypt cookies so yt-dlp cannot read them.
+            ApplyCookieOptions(options);
+
+            // AI subtitles need the raw .srt on disk (we embed it ourselves afterwards),
+            // so let yt-dlp write subtitles but not embed them when AI fallback is active.
+            var aiSubtitlesActive = IsAiSubtitleFallbackActive(profile, isAudioOnly);
+            if (aiSubtitlesActive)
+            {
+                options.EmbedSubs = false;
             }
 
             // Only set AudioFormat if extracting audio
@@ -383,6 +426,9 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 {
                     options.AudioFormat = audioFormat.Value;
                 }
+
+                // Settings > Downloads > MP3 Quality (0 = best VBR)
+                options.AddCustomOption("--audio-quality", GetAudioQualityArgument(ReadSetting("AudioQuality", 0)));
             }
 
             TraceLog.Write($"[YTDLP] Downloading video: {downloadItem.Video!.Url}");
@@ -395,6 +441,12 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             // Set up progress reporting
             var progress = new Progress<DownloadProgress>(p =>
             {
+                // Progress<T> callbacks run on the thread pool and can arrive late/out of
+                // order; ignore anything after the item left the Started state so a stale
+                // callback can't rewind a Completed/Paused item or re-fire its events.
+                if (downloadItem.Status != DownloadStatus.Started)
+                    return;
+
                 downloadItem.Progress = p.Progress * 100;
 
                 // Parse download size if available
@@ -487,12 +539,10 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                     var searchDir = Path.GetDirectoryName(downloadItem.FilePath) ?? "";
                     var baseFileName = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
 
-                    // Search for files matching the base name
-                    // Order by file size (largest first) to avoid picking up small stub files
-                    var possibleFiles = Directory.GetFiles(searchDir, $"{baseFileName}*")
-                        .Where(f => !string.IsNullOrEmpty(baseFileName) && f.Contains(baseFileName))
-                        .OrderByDescending(f => new FileInfo(f).Length)
-                        .ToList();
+                    var possibleFiles = FindDownloadedFileCandidates(
+                        searchDir,
+                        baseFileName,
+                        downloadItem.StartedAt ?? downloadItem.CreatedAt);
 
                     TraceLog.Write($"[YTDLP] Searching directory: {searchDir}");
                     TraceLog.Write($"[YTDLP] Base filename: {baseFileName}");
@@ -526,10 +576,34 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
                 {
                     downloadItem.FilePath = actualFilePath;
                     TraceLog.Write($"[YTDLP] Final FilePath: {downloadItem.FilePath}");
+                    outputComplete = true;
                 }
                 else
                 {
+                    // yt-dlp reported success but no output exists: that is a failure, not
+                    // "Completed" (QA saw Completed items with no file on disk).
                     TraceLog.Write($"[YTDLP] ERROR: Could not locate downloaded file!");
+                    throw new InvalidOperationException(
+                        "yt-dlp finished but the downloaded file could not be found");
+                }
+
+                // Embedded style: the track is inside the video now, so remove the .srt that
+                // --convert-subs leaves next to it
+                if (shouldEmbedSubs && !aiSubtitlesActive && !string.IsNullOrEmpty(downloadItem.FilePath))
+                {
+                    while (FindSubtitleFile(downloadItem.FilePath) is { } sidecar
+                        && File.GetLastWriteTimeUtc(sidecar) >= (downloadItem.StartedAt ?? downloadItem.CreatedAt).AddSeconds(-5))
+                    {
+                        TryDelete(sidecar);
+                        if (File.Exists(sidecar))
+                            break;
+                    }
+                }
+
+                // Post-processing: AI subtitle fallback when the site provided none
+                if (aiSubtitlesActive && !string.IsNullOrEmpty(downloadItem.FilePath) && File.Exists(downloadItem.FilePath))
+                {
+                    await ProcessAiSubtitlesAsync(downloadItem, profile, cancellationToken);
                 }
 
                 // Post-processing: Burn in subtitles if requested
@@ -583,6 +657,15 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             // Build detailed error message with context
             var errorMessage = BuildDetailedErrorMessage(ex, downloadItem);
 
+            // Don't leave half-written media, thumbnails or subtitle files behind, but never
+            // touch the output once yt-dlp finished it (a later post-processing error must
+            // not delete a good download)
+            if (!outputComplete)
+            {
+                DeletePartialOutputs(downloadItem);
+                DeleteSidecarLeftovers(downloadItem);
+            }
+
             downloadItem.Status = DownloadStatus.Failed;
             downloadItem.ErrorMessage = errorMessage;
             downloadItem.CanPause = false;
@@ -595,9 +678,20 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         }
         finally
         {
-            _downloadSemaphore.Release();
-            TraceLog.Write($"[YTDLP] Semaphore released for {downloadItem.Id}");
-            _cancellationTokens.TryRemove(downloadItem.Id, out _);
+            if (slotAcquired)
+            {
+                ReleaseSlot();
+                TraceLog.Write($"[YTDLP] Download slot released for {downloadItem.Id}");
+            }
+
+            // Only remove OUR token: a quick Pause→Resume registers a new one before this
+            // run finishes, and removing it made the next Pause unable to stop yt-dlp.
+            if (_cancellationTokens.TryGetValue(downloadItem.Id, out var current)
+                && current.Token == cancellationToken)
+            {
+                _cancellationTokens.TryRemove(
+                    new KeyValuePair<string, CancellationTokenSource>(downloadItem.Id, current));
+            }
         }
     }
 
@@ -778,12 +872,15 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         if (string.IsNullOrEmpty(sizeString))
             return false;
 
-        // Try to parse strings like "10.5MiB", "1.2GiB", "500KiB"
-        var trimmed = sizeString.Trim();
+        // Try to parse strings like "10.5MiB", "1.2GiB", "500KiB", "~12.3MiB" (estimate).
+        // yt-dlp always prints '.' decimals, so parse with the invariant culture (on de-DE
+        // "10.50" used to parse as 1050).
+        var trimmed = sizeString.Trim().TrimStart('~').Trim();
         var numberPart = new string(trimmed.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
         var unitPart = trimmed.Substring(numberPart.Length).Trim();
 
-        if (!double.TryParse(numberPart, out double value))
+        if (!double.TryParse(numberPart, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out double value))
             return false;
 
         bytes = unitPart.ToUpperInvariant() switch
@@ -809,17 +906,17 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         };
     }
 
-    private static string BuildFormatString(FormatProfile profile)
+    internal static string BuildFormatString(FormatProfile profile)
     {
-        // Handle audio-only formats
-        if (profile.Quality == "audio-only")
+        // Handle audio-only formats (MP3 is always audio-only). Sites such as TikTok and
+        // Twitter only offer combined streams, so fall back to "best" and extract audio.
+        if (profile.Quality == "audio-only" || profile.Container == "mp3")
         {
             return profile.Container switch
             {
-                "mp3" => "bestaudio",
-                "m4a" => "bestaudio[ext=m4a]/bestaudio",
-                "webm" => "bestaudio[ext=webm]/bestaudio",
-                _ => "bestaudio"
+                "m4a" => "bestaudio[ext=m4a]/bestaudio/best",
+                "webm" => "bestaudio[ext=webm]/bestaudio/best",
+                _ => "bestaudio/best"
             };
         }
 
@@ -833,11 +930,19 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
             _ => "" // highest quality, no filter
         };
 
+        // Preferred container first, then any streams at the requested quality, then
+        // anything at all, so sites without that container (Vimeo, TikTok, Bilibili) still
+        // download; --merge-output-format keeps the requested container where possible.
+        var fallback = $"bestvideo{qualityFilter}+bestaudio/best{qualityFilter}/best";
+
+        // For MP4 prefer H.264 (avc1): YouTube's mp4 video is often AV1 and TikTok's HEVC,
+        // which Windows can't play without extra codec packs and many editors can't open.
         return profile.Container switch
         {
-            "webm" => $"bestvideo{qualityFilter}[ext=webm]+bestaudio[ext=webm]/best{qualityFilter}[ext=webm]",
-            "mp4" => $"bestvideo{qualityFilter}[ext=mp4]+bestaudio[ext=m4a]/best{qualityFilter}[ext=mp4]/best{qualityFilter}",
-            _ => $"bestvideo{qualityFilter}[ext=mp4]+bestaudio[ext=m4a]/best{qualityFilter}[ext=mp4]/best{qualityFilter}"
+            "webm" => $"bestvideo{qualityFilter}[ext=webm]+bestaudio[ext=webm]/best{qualityFilter}[ext=webm]/{fallback}",
+            _ => $"bestvideo{qualityFilter}[ext=mp4][vcodec^=avc1]+bestaudio[ext=m4a]"
+                + $"/best{qualityFilter}[ext=mp4][vcodec^=avc1]"
+                + $"/bestvideo{qualityFilter}[ext=mp4]+bestaudio[ext=m4a]/best{qualityFilter}[ext=mp4]/{fallback}"
         };
     }
 
@@ -845,6 +950,112 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     {
         return profile.Quality == "audio-only" || profile.Container == "mp3";
     }
+
+    private static readonly HashSet<string> MediaExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".mp4", ".webm", ".mkv", ".mov", ".m4a", ".mp3", ".opus", ".ogg", ".aac", ".flac", ".wav",
+    };
+
+    /// <summary>
+    /// Files this download produced under a different name than expected (e.g. "X.mkv" or
+    /// "X.mp4.webm"), largest first. Only "base." prefixes with a media extension that were
+    /// written after the download started qualify, so an older "Intro to Python.mp4" can
+    /// never be picked up (and renamed) for a download named "Intro".
+    /// </summary>
+    internal static List<string> FindDownloadedFileCandidates(string directory, string baseFileName, DateTime startedUtc)
+    {
+        if (string.IsNullOrEmpty(baseFileName) || !Directory.Exists(directory))
+            return [];
+
+        var notBefore = startedUtc.AddSeconds(-5);
+        return Directory
+            .EnumerateFiles(directory)
+            .Where(f =>
+            {
+                var name = Path.GetFileName(f);
+                return name.StartsWith(baseFileName + ".", StringComparison.OrdinalIgnoreCase)
+                    && MediaExtensions.Contains(Path.GetExtension(f))
+                    && File.GetLastWriteTimeUtc(f) >= notBefore;
+            })
+            .OrderByDescending(f => new FileInfo(f).Length)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Removes files a stopped (paused/canceled/deleted) run left behind: the cut-off output
+    /// and yt-dlp's per-stream fragments ("X.f137.mp4"). Same safety rules as above.
+    /// </summary>
+    private static void DeletePartialOutputs(DownloadItem downloadItem)
+    {
+        if (string.IsNullOrEmpty(downloadItem.FilePath))
+            return;
+
+        try
+        {
+            var directory = Path.GetDirectoryName(downloadItem.FilePath) ?? string.Empty;
+            var baseFileName = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
+            var candidates = FindDownloadedFileCandidates(
+                directory, baseFileName, downloadItem.StartedAt ?? downloadItem.CreatedAt);
+
+            foreach (var file in candidates.Append(downloadItem.FilePath).Distinct())
+            {
+                if (File.Exists(file) && File.GetLastWriteTimeUtc(file) >= (downloadItem.StartedAt ?? downloadItem.CreatedAt).AddSeconds(-5))
+                    File.Delete(file);
+            }
+        }
+        catch (Exception ex)
+        {
+            TraceLog.Write($"[YTDLP] Could not clean partial files: {ex.Message}");
+        }
+    }
+
+    private static readonly HashSet<string> SidecarExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg", ".jpeg", ".png", ".webp", ".srt", ".vtt", ".ass", ".part", ".ytdl",
+    };
+
+    /// <summary>
+    /// After a failed download, removes the thumbnail/subtitle/.part files yt-dlp wrote for it
+    /// ("X.jpg", "X.en.srt"). Only "base." names written during this download qualify.
+    /// </summary>
+    private static void DeleteSidecarLeftovers(DownloadItem downloadItem)
+    {
+        if (string.IsNullOrEmpty(downloadItem.FilePath))
+            return;
+
+        try
+        {
+            var directory = Path.GetDirectoryName(downloadItem.FilePath) ?? string.Empty;
+            if (!Directory.Exists(directory))
+                return;
+
+            var baseFileName = Path.GetFileNameWithoutExtension(downloadItem.FilePath);
+            var notBefore = (downloadItem.StartedAt ?? downloadItem.CreatedAt).AddSeconds(-5);
+            foreach (var file in Directory.EnumerateFiles(directory))
+            {
+                if (Path.GetFileName(file).StartsWith(baseFileName + ".", StringComparison.OrdinalIgnoreCase)
+                    && SidecarExtensions.Contains(Path.GetExtension(file))
+                    && File.GetLastWriteTimeUtc(file) >= notBefore)
+                {
+                    File.Delete(file);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            TraceLog.Write($"[YTDLP] Could not clean leftover files: {ex.Message}");
+        }
+    }
+
+    /// <summary>Maps the MP3 Quality setting index to yt-dlp's --audio-quality value.</summary>
+    internal static string GetAudioQualityArgument(int index) =>
+        index switch
+        {
+            1 => "320K",
+            2 => "192K",
+            3 => "128K",
+            _ => "0",
+        };
 
     private static YoutubeDLSharp.Options.AudioConversionFormat? GetAudioFormat(FormatProfile profile)
     {
@@ -893,6 +1104,25 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
     {
         var errorType = ex.GetType().Name;
         var baseMessage = ex.Message;
+
+        // Authentication problems first: their raw text mentions "network"/"unavailable"
+        // and would otherwise be mislabeled. Keep the raw text so the UI can classify it.
+        switch (YtDlpErrorClassifier.Classify(baseMessage))
+        {
+            case YtDlpErrorKind.CookieReadFailed:
+                return "Could not read your browser's cookies (Chrome/Edge lock them on Windows). "
+                    + "Use a cookies.txt file or Firefox in Settings > Advanced > Authentication. "
+                    + $"Details: {baseMessage}";
+            case YtDlpErrorKind.SignInRequired:
+                return "Sign-in required: the site blocked this download until you're signed in. "
+                    + "Add your cookies in Settings > Advanced > Authentication, then click Restart. "
+                    + $"Details: {baseMessage}";
+        }
+
+        if (baseMessage.Contains("DRM protected", StringComparison.OrdinalIgnoreCase))
+        {
+            return "This video is DRM-protected and cannot be downloaded.";
+        }
 
         // Categorize error and add context
         if (ex is UnauthorizedAccessException || ex is System.Security.SecurityException)
@@ -956,6 +1186,222 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Fetches title/channel/thumbnail with yt-dlp (same cookies and JS runtime as downloads).
+    /// Used when YoutubeExplode is blocked (YouTube bot check) and for non-YouTube sites,
+    /// which previously showed "YouTube video" / "Video from TikTok" placeholders.
+    /// </summary>
+    public async Task<IVideo?> TryFetchVideoInfoAsync(string url, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeout.CancelAfter(TimeSpan.FromSeconds(45));
+
+            var options = new OptionSet { NoPlaylist = true };
+            ApplyCompatibilityOptions(options);
+            ApplyCookieOptions(options);
+
+            var result = await _ytdl.RunVideoDataFetch(url, timeout.Token, flat: false, overrideOptions: options);
+            if (!result.Success || result.Data == null || string.IsNullOrWhiteSpace(result.Data.Title))
+            {
+                TraceLog.Write($"[YTDLP] Metadata fetch failed: {string.Join(", ", result.ErrorOutput ?? [])}");
+                return null;
+            }
+
+            var data = result.Data;
+            var author = FirstNonEmpty(data.Uploader, data.Channel, data.Extractor);
+            TimeSpan? duration = data.Duration is > 0 ? TimeSpan.FromSeconds(data.Duration.Value) : null;
+            return new Models.GenericVideo(url, data.Title, data.ID, author, duration, data.Thumbnail);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            TraceLog.Write($"[YTDLP] Metadata fetch error: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static string? FirstNonEmpty(params string?[] values) =>
+        values.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v));
+
+    /// <summary>
+    /// Reads a property from the Desktop settings object (Core cannot reference Desktop).
+    /// Returns <paramref name="fallback"/> when the property is missing or the wrong type.
+    /// </summary>
+    private T ReadSetting<T>(string name, T fallback)
+    {
+        try
+        {
+            var value = _settingsService.GetType().GetProperty(name)?.GetValue(_settingsService);
+            return value is T typed ? typed : fallback;
+        }
+        catch (Exception ex)
+        {
+            TraceLog.Write($"[YTDLP] Could not read setting {name}: {ex.Message}");
+            return fallback;
+        }
+    }
+
+    internal int GetParallelLimit() =>
+        Math.Clamp(ReadSetting("ParallelLimit", _defaultParallelLimit), 1, 10);
+
+    /// <summary>
+    /// Waits for a free download slot. The limit is re-read on every check so changing
+    /// "Parallel downloads" in Settings applies to queued items without a restart.
+    /// </summary>
+    private async Task AcquireSlotAsync(CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            lock (_slotLock)
+            {
+                if (_activeDownloads < GetParallelLimit())
+                {
+                    _activeDownloads++;
+                    return;
+                }
+            }
+
+            await Task.Delay(250, cancellationToken);
+        }
+    }
+
+    private void ReleaseSlot()
+    {
+        lock (_slotLock)
+        {
+            _activeDownloads = Math.Max(0, _activeDownloads - 1);
+        }
+    }
+
+    private void ApplyCookieOptions(OptionSet options)
+    {
+        var cookiesFile = ReadSetting("CookiesFilePath", string.Empty);
+        if (!string.IsNullOrWhiteSpace(cookiesFile))
+        {
+            if (File.Exists(cookiesFile))
+            {
+                options.AddCustomOption("--cookies", cookiesFile);
+                TraceLog.Write("[YTDLP] Using cookies.txt file for authentication");
+                return;
+            }
+
+            TraceLog.Write($"[YTDLP] Warning: cookies file not found, ignoring: {cookiesFile}");
+        }
+
+        var useBrowser = ReadSetting("UseBrowserCookies", false);
+        var browser = ReadSetting("BrowserForCookies", string.Empty);
+        if (useBrowser && !string.IsNullOrWhiteSpace(browser))
+        {
+            options.AddCustomOption("--cookies-from-browser", browser);
+            TraceLog.Write($"[YTDLP] Using browser cookies from: {browser}");
+        }
+    }
+
+    private bool IsAiSubtitleFallbackActive(FormatProfile profile, bool isAudioOnly) =>
+        profile.IncludeSubtitles
+        && !isAudioOnly
+        && _subtitleGenerationService != null
+        && ReadSetting("EnableAISubtitles", false);
+
+    /// <summary>
+    /// Finds the subtitle file yt-dlp wrote next to the video (any language), if any.
+    /// </summary>
+    internal static string? FindSubtitleFile(string videoPath)
+    {
+        var directory = Path.GetDirectoryName(videoPath);
+        if (string.IsNullOrEmpty(directory) || !Directory.Exists(directory))
+            return null;
+
+        var nameWithoutExt = Path.GetFileNameWithoutExtension(videoPath);
+        var exact = Path.Combine(directory, $"{nameWithoutExt}.en.srt");
+        if (File.Exists(exact))
+            return exact;
+
+        // Match by prefix in code rather than a glob: titles can contain glob characters
+        return Directory
+            .EnumerateFiles(directory, "*.srt")
+            .Where(f => Path.GetFileName(f).StartsWith(nameWithoutExt + ".", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(f => new FileInfo(f).Length)
+            .FirstOrDefault();
+    }
+
+    private async Task ProcessAiSubtitlesAsync(
+        DownloadItem downloadItem,
+        FormatProfile profile,
+        CancellationToken cancellationToken)
+    {
+        var videoPath = downloadItem.FilePath!;
+        try
+        {
+            var subtitlePath = FindSubtitleFile(videoPath);
+
+            if (subtitlePath == null)
+            {
+                var language = ReadSetting("AISubtitleLanguage", "auto");
+                subtitlePath = Path.Combine(
+                    Path.GetDirectoryName(videoPath) ?? string.Empty,
+                    $"{Path.GetFileNameWithoutExtension(videoPath)}.srt");
+
+                TraceLog.Write($"[AI-SUBS] No subtitles from source, generating with Whisper ({language})");
+                downloadItem.ErrorMessage = "Generating AI subtitles...";
+                _downloadStatusChanged.OnNext(downloadItem);
+
+                var progress = new Progress<double>(p =>
+                {
+                    downloadItem.ErrorMessage = $"Generating AI subtitles... {p * 100:F0}%";
+                    _downloadStatusChanged.OnNext(downloadItem);
+                });
+
+                var generated = await _subtitleGenerationService!.GenerateSubtitlesAsync(
+                    videoPath, subtitlePath, language, progress, cancellationToken);
+
+                if (!generated || !File.Exists(subtitlePath))
+                {
+                    TraceLog.Write("[AI-SUBS] Generation failed, keeping video without subtitles");
+                    downloadItem.ErrorMessage = null;
+                    return;
+                }
+            }
+
+            // yt-dlp embedding was disabled for this download, so embed ourselves when asked
+            if (profile.SubtitleStyle == SubtitleStyle.Embedded)
+            {
+                downloadItem.ErrorMessage = "Embedding subtitles...";
+                _downloadStatusChanged.OnNext(downloadItem);
+
+                if (await _subtitleBurnInService.EmbedSubtitlesAsync(videoPath, subtitlePath, cancellationToken))
+                {
+                    TryDelete(subtitlePath);
+                }
+            }
+
+            downloadItem.ErrorMessage = null;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Subtitles are best-effort; never fail a finished download because of them
+            TraceLog.Write($"[AI-SUBS] Error: {ex.Message}");
+            downloadItem.ErrorMessage = null;
+        }
+    }
+
+    private static void TryDelete(string path)
+    {
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception ex)
+        {
+            TraceLog.Write($"[YTDLP] Could not delete {path}: {ex.Message}");
+        }
+    }
+
     public void Dispose()
     {
         foreach (var cts in _cancellationTokens.Values)
@@ -965,7 +1411,6 @@ public class YtDlpDownloadService : IDownloadService, IDisposable
         }
         _cancellationTokens.Clear();
 
-        _downloadSemaphore?.Dispose();
         _downloadStatusChanged?.Dispose();
         _overallProgress?.Dispose();
         _stateRepository?.Dispose();

@@ -12,7 +12,14 @@ public interface IDownloadService
     Task CancelDownloadAsync(DownloadItem downloadItem);
     Task RestartDownloadAsync(DownloadItem downloadItem);
     Task DeleteDownloadAsync(DownloadItem downloadItem);
-    
+
+    /// <summary>
+    /// Looks up a video's real title/author/thumbnail without downloading it.
+    /// Returns null when the lookup is unsupported or fails.
+    /// </summary>
+    Task<IVideo?> TryFetchVideoInfoAsync(string url, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IVideo?>(null);
+
     IObservable<DownloadItem> DownloadStatusChanged { get; }
     IObservable<double> OverallProgress { get; }
 }

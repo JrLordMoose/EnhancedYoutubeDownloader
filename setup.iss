@@ -2,7 +2,7 @@
 ; This script creates a Windows installer with desktop shortcut and launch options
 
 #define MyAppName "Enhanced YouTube Downloader"
-#define MyAppVersion "0.4.7"
+#define MyAppVersion "0.4.8"
 #define MyAppPublisher "JrLordMoose"
 #define MyAppURL "https://github.com/JrLordMoose/EnhancedYoutubeDownloader"
 #define MyAppExeName "EnhancedYoutubeDownloader.exe"
@@ -59,9 +59,8 @@ Name: "{autodesktop}\Uninstall {#MyAppName}"; Filename: "{app}\uninstall.exe"; T
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent; Tasks: launchafterinstall
 
-[UninstallDelete]
-; Clean up application data on uninstall (optional - user data cleanup)
-Type: filesandordirs; Name: "{localappdata}\{#MyAppName}"
+; App data ({userappdata}\EnhancedYoutubeDownloader) is removed only when the user
+; answers Yes in the uninstall prompt ([Code] below), so there is no [UninstallDelete].
 
 [Code]
 function InitializeSetup(): Boolean;
@@ -110,7 +109,8 @@ begin
               'Choose "No" to keep your settings and download history.',
               mbConfirmation, MB_YESNO) = IDYES then
     begin
-      AppDataPath := ExpandConstant('{localappdata}\{#MyAppName}');
+      // Settings, cache and download state live in %AppData%\EnhancedYoutubeDownloader
+      AppDataPath := ExpandConstant('{userappdata}\EnhancedYoutubeDownloader');
       if DirExists(AppDataPath) then
       begin
         DelTree(AppDataPath, True, True, True);
@@ -133,6 +133,7 @@ begin
     end;
   end;
 end;
+
 
 
 

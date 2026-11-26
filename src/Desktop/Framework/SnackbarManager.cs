@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace EnhancedYoutubeDownloader.Framework;
 
@@ -126,8 +127,38 @@ public partial class SnackbarManager : ObservableObject
     }
 
     /// <summary>
+    /// Dismisses a specific snackbar (bound to each snackbar's Close button)
+    /// </summary>
+    [RelayCommand]
+    private void Dismiss(SnackbarItem? item)
+    {
+        if (item is null)
+            return;
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (SnackbarQueue.Remove(item))
+                ProcessQueueAsync().ConfigureAwait(false);
+        });
+    }
+
+    /// <summary>
+    /// Runs a snackbar's action callback, then dismisses it
+    /// </summary>
+    [RelayCommand]
+    private void InvokeAction(SnackbarItem? item)
+    {
+        if (item is null)
+            return;
+
+        item.Action?.Invoke();
+        Dismiss(item);
+    }
+
+    /// <summary>
     /// Dismisses the currently displayed snackbar
     /// </summary>
+    [RelayCommand]
     public void DismissCurrent()
     {
         if (Dispatcher.UIThread.CheckAccess())

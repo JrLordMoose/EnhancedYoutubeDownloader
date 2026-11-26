@@ -50,7 +50,7 @@
             <ScrollViewer Grid.Row="1"
                          MaxHeight="400"
                          Padding="24,20">
-                <TextBlock Text="{Binding Message}"
+                <SelectableTextBlock Text="{Binding Message}"
                           FontSize="14"
                           TextWrapping="Wrap"
                           LineHeight="24"/>
@@ -69,6 +69,7 @@
                     <Button x:Name="SecondaryButton"
                            Content="{Binding SecondaryButtonText}"
                            Command="{Binding ClickSecondaryCommand}"
+                           IsCancel="True"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"
                            IsVisible="{Binding SecondaryButtonText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
@@ -77,6 +78,7 @@
                     <Button x:Name="PrimaryButton"
                            Content="{Binding PrimaryButtonText}"
                            Command="{Binding ClickPrimaryCommand}"
+                           IsDefault="True"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>
                 </StackPanel>

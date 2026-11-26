@@ -20,4 +20,21 @@ public interface ISubtitleBurnInService
         string outputPath,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Muxes an .srt file into the video as a soft (toggleable) subtitle track, in place.
+    /// </summary>
+    /// <returns>True if the video now contains the subtitle track.</returns>
+    Task<bool> EmbedSubtitlesAsync(
+        string videoPath,
+        string subtitlePath,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Extracts the audio track as 16 kHz mono PCM WAV (the input format Whisper requires).
+    /// </summary>
+    Task<bool> ExtractWavAudioAsync(
+        string videoPath,
+        string wavOutputPath,
+        CancellationToken cancellationToken = default);
 }

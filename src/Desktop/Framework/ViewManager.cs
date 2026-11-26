@@ -15,7 +15,6 @@ public partial class ViewManager
         {
             MainViewModel => new MainView(),
             DashboardViewModel => null, // Dashboard is embedded in MainView
-            AuthSetupViewModel => new AuthSetupDialog(),
             DownloadMultipleSetupViewModel => new DownloadMultipleSetupDialog(),
             DownloadSingleSetupViewModel => new DownloadSingleSetupDialog(),
             MessageBoxViewModel => new MessageBoxDialog(),

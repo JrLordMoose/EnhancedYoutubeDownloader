@@ -14,8 +14,8 @@
     <!-- Modern Dialog Card with Shadow Effect -->
     <Border Background="{DynamicResource MaterialPaperBrush}"
             CornerRadius="12"
-            Width="850"
-            Height="600">
+            MaxWidth="850"
+            MaxHeight="600">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -25,18 +25,18 @@
 
             <!-- Elegant Header with Gradient Feel -->
             <Border Grid.Row="0"
-                    Background="{DynamicResource MaterialPrimaryBrush}"
+                    Background="{DynamicResource AppAccentBrush}"
                     CornerRadius="12,12,0,0"
                     Padding="32,20">
                 <StackPanel Spacing="4">
                     <TextBlock Text="{Binding Title}"
                               FontSize="22"
                               FontWeight="SemiBold"
-                              Foreground="White"/>
+                              Foreground="{DynamicResource AppOnAccentBrush}"/>
                     <TextBlock Text="Everything you need to know to get started"
                               FontSize="13"
                               Opacity="0.9"
-                              Foreground="White"/>
+                              Foreground="{DynamicResource AppOnAccentBrush}"/>
                 </StackPanel>
             </Border>
 
@@ -58,13 +58,13 @@
                                 Padding="16">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                                    <Border Background="{DynamicResource AppAccentBrush}"
                                             Width="32" Height="32"
                                             CornerRadius="16">
                                         <TextBlock Text="1"
                                                   FontSize="16"
                                                   FontWeight="Bold"
-                                                  Foreground="White"
+                                                  Foreground="{DynamicResource AppOnAccentBrush}"
                                                   HorizontalAlignment="Center"
                                                   VerticalAlignment="Center"/>
                                     </Border>
@@ -88,13 +88,13 @@
                                 Padding="16">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                                    <Border Background="{DynamicResource AppAccentBrush}"
                                             Width="32" Height="32"
                                             CornerRadius="16">
                                         <TextBlock Text="2"
                                                   FontSize="16"
                                                   FontWeight="Bold"
-                                                  Foreground="White"
+                                                  Foreground="{DynamicResource AppOnAccentBrush}"
                                                   HorizontalAlignment="Center"
                                                   VerticalAlignment="Center"/>
                                     </Border>
@@ -118,13 +118,13 @@
                                 Padding="16">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                                    <Border Background="{DynamicResource AppAccentBrush}"
                                             Width="32" Height="32"
                                             CornerRadius="16">
                                         <TextBlock Text="3"
                                                   FontSize="16"
                                                   FontWeight="Bold"
-                                                  Foreground="White"
+                                                  Foreground="{DynamicResource AppOnAccentBrush}"
                                                   HorizontalAlignment="Center"
                                                   VerticalAlignment="Center"/>
                                     </Border>
@@ -149,7 +149,7 @@
                         <TextBlock Text="Need More Help?"
                                   FontSize="18"
                                   FontWeight="SemiBold"
-                                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                                  Foreground="{DynamicResource AppAccentTextBrush}"/>
 
                         <Grid ColumnDefinitions="*,16,*">
                             <!-- GitHub Button -->
@@ -204,6 +204,8 @@
                             FontSize="14"
                             FontWeight="SemiBold"
                             HorizontalAlignment="Right"
+                            IsDefault="True"
+                            IsCancel="True"
                             Command="{Binding CloseDialogCommand}"/>
                 </Grid>
             </Border>

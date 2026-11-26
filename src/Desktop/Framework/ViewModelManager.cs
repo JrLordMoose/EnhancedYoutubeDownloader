@@ -24,9 +24,6 @@ public class ViewModelManager
     public DownloadViewModel CreateDownloadViewModel() =>
         _serviceProvider.GetRequiredService<DownloadViewModel>();
 
-    public AuthSetupViewModel CreateAuthSetupViewModel() =>
-        _serviceProvider.GetRequiredService<AuthSetupViewModel>();
-
     public DownloadMultipleSetupViewModel CreateDownloadMultipleSetupViewModel() =>
         _serviceProvider.GetRequiredService<DownloadMultipleSetupViewModel>();
 

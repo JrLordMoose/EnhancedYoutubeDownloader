@@ -71,3 +71,10 @@ release/
 
 # Windows reserved device name (accidentally created by `> NUL` redirects)
 NUL
+
+# Exported browser cookies (session credentials) - never commit
+cookies temp/
+*cookies*.txt
+
+# Per-user app settings (older builds saved them in the working directory)
+/EnhancedYoutubeDownloader

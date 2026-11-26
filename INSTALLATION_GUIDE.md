@@ -208,8 +208,8 @@ During uninstallation, you'll be asked:
 - Download history
 - Saved settings
 - Cached video metadata
-- Authentication tokens
-- All user data in `%LocalAppData%\Enhanced YouTube Downloader\`
+- Your sign-in settings (the path to your cookies.txt; the cookies file itself is not deleted)
+- All app data in `%AppData%\EnhancedYoutubeDownloader\` (settings.json, cache.db, download_state.db)
 
 **What stays if you choose "No":**
 - All settings and data remain for future reinstalls
@@ -278,7 +278,7 @@ Some overly cautious antivirus programs may block unsigned executables:
 3. Your settings and data are preserved
 
 ### Q: Where is my download history stored?
-**A:** `%LocalAppData%\Enhanced YouTube Downloader\` (typically `C:\Users\YourName\AppData\Local\Enhanced YouTube Downloader\`)
+**A:** `%AppData%\EnhancedYoutubeDownloader\` (typically `C:\Users\YourName\AppData\Roaming\EnhancedYoutubeDownloader\`): `settings.json`, `cache.db` and `download_state.db`.
 
 ### Q: Can I use this installer on multiple computers?
 **A:** Yes, the installer can be used on as many Windows computers as you want. It's free and open-source.
@@ -323,4 +323,4 @@ Your privacy and security are paramount.
 
 **Enhanced YouTube Downloader - Professional YouTube video downloader with modern UI/UX**
 
-*Version 1.0.0 | MIT License | Free & Open Source*
+*Version 0.4.8 | MIT License | Free & Open Source*

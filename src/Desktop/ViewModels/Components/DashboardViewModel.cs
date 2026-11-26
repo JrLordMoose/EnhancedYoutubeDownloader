@@ -6,9 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnhancedYoutubeDownloader.Core.Models;
+using EnhancedYoutubeDownloader.Core.Utils;
 using EnhancedYoutubeDownloader.Framework;
 using EnhancedYoutubeDownloader.Services;
 using EnhancedYoutubeDownloader.Shared.Interfaces;
@@ -52,61 +56,64 @@ public partial class DashboardViewModel : ViewModelBase
         // Force property change notification to ensure UI updates
         OnPropertyChanged(nameof(IsBusy));
 
-        _eventRoot.Add(
-            _settingsService.WatchProperty(
-                o => o.ParallelLimit,
-                () => OnPropertyChanged(nameof(IsProgressIndeterminate)),
-                true
-            )
-        );
-
-        // Subscribe to download status changes
+        // Subscribe to download status changes. Events are raised on background (thread
+        // pool) threads by the download service; anything that touches UI (dialogs, file
+        // pickers, notifications) must be marshalled to the UI thread or Avalonia throws
+        // and the fire-and-forget task swallows it (the sign-in prompt never appeared).
         _eventRoot.Add(
             _downloadService.DownloadStatusChanged.Subscribe(downloadItem =>
-            {
-                TraceLog.Write(
-                    $"[DASHBOARD] Download status changed: {downloadItem.Id} - {downloadItem.Status} - {downloadItem.Progress:F1}%"
-                );
-                // No need to trigger collection change - DownloadItem already implements INotifyPropertyChanged
-                // and individual property changes will automatically update the UI
-
-                // Check if download completed and auto-open folder is enabled
-                if (
-                    downloadItem.Status == DownloadStatus.Completed
-                    && _settingsService.OpenFolderAfterDownload
-                )
-                {
-                    TraceLog.Write(
-                        $"[DASHBOARD] Download completed, auto-opening folder (setting enabled)"
-                    );
-                    OpenDownloadFolder(downloadItem);
-                }
-
-                // Check for 403 errors and offer to enable browser cookies
-                if (
-                    downloadItem.Status == DownloadStatus.Failed
-                    && !string.IsNullOrEmpty(downloadItem.ErrorMessage)
-                    && (
-                        downloadItem.ErrorMessage.Contains("403")
-                        || downloadItem.ErrorMessage.Contains("Forbidden")
-                    )
-                    && !_settingsService.UseBrowserCookies
-                )
-                {
-                    TraceLog.Write(
-                        $"[DASHBOARD] 403 error detected, showing browser cookie prompt"
-                    );
-                    _ = Show403BrowserCookiePromptAsync(downloadItem);
-                }
-            })
+                Dispatcher.UIThread.Post(() => OnDownloadStatusChanged(downloadItem))
+            )
         );
+    }
+
+    // Completed events can repeat (post-processing re-raises them); act on each item once
+    private readonly HashSet<string> _completionHandled = new();
+
+    private void OnDownloadStatusChanged(DownloadItem downloadItem)
+    {
+        TraceLog.Write(
+            $"[DASHBOARD] Download status changed: {downloadItem.Id} - {downloadItem.Status} - {downloadItem.Progress:F1}%"
+        );
+
+        if (downloadItem.Status == DownloadStatus.Completed)
+        {
+            if (!_completionHandled.Add(downloadItem.Id))
+                return;
+
+            if (_settingsService.NotifyOnComplete)
+                _snackbarManager.NotifySuccess($"Downloaded: {downloadItem.Title}");
+
+            if (_settingsService.OpenFolderAfterDownload)
+            {
+                TraceLog.Write("[DASHBOARD] Download completed, auto-opening folder");
+                OpenDownloadFolder(downloadItem);
+            }
+
+            return;
+        }
+
+        // A restarted item may complete again later
+        _completionHandled.Remove(downloadItem.Id);
+
+        // Sign-in walls (YouTube bot check, Instagram/Reddit login, 403) and unreadable
+        // browser cookies: offer a way to authenticate and retry. Only one prompt at a time,
+        // so a failing playlist doesn't stack dialogs.
+        if (
+            downloadItem.Status == DownloadStatus.Failed
+            && YtDlpErrorClassifier.NeedsAuthentication(downloadItem.ErrorMessage)
+            && Interlocked.CompareExchange(ref _authPromptOpen, 1, 0) == 0
+        )
+        {
+            TraceLog.Write("[DASHBOARD] Sign-in error detected, showing cookie prompt");
+            _ = ShowAuthenticationPromptAsync(downloadItem);
+        }
     }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsProgressIndeterminate))]
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowTutorialCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ShowAuthSetupCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowSettingsCommand))]
     public partial bool IsBusy { get; set; }
 
@@ -127,12 +134,6 @@ public partial class DashboardViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanShowTutorial))]
     private async Task ShowTutorialAsync() =>
         await _dialogManager.ShowDialogAsync(_viewModelManager.CreateTutorialViewModel());
-
-    private bool CanShowAuthSetup() => !IsBusy;
-
-    [RelayCommand(CanExecute = nameof(CanShowAuthSetup))]
-    private async Task ShowAuthSetupAsync() =>
-        await _dialogManager.ShowDialogAsync(_viewModelManager.CreateAuthSetupViewModel());
 
     private bool CanShowSettings() => !IsBusy;
 
@@ -247,14 +248,35 @@ public partial class DashboardViewModel : ViewModelBase
                 return;
             }
 
-            TraceLog.Write($"[DEBUG] Video: {result.Video.Title}");
+            // Placeholder metadata ("YouTube video", "Video from TikTok"): ask yt-dlp for the
+            // real title/channel/thumbnail. It uses the user's cookies, so it also works when
+            // YouTube's bot check blocks YoutubeExplode.
+            var video = result.Video;
+            if (video is GenericVideo)
+            {
+                _snackbarManager.NotifyInfo("Fetching video details...");
+                var info = await _downloadService.TryFetchVideoInfoAsync(video.Url);
+                if (info != null)
+                {
+                    video = info;
+                }
+            }
+
+            TraceLog.Write($"[DEBUG] Video: {video.Title}");
 
             // Show download setup dialog
             var setupDialog = _viewModelManager.CreateDownloadSingleSetupViewModel();
-            setupDialog.Video = result.Video;
+            setupDialog.Video = video;
+
+            // Apply the user's defaults from Settings > Downloads (before FilePath, whose
+            // extension follows SelectedFormat)
+            setupDialog.SelectedQuality = GetDefaultQualityOption(_settingsService.DefaultQuality);
+            setupDialog.SelectedFormat = GetDefaultFormatOption(_settingsService.DefaultFormat);
+            setupDialog.DownloadSubtitles = _settingsService.ShouldInjectSubtitles;
+            setupDialog.InjectTags = _settingsService.ShouldInjectTags;
 
             // Set default download path
-            var sanitizedTitle = SanitizeFileName(result.Video.Title);
+            var sanitizedTitle = SanitizeFileName(video.Title);
             var defaultPath = !string.IsNullOrWhiteSpace(_settingsService.DefaultDownloadPath)
                 ? _settingsService.DefaultDownloadPath
                 : Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
@@ -279,15 +301,6 @@ public partial class DashboardViewModel : ViewModelBase
 
             TraceLog.Write($"[DEBUG] Download path: {setupDialog.FilePath}");
 
-            // Ensure unique file path to prevent overwriting existing files
-            var uniqueFilePath = DownloadSingleSetupViewModel.GetUniqueFilePath(
-                setupDialog.FilePath
-            );
-            if (uniqueFilePath != setupDialog.FilePath)
-            {
-                TraceLog.Write($"[DEBUG] File already exists, using unique path: {uniqueFilePath}");
-            }
-
             // Create FormatProfile from dialog settings
             var formatProfile = CreateFormatProfile(
                 setupDialog.SelectedQuality,
@@ -295,6 +308,19 @@ public partial class DashboardViewModel : ViewModelBase
                 setupDialog.DownloadSubtitles,
                 setupDialog.InjectTags
             );
+
+            // The extension follows the actual output ("Audio Only" always saves .mp3), and
+            // the path must be unique on disk AND among downloads still in the queue (adding
+            // the same video twice used to give both items the same file).
+            var requestedPath = Path.ChangeExtension(
+                setupDialog.FilePath,
+                "." + formatProfile.Container
+            );
+            var uniqueFilePath = GetUniqueBatchFilePath(requestedPath, GetActiveDownloadPaths());
+            if (uniqueFilePath != setupDialog.FilePath)
+            {
+                TraceLog.Write($"[DEBUG] Using unique path: {uniqueFilePath}");
+            }
             TraceLog.Write(
                 $"[DEBUG] Format profile: {formatProfile.Quality} {formatProfile.Container}, Subs={formatProfile.IncludeSubtitles}, Tags={formatProfile.IncludeTags}"
             );
@@ -302,7 +328,7 @@ public partial class DashboardViewModel : ViewModelBase
             // Create download item
             TraceLog.Write("[DEBUG] Creating download item");
             var downloadItem = await _downloadService.CreateDownloadAsync(
-                result.Video,
+                video,
                 uniqueFilePath,
                 formatProfile,
                 result.Platform
@@ -321,12 +347,12 @@ public partial class DashboardViewModel : ViewModelBase
                 TraceLog.Write("[DEBUG] Calling StartDownloadAsync...");
                 await _downloadService.StartDownloadAsync(downloadItem);
                 TraceLog.Write("[DEBUG] Download started automatically");
-                _snackbarManager.Notify($"Downloading: {result.Video.Title}");
+                _snackbarManager.Notify($"Downloading: {video.Title}");
             }
             else
             {
                 TraceLog.Write("[DEBUG] Download queued, waiting for manual start");
-                _snackbarManager.Notify($"Ready to download: {result.Video.Title}");
+                _snackbarManager.Notify($"Ready to download: {video.Title}");
             }
         }
         catch (Exception ex)
@@ -361,6 +387,8 @@ public partial class DashboardViewModel : ViewModelBase
                 : Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
             dialog.DownloadSubtitles = _settingsService.ShouldInjectSubtitles;
             dialog.InjectTags = _settingsService.ShouldInjectTags;
+            dialog.SelectedQuality = GetDefaultQualityOption(_settingsService.DefaultQuality);
+            dialog.SelectedFormat = GetDefaultFormatOption(_settingsService.DefaultFormat);
             dialog.SetVideos(result.Videos);
 
             var dialogResult = await _dialogManager.ShowDialogAsync(dialog);
@@ -373,12 +401,12 @@ public partial class DashboardViewModel : ViewModelBase
                     dialog.DownloadSubtitles,
                     dialog.InjectTags
                 );
-                var reservedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var reservedPaths = GetActiveDownloadPaths();
 
                 // User confirmed, create downloads for selected videos
                 foreach (var video in dialog.SelectedVideos)
                 {
-                    var extension = dialog.SelectedFormat.ToLowerInvariant();
+                    var extension = formatProfile.Container;
                     var requestedPath = Path.Combine(
                         dialog.DownloadDirectory,
                         $"{SanitizeFileName(video.Title)}.{extension}"
@@ -392,7 +420,10 @@ public partial class DashboardViewModel : ViewModelBase
                         result.Platform
                     );
                     Downloads.Add(downloadItem);
-                    await _downloadService.StartDownloadAsync(downloadItem);
+                    if (_settingsService.AutoStartDownload)
+                    {
+                        await _downloadService.StartDownloadAsync(downloadItem);
+                    }
                 }
 
                 _snackbarManager.Notify($"Added {dialog.SelectedVideos.Count} videos to queue");
@@ -405,6 +436,23 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
+    /// <summary>Output paths of downloads that haven't finished, so new ones never collide.</summary>
+    private HashSet<string> GetActiveDownloadPaths() =>
+        new(
+            Downloads
+                .Where(d =>
+                    d.Status
+                        is DownloadStatus.Queued
+                            or DownloadStatus.Started
+                            or DownloadStatus.Paused
+                    && !string.IsNullOrEmpty(d.FilePath)
+                )
+                // Reserve by name WITHOUT extension: yt-dlp temp files (X.temp.mp4, X.f137.mp4,
+                // X.webm before MP3 extraction) collide even when X.mp4 and X.mp3 differ.
+                .Select(d => Path.ChangeExtension(d.FilePath!, null)),
+            StringComparer.OrdinalIgnoreCase
+        );
+
     private static string GetUniqueBatchFilePath(
         string requestedPath,
         HashSet<string> reservedPaths
@@ -416,7 +464,10 @@ public partial class DashboardViewModel : ViewModelBase
         var extension = Path.GetExtension(candidate);
         var suffix = 1;
 
-        while (!reservedPaths.Add(candidate))
+        while (
+            !reservedPaths.Add(Path.ChangeExtension(candidate, null))
+            || (candidate != requestedPath && File.Exists(candidate))
+        )
         {
             candidate = Path.Combine(directory, $"{fileName} ({suffix++}){extension}");
         }
@@ -490,6 +541,31 @@ public partial class DashboardViewModel : ViewModelBase
         Downloads.Remove(download);
     }
 
+    /// <summary>
+    /// Maps Settings > Downloads "Default Quality" index to the setup dialogs' option text.
+    /// </summary>
+    internal static string GetDefaultQualityOption(int index) =>
+        index switch
+        {
+            1 => "1080p (Full HD)",
+            2 => "720p (HD)",
+            3 => "480p (SD)",
+            4 => "360p",
+            5 => "Audio Only (Best)",
+            _ => "Best Quality",
+        };
+
+    /// <summary>
+    /// Maps Settings > Downloads "Default Format" index to the setup dialogs' option text.
+    /// </summary>
+    internal static string GetDefaultFormatOption(int index) =>
+        index switch
+        {
+            1 => "WebM",
+            2 => "MP3",
+            _ => "MP4",
+        };
+
     private FormatProfile CreateFormatProfile(
         string quality,
         string format,
@@ -517,6 +593,13 @@ public partial class DashboardViewModel : ViewModelBase
             "MP3" => "mp3",
             _ => "mp4",
         };
+
+        // "Audio Only" with MP4/WebM produced Opus/M4A audio under a .mp4/.webm name;
+        // audio-only downloads are always MP3.
+        if (qualityValue == "audio-only")
+        {
+            containerValue = "mp3";
+        }
 
         var profile = new FormatProfile
         {
@@ -680,12 +763,6 @@ public partial class DashboardViewModel : ViewModelBase
                     ActionKey = "change_path",
                     Description = "Select a different download location",
                 },
-                new ErrorAction
-                {
-                    Text = "Run as Admin",
-                    ActionKey = "run_admin",
-                    Description = "Restart with administrator privileges",
-                },
             ],
             ErrorCategory.InvalidUrl =>
             [
@@ -791,7 +868,24 @@ public partial class DashboardViewModel : ViewModelBase
                 break;
 
             case "change_path":
-                _snackbarManager.NotifyInfo("Path selection feature coming soon");
+            {
+                // Settings > Downloads holds the default download location
+                var settings = _viewModelManager.CreateSettingsViewModel();
+                settings.SelectedTabIndex = 1;
+                await _dialogManager.ShowDialogAsync(settings);
+                break;
+            }
+
+            case "check_video":
+                if (!string.IsNullOrWhiteSpace(Query) && Query.Contains("://"))
+                    OpenUrl(Query);
+                else
+                    _snackbarManager.NotifyInfo("Open the video in your browser to check it");
+                break;
+
+            case "try_format":
+                // Re-open the download dialog so a different quality/format can be picked
+                await ProcessQueryAsync();
                 break;
 
             case "correct_url":
@@ -824,43 +918,82 @@ public partial class DashboardViewModel : ViewModelBase
         }
     }
 
-    private async Task Show403BrowserCookiePromptAsync(DownloadItem downloadItem)
+    private int _authPromptOpen;
+
+    private async Task ShowAuthenticationPromptAsync(DownloadItem downloadItem)
     {
-        TraceLog.Write($"[403-PROMPT] Showing browser cookie prompt for {downloadItem.Id}");
-
-        var dialog = _viewModelManager.CreateMessageBoxViewModel();
-        dialog.Title = "Access Restricted (403 Forbidden)";
-        dialog.Message =
-            "This video requires authentication to download.\n\n"
-            + "Would you like to enable browser cookie authentication?\n"
-            + "This will use your logged-in YouTube session from Chrome.\n\n"
-            + "Make sure you're logged into YouTube in Chrome and close all browser windows before retrying.";
-        dialog.PrimaryButtonText = "Enable & Retry";
-        dialog.SecondaryButtonText = "Not Now";
-
-        var result = await _dialogManager.ShowDialogAsync(dialog);
-
-        if (result == true)
+        try
         {
-            // User clicked "Enable & Retry"
-            TraceLog.Write($"[403-PROMPT] User chose to enable browser cookies");
+            var kind = YtDlpErrorClassifier.Classify(downloadItem.ErrorMessage);
+            var firefoxInstalled = BrowserCookieHelper.IsFirefoxInstalled();
+            TraceLog.Write(
+                $"[AUTH-PROMPT] {kind} for {downloadItem.Id}; Firefox installed: {firefoxInstalled}"
+            );
 
-            _settingsService.UseBrowserCookies = true;
-            _settingsService.BrowserForCookies = "chrome"; // Default to Chrome
+            var dialog = _viewModelManager.CreateMessageBoxViewModel();
+            dialog.Title =
+                kind == YtDlpErrorKind.CookieReadFailed
+                    ? "Couldn't Read Browser Cookies"
+                    : "Sign-In Required";
+
+            var reason =
+                kind == YtDlpErrorKind.CookieReadFailed
+                    ? "Your browser's cookies couldn't be read. On Windows, Chrome, Edge and Brave "
+                        + "encrypt them so other apps can't use them."
+                    : "This site blocked the download until you're signed in "
+                        + "(YouTube shows this as \"confirm you're not a bot\").";
+
+            var useFirefox = firefoxInstalled && kind != YtDlpErrorKind.CookieReadFailed;
+            dialog.Message = useFirefox
+                ? reason
+                    + "\n\nYou have Firefox installed. Sign in to the site in Firefox, then retry "
+                    + "using Firefox's cookies. You can also pick a cookies.txt file in "
+                    + "Settings > Advanced > Authentication."
+                : reason
+                    + "\n\nExport a cookies.txt file from a browser where you're signed in "
+                    + "(for example with the \"Get cookies.txt LOCALLY\" extension), then choose "
+                    + "that file to retry. Your cookies stay on this computer.";
+            dialog.PrimaryButtonText = useFirefox ? "Use Firefox & Retry" : "Choose cookies.txt";
+            dialog.SecondaryButtonText = "Not Now";
+
+            var result = await _dialogManager.ShowDialogAsync(dialog);
+            if (result != true)
+            {
+                TraceLog.Write("[AUTH-PROMPT] User declined");
+                _snackbarManager.NotifyInfo(
+                    "You can set this up later in Settings > Advanced > Authentication"
+                );
+                return;
+            }
+
+            if (useFirefox)
+            {
+                _settingsService.UseBrowserCookies = true;
+                _settingsService.BrowserForCookies = "firefox";
+            }
+            else
+            {
+                var path = await _dialogManager.PromptOpenFilePathAsync(
+                    "Choose cookies.txt",
+                    "Cookies file",
+                    "*.txt"
+                );
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    _snackbarManager.NotifyInfo("No cookies file selected");
+                    return;
+                }
+
+                _settingsService.CookiesFilePath = path;
+            }
+
             _settingsService.Save();
-
-            _snackbarManager.NotifySuccess("Browser cookies enabled! Retrying download...");
-
-            // Retry the download
+            _snackbarManager.NotifySuccess("Authentication saved. Retrying download...");
             await _downloadService.RestartDownloadAsync(downloadItem);
         }
-        else
+        finally
         {
-            // User clicked "Not Now" or closed dialog
-            TraceLog.Write($"[403-PROMPT] User declined browser cookies");
-            _snackbarManager.NotifyInfo(
-                "You can enable this later in Settings > Advanced > Authentication"
-            );
+            Interlocked.Exchange(ref _authPromptOpen, 0);
         }
     }
 

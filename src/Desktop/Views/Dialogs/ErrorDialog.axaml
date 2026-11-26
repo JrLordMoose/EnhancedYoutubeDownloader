@@ -23,18 +23,25 @@
             <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
                 <materialIcons:MaterialIcon Kind="AlertCircle"
                                           Width="32" Height="32"
-                                          Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"/>
+                                          Foreground="{DynamicResource MaterialValidationErrorBrush}"/>
                 <TextBlock Text="Error Occurred"
                           FontSize="19"
                           FontWeight="SemiBold"
                           VerticalAlignment="Center"/>
             </StackPanel>
 
-            <!-- Error Message -->
-            <TextBlock Grid.Row="1"
-                      Text="{Binding ErrorInfo.Message}"
-                      TextWrapping="Wrap"
-                      Margin="0,0,0,12"/>
+            <!-- Error Message + Category Badge (badge shown even when there are no details) -->
+            <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,12">
+                <TextBlock Text="{Binding ErrorInfo.Message}"
+                          TextWrapping="Wrap"/>
+                <Border Background="{DynamicResource MaterialDesignChipBackground}"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding ErrorInfo.Category, StringFormat='Category: {0}'}"
+                              FontSize="12"/>
+                </Border>
+            </StackPanel>
 
             <!-- Details Section -->
             <Border Grid.Row="2"
@@ -57,22 +64,13 @@
                                 IsVisible="{Binding IsDetailsExpanded}"
                                 HorizontalScrollBarVisibility="Auto"
                                 VerticalScrollBarVisibility="Auto">
-                        <TextBlock Text="{Binding ErrorInfo.Details}"
+                        <SelectableTextBlock Text="{Binding ErrorInfo.Details}"
                                   FontSize="12"
                                   TextWrapping="Wrap"
                                   FontFamily="Consolas,Courier New,monospace"
                                   Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"
                                   Padding="8"/>
                     </ScrollViewer>
-
-                    <!-- Error Category Badge -->
-                    <Border Background="{DynamicResource MaterialDesignChipBackground}"
-                            CornerRadius="12"
-                            Padding="8,4"
-                            HorizontalAlignment="Left">
-                        <TextBlock Text="{Binding ErrorInfo.Category, StringFormat='Category: {0}'}"
-                                  FontSize="12"/>
-                    </Border>
                 </StackPanel>
             </Border>
 
@@ -82,10 +80,11 @@
                 <!-- Suggested Actions -->
                 <ItemsControl Grid.Column="0"
                             ItemsSource="{Binding ErrorInfo.SuggestedActions}"
-                            HorizontalAlignment="Left">
+                            HorizontalAlignment="Left"
+                            Margin="0,0,8,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="8"/>
+                            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -100,7 +99,7 @@
                 </ItemsControl>
 
                 <!-- Dialog Action Buttons -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
                     <Button Content="Copy Details"
                             Command="{Binding CopyErrorDetailsCommand}"
                             Theme="{DynamicResource MaterialOutlineButton}">
@@ -116,7 +115,8 @@
                     <Button Content="Close"
                             Command="{Binding CloseDialogCommand}"
                             Theme="{DynamicResource MaterialOutlineButton}"
-                            IsDefault="True"/>
+                            IsDefault="True"
+                            IsCancel="True"/>
                 </StackPanel>
             </Grid>
         </Grid>

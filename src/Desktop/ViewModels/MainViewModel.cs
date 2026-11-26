@@ -15,10 +15,11 @@ namespace EnhancedYoutubeDownloader.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     private readonly ViewModelManager _viewModelManager;
+    private readonly DialogManager _dialogManager;
     private readonly SettingsService _settingsService;
     private readonly UpdateService? _updateService;
 
-    public string Title { get; } = $"{Program.Name} v{Program.VersionString}";
+    public string Title { get; } = $"Enhanced YouTube Downloader v{Program.VersionString}";
 
     public DashboardViewModel Dashboard { get; }
 
@@ -28,28 +29,16 @@ public partial class MainViewModel : ViewModelBase
         ViewModelManager viewModelManager,
         SnackbarManager snackbarManager,
         SettingsService settingsService,
+        DialogManager dialogManager,
         UpdateService? updateService = null
     )
     {
+        _dialogManager = dialogManager;
         _viewModelManager = viewModelManager;
         SnackbarManager = snackbarManager;
         _settingsService = settingsService;
         _updateService = updateService;
         Dashboard = viewModelManager.CreateDashboardViewModel();
-    }
-
-    private Task ShowUkraineSupportMessageAsync()
-    {
-        if (!_settingsService.IsUkraineSupportMessageEnabled)
-            return Task.CompletedTask;
-
-        var dialog = _viewModelManager.CreateMessageBoxViewModel();
-        // Set dialog properties here
-
-        // Disable this message in the future
-        _settingsService.IsUkraineSupportMessageEnabled = false;
-        _settingsService.Save();
-        return Task.CompletedTask;
     }
 
     private Task ShowDevelopmentBuildMessageAsync()
@@ -80,33 +69,51 @@ public partial class MainViewModel : ViewModelBase
         if (_updateService == null || !OperatingSystem.IsWindows())
             return;
 
+        // Respect Settings > General > "Automatic updates"; manual checks still work
+        if (!_settingsService.IsAutoUpdateEnabled)
+            return;
+
         try
         {
             var updateVersion = await _updateService.CheckForUpdatesAsync();
             if (updateVersion is null)
                 return;
 
-            SnackbarManager.Notify($"Downloading update to {Program.Name} v{updateVersion}...");
+            // Ask with a real dialog. Older builds only showed a toast whose "INSTALL NOW"
+            // button couldn't be clicked, and nothing installed the update on exit.
+            var prompt = _viewModelManager.CreateMessageBoxViewModel();
+            prompt.Title = "Update Available";
+            prompt.Message =
+                $"Version {updateVersion.ToString(3)} is available (you have {Program.VersionString}).\n\n"
+                + "Update now? The app will close, install the update and reopen.\n"
+                + "Choose Later to install it automatically the next time you close the app.";
+            prompt.PrimaryButtonText = "Update Now";
+            prompt.SecondaryButtonText = "Later";
+
+            var updateNow = await _dialogManager.ShowDialogAsync(prompt) == true;
+
+            SnackbarManager.Notify($"Downloading update v{updateVersion.ToString(3)}...");
             await _updateService.PrepareUpdateAsync(updateVersion);
 
-            SnackbarManager.Notify(
-                "Update has been downloaded and will be installed when you exit",
-                "INSTALL NOW",
-                () =>
-                {
-                    if (OperatingSystem.IsWindows())
-                    {
-                        _updateService.FinalizeUpdate(updateVersion, true);
-                    }
+            if (updateNow)
+            {
+                _updateService.FinalizeUpdate(updateVersion, restart: true);
+                ShutdownForUpdate();
+                return;
+            }
 
-                    if (
-                        Application.Current?.ApplicationLifetime
-                        is IClassicDesktopStyleApplicationLifetime desktop
-                    )
-                        desktop.Shutdown(2);
-                    else
-                        Environment.Exit(2);
-                }
+            // Install on exit (no restart)
+            _pendingUpdate = updateVersion;
+            if (
+                Application.Current?.ApplicationLifetime
+                is IClassicDesktopStyleApplicationLifetime lifetime
+            )
+            {
+                lifetime.Exit += (_, _) => ApplyPendingUpdateOnExit();
+            }
+
+            SnackbarManager.Notify(
+                $"Update v{updateVersion.ToString(3)} is ready and will install when you close the app"
             );
         }
         catch
@@ -116,10 +123,41 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    private Version? _pendingUpdate;
+
+    private void ApplyPendingUpdateOnExit()
+    {
+        if (_pendingUpdate is null || _updateService is null || !OperatingSystem.IsWindows())
+            return;
+
+        try
+        {
+            _updateService.FinalizeUpdate(_pendingUpdate, restart: false);
+        }
+        catch
+        {
+            // Never block exit; the update will be offered again next launch
+        }
+        finally
+        {
+            _pendingUpdate = null;
+        }
+    }
+
+    private static void ShutdownForUpdate()
+    {
+        if (
+            Application.Current?.ApplicationLifetime
+            is IClassicDesktopStyleApplicationLifetime desktop
+        )
+            desktop.Shutdown(2);
+        else
+            Environment.Exit(2);
+    }
+
     [RelayCommand]
     private async Task InitializeAsync()
     {
-        await ShowUkraineSupportMessageAsync();
         await ShowDevelopmentBuildMessageAsync();
         await ShowFFmpegMessageAsync();
         // Check for updates on startup

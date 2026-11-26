@@ -42,7 +42,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                          Text="Enhanced Video Downloader"
+                          Text="Enhanced YouTube Downloader"
                           FontSize="24"
                           FontWeight="SemiBold"
                           VerticalAlignment="Center"/>
@@ -54,9 +54,6 @@
                     <Button Content="Settings"
                             Classes="Outline"
                             Command="{Binding Dashboard.ShowSettingsCommand}"/>
-                    <Button Content="Auth"
-                            Classes="Outline"
-                            Command="{Binding Dashboard.ShowAuthSetupCommand}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -105,7 +102,7 @@
                     <TextBlock Grid.Row="1"
                                Text="{Binding Dashboard.QueryError}"
                                IsVisible="{Binding Dashboard.QueryError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                               Foreground="#F44336"
+                               Foreground="{DynamicResource AppErrorTextBrush}"
                                FontSize="12"
                                Margin="0,4,0,0"/>
                 </Grid>
@@ -159,26 +156,30 @@
 
                                             <!-- Title and Author -->
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <TextBlock Text="{Binding Title}"
+                                                <!-- Grid (not a horizontal StackPanel) so long titles wrap and the badge stays visible -->
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <SelectableTextBlock Grid.Column="0"
+                                                              Text="{Binding Title}"
                                                               FontSize="15"
                                                               FontWeight="SemiBold"
                                                               TextWrapping="Wrap"
+                                                              TextTrimming="CharacterEllipsis"
                                                               MaxLines="2"/>
-                                                    <Border Background="#F9A825"
+                                                    <Border Grid.Column="1"
+                                                            Background="{DynamicResource AppAccentBrush}"
                                                             CornerRadius="4"
                                                             Padding="6,2"
                                                             VerticalAlignment="Top"
-                                                            Margin="0,2,0,0">
+                                                            Margin="8,2,0,0">
                                                         <TextBlock Text="{Binding PlatformDisplayName}"
                                                                   FontSize="10"
                                                                   FontWeight="SemiBold"
-                                                                  Foreground="#FFFFFF"/>
+                                                                  Foreground="{DynamicResource AppOnAccentBrush}"/>
                                                     </Border>
-                                                </StackPanel>
-                                                <TextBlock Text="{Binding Author}"
+                                                </Grid>
+                                                <SelectableTextBlock Text="{Binding Author}"
                                                           FontSize="13"
-                                                          Opacity="0.65"
+                                                          Opacity="0.8"
                                                           TextWrapping="NoWrap"
                                                           TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
@@ -197,10 +198,11 @@
                                                         Height="6"
                                                         CornerRadius="3"/>
 
-                                            <TextBlock Grid.Row="1"
+                                            <SelectableTextBlock Grid.Row="1"
+                                                      TextWrapping="Wrap"
                                                       Text="{Binding FormattedProgressInfo}"
                                                       FontSize="12"
-                                                      Opacity="0.6"
+                                                      Opacity="0.8"
                                                       Margin="0,6,0,0"/>
                                         </Grid>
 
@@ -268,6 +270,17 @@
                     </ItemsControl>
                 </ScrollViewer>
 
+                <!-- Empty State -->
+                <TextBlock Text="Paste a video link above to get started"
+                           IsVisible="{Binding !Dashboard.Downloads.Count}"
+                           Foreground="{DynamicResource AppSecondaryTextBrush}"
+                           FontSize="15"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="16"/>
+
                 <!-- Loading Indicator Overlay -->
                 <controls:LoadingIndicator IsLoading="{Binding Dashboard.IsBusy}"
                                           LoadingMessage="Resolving query..."
@@ -275,13 +288,13 @@
             </Grid>
         </Grid>
 
-        <!-- Snackbar Host (Bottom Center) -->
+        <!-- Snackbar Host (Bottom Center): sized to its content so it only covers the
+             snackbars themselves and their Close/action buttons stay clickable -->
         <controls:SnackbarHost Grid.Row="0"
                               Grid.RowSpan="2"
                               DataContext="{Binding SnackbarManager}"
                               VerticalAlignment="Bottom"
-                              HorizontalAlignment="Stretch"
-                              IsHitTestVisible="False"/>
+                              HorizontalAlignment="Center"/>
     </Grid>
     </dialogHostAvalonia:DialogHost>
 </Window>

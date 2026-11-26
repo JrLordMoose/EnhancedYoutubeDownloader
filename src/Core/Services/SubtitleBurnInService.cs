@@ -275,4 +275,104 @@ public class SubtitleBurnInService : ISubtitleBurnInService
             return escaped;
         }
     }
+
+    public async Task<bool> EmbedSubtitlesAsync(
+        string videoPath,
+        string subtitlePath,
+        CancellationToken cancellationToken = default)
+    {
+        if (!File.Exists(videoPath) || !File.Exists(subtitlePath) || !File.Exists(_ffmpegPath))
+        {
+            TraceLog.Write("[EMBED-SUBS] Missing video, subtitle or ffmpeg; skipping");
+            return false;
+        }
+
+        var extension = Path.GetExtension(videoPath);
+        var codec = extension.Equals(".webm", StringComparison.OrdinalIgnoreCase)
+            ? "webvtt"
+            : extension.Equals(".mkv", StringComparison.OrdinalIgnoreCase) ? "srt" : "mov_text";
+        var tempOutput = Path.Combine(
+            Path.GetDirectoryName(videoPath) ?? string.Empty,
+            $"{Path.GetFileNameWithoutExtension(videoPath)}.subs-tmp{extension}");
+
+        var args = new[]
+        {
+            "-y", "-hide_banner", "-loglevel", "error",
+            "-i", videoPath, "-i", subtitlePath,
+            "-map", "0", "-map", "1:0",
+            "-c", "copy", "-c:s", codec,
+            tempOutput,
+        };
+
+        if (!await RunFfmpegAsync(args, cancellationToken) || !File.Exists(tempOutput))
+        {
+            if (File.Exists(tempOutput))
+                File.Delete(tempOutput);
+            return false;
+        }
+
+        File.Move(tempOutput, videoPath, overwrite: true);
+        TraceLog.Write($"[EMBED-SUBS] Embedded {codec} subtitles into {videoPath}");
+        return true;
+    }
+
+    public Task<bool> ExtractWavAudioAsync(
+        string videoPath,
+        string wavOutputPath,
+        CancellationToken cancellationToken = default)
+    {
+        var args = new[]
+        {
+            "-y", "-hide_banner", "-loglevel", "error",
+            "-i", videoPath,
+            "-vn", "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le",
+            wavOutputPath,
+        };
+        return RunFfmpegAsync(args, cancellationToken);
+    }
+
+    private async Task<bool> RunFfmpegAsync(IEnumerable<string> args, CancellationToken cancellationToken)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = _ffmpegPath,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+        };
+
+        // ArgumentList quotes each value, so titles with spaces/quotes are passed safely
+        foreach (var arg in args)
+            startInfo.ArgumentList.Add(arg);
+
+        using var process = new Process { StartInfo = startInfo };
+        process.Start();
+        var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
+        var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+
+        try
+        {
+            await process.WaitForExitAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException) { }
+            throw;
+        }
+
+        await stdoutTask;
+        var stderr = await stderrTask;
+        if (process.ExitCode != 0)
+        {
+            TraceLog.Write($"[FFMPEG] Exit {process.ExitCode}: {stderr.Trim()}");
+            return false;
+        }
+
+        return true;
+    }
 }

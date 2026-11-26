@@ -13,7 +13,7 @@ Experience our professional landing page featuring:
 - Multi-platform support (YouTube, TikTok, Instagram, Twitter, 1,800+ sites)
 - Modern glassmorphism design with animated gradients
 - Netflix-style burned-in subtitles
-- Intelligent pause/resume and queue management
+- Queue management with pause and restart
 
 ---
 
@@ -24,22 +24,22 @@ Experience our professional landing page featuring:
 <br>
 
 ### Core Features
-- ✅ Cross-platform support (Windows, Linux, macOS)
+- ✅ Windows 10/11 (installer with automatic updates)
 - ✅ Download single videos, playlists, and channels
-- ✅ Multiple quality and format options
-- ✅ Subtitle support
-- ✅ Metadata tagging
-- ✅ **Browser cookie authentication** - For private, age-restricted, and 403-blocked content (Settings → Advanced)
+- ✅ MP4, WebM and MP3 (with selectable MP3 bitrate)
+- ✅ Subtitles in your language: embedded, burned-in, or a separate .srt file
+- ✅ Optional AI-generated subtitles (Whisper) when a video has none
+- ✅ Metadata tagging and thumbnails
+- ✅ **Sign-in support (cookies)** - Choose a `cookies.txt` file (or use Firefox's cookies) in Settings → Advanced → Authentication. Needed for private/age-restricted videos, Instagram, Reddit, and YouTube's "Sign in to confirm you're not a bot" check. On Windows, Chrome/Edge/Brave cookies can't be read directly, so export a `cookies.txt` instead.
 
 ### Enhanced Features
 - 🚀 **Unified Queue Management** - Single pane for all download states
-- 🚀 **Pause/Resume Functionality** - State persistence and recovery
-- 🚀 **Enhanced Error Handling** - User-friendly messages with actions
-- 🚀 **Metadata Caching** - SQLite-based cache with invalidation
-- 🚀 **Multi-Platform Downloads** - YouTube, TikTok, Instagram, Twitter, and 1,800+ sites via yt-dlp
-- 🚀 **Format Profiles** - Quick presets for common scenarios
-- 🚀 **Automatic Updates** - Check for updates from Settings (Windows)
-- 🚀 **Better Feedback** - Toast notifications and loading states
+- 🚀 **Pause and Restart** - Pause a download and continue it later (it restarts from the beginning)
+- 🚀 **Enhanced Error Handling** - User-friendly messages with actions, plus an automatic sign-in prompt
+- 🚀 **Multi-Platform Downloads** - YouTube, TikTok, Instagram, X/Twitter, Facebook, Vimeo, Dailymotion, SoundCloud and 1,800+ sites via yt-dlp, with real titles and thumbnails
+- 🚀 **Automatic Updates** - Prompted on startup, or check any time from Settings (Windows)
+- 🚀 **Light and Dark Themes** - Follows Windows automatically or pick one
+- 🚀 **Better Feedback** - Notifications when downloads finish, selectable/copyable text
 - 🚀 **Performance Optimization** - Parallel downloads and retry logic
 
 ## Technology Stack
@@ -58,7 +58,7 @@ Experience our professional landing page featuring:
 
 #### Windows
 Download and run the installer:
-1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.7.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.7/EnhancedYoutubeDownloader-Setup-v0.4.7.exe)** (~84 MB)
+1. **[Download EnhancedYoutubeDownloader-Setup-v0.4.8.exe](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/download/v0.4.8/EnhancedYoutubeDownloader-Setup-v0.4.8.exe)** (~84 MB)
 2. Run the installer and follow the setup wizard
 
 **⚠️ Windows SmartScreen Warning**
@@ -92,6 +92,8 @@ You may see a red warning screen saying "Windows protected your PC".
 - Smart uninstaller with optional data cleanup
 - FFmpeg + yt-dlp bundled for video download and conversion (80 MB total)
 - Dependency validation on startup with download links
+
+> ⚠️ **Note:** Only Windows is currently supported and tested. The download pipeline expects Windows builds of yt-dlp/FFmpeg, so the macOS and Linux steps below are experimental and may not work.
 
 #### Mac & macOS
 Currently, Mac support is experimental. To run Enhanced YouTube Downloader on Mac:
@@ -203,7 +205,7 @@ dotnet publish src/Desktop/EnhancedYoutubeDownloader.csproj -c Release -r win-x6
 # 2. Build installer with Inno Setup
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.7.exe
+# Installer output: release/EnhancedYoutubeDownloader-Setup-v0.4.8.exe
 ```
 
 **Installer Features:**

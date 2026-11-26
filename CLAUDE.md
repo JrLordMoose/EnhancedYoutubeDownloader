@@ -49,12 +49,9 @@ The build-installer.ps1 script creates BOTH files automatically. YOU MUST UPLOAD
    ```
    - Default version parameter for build script
 
-4. **`src/Desktop/Views/Dialogs/SettingsDialog.axaml`** (line 406) - Settings UI version
-   ```xml
-   <TextBlock Text="Version X.X.X"
-   ```
-   - Displayed in Settings > About section
-   - User-facing version display
+4. **`src/Desktop/Views/Dialogs/SettingsDialog.axaml`** - **No edit needed**
+   - Settings > About binds `{Binding CurrentVersion}`, read from the assembly version
+     set by `Directory.Build.props`
 
 5. **`README.md`** - Update download links (lines 47, 140)
    ```markdown
@@ -551,7 +548,7 @@ src/
 - `DownloadViewModel` - Individual download item representation
 - **Dialog ViewModels** in `ViewModels/Dialogs/`:
   - `SettingsViewModel` - App settings with 3 tabs (General, Downloads, Advanced)
-  - `AuthSetupViewModel` - Google authentication for private content
+  - (AuthSetup dialog removed in v0.4.8: sign-in is configured in Settings > Advanced > Authentication)
   - `DownloadSingleSetupViewModel` - Single video download configuration
   - `DownloadMultipleSetupViewModel` - Playlist/channel download configuration
   - `MessageBoxViewModel` - Generic message/confirm dialogs
@@ -570,7 +567,7 @@ src/
 - **DownloadSingleSetupDialog** - Video info, quality/format selector, file path picker
 - **DownloadMultipleSetupDialog** - Video checklist with virtualization, batch settings
 - **SettingsDialog** - TabControl with 3 sections (General, Downloads, Advanced)
-- **AuthSetupDialog** - WebView for Google authentication with instructions
+- **Sign-in prompt** (MessageBox) - offers a cookies.txt file or Firefox cookies when a site requires sign-in
 - **MessageBoxDialog** - Icon, title, message, primary/secondary buttons
 - **ErrorDialog** - Error icon, message, expandable details, category badge, action buttons
 
@@ -624,7 +621,7 @@ src/
 ## Configuration
 
 - **Directory.Build.props** - Shared MSBuild properties (targets .NET 9.0, enables nullable, treats warnings as errors)
-- **Settings**: Stored in user AppData via SettingsService (Cogwheel-based)
+- **Settings**: `%AppData%\EnhancedYoutubeDownloader\settings.json` via SettingsService (Cogwheel). Migrated once from the legacy file named after the app in the working/app directory.
 - **Material Theme**: Custom colors defined in `App.axaml.cs:117` (Light: #343838/#F9A825, Dark: #E8E8E8/#F9A825)
 
 ## Development Notes
@@ -688,7 +685,7 @@ All 5 Material Design dialogs created with complete AXAML markup:
 - **DownloadSingleSetupDialog** - Video info, quality/format selectors, file path picker
 - **DownloadMultipleSetupDialog** - Video checklist with virtualization, batch configuration
 - **SettingsDialog** - 3-tab interface (General, Downloads, Advanced)
-- **AuthSetupDialog** - WebView placeholder for Google authentication
+- **Sign-in prompt** - MessageBox shown when a download hits a sign-in wall; offers cookies.txt or Firefox cookies (`YtDlpErrorClassifier`, `BrowserCookieHelper`)
 - **MessageBoxDialog** - Flexible message/confirmation dialog
 
 ### QueryResolver ✅

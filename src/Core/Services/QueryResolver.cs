@@ -16,7 +16,9 @@ public class QueryResolver : IQueryResolver
     private readonly ICacheService _cacheService;
 
     private static readonly Regex VideoIdRegex = new(
-        @"(?:youtube\.com/watch\?v=|youtube\.com/shorts/|youtu\.be/|youtube\.com/embed/)([a-zA-Z0-9_-]{11})",
+        // watch?v= may follow other parameters (m.youtube.com/watch?app=desktop&v=ID,
+        // watch?feature=share&v=ID); also /shorts/, /embed/, /live/, /v/ and youtu.be/
+        @"(?:youtube\.com/(?:watch\?(?:[^#\s]*?&)?v=|shorts/|embed/|live/|v/)|youtu\.be/)([a-zA-Z0-9_-]{11})",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
@@ -31,7 +33,7 @@ public class QueryResolver : IQueryResolver
     );
 
     private static readonly Regex ChannelHandleRegex = new(
-        @"youtube\.com/@([a-zA-Z0-9_-]+)",
+        @"youtube\.com/@([a-zA-Z0-9_.\-]+)",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
@@ -70,7 +72,7 @@ public class QueryResolver : IQueryResolver
         // For non-YouTube URLs, create a generic video stub and let yt-dlp handle it
         if (platform != PlatformType.YouTube && platform != PlatformType.Unknown)
         {
-            var genericVideo = new GenericVideo(query, $"Video from {platform}");
+            var genericVideo = new GenericVideo(EnsureScheme(query), $"Video from {platform}");
             return new QueryResult
             {
                 Kind = QueryResultKind.Video,
@@ -84,9 +86,18 @@ public class QueryResolver : IQueryResolver
         // A watch URL can also contain a playlist. Prefer the playlist whenever a
         // list parameter is present so pasted watch-and-list URLs open batch selection.
         var playlistId = ExtractPlaylistId(query);
-        if (playlistId != null)
+        var videoIdInUrl = ExtractVideoId(query);
+        if (playlistId != null && !(videoIdInUrl != null && IsUnfetchablePlaylist(playlistId)))
         {
-            return await ResolvePlaylistAsync(playlistId, platform);
+            try
+            {
+                return await ResolvePlaylistAsync(playlistId, platform);
+            }
+            catch (Exception ex) when (videoIdInUrl != null)
+            {
+                // Private/unavailable playlist: fall back to the single video in the URL
+                TraceLog.Write($"[QUERY] Playlist fetch failed, using the video instead: {ex.Message}");
+            }
         }
 
         // Try to resolve as video URL
@@ -192,21 +203,63 @@ public class QueryResolver : IQueryResolver
         // Check for Twitter/X URLs
         if (
             TwitterUrlRegex.IsMatch(query)
-            || query.Contains("twitter.com", StringComparison.OrdinalIgnoreCase)
-            || query.Contains("x.com", StringComparison.OrdinalIgnoreCase)
+            || HostMatches(query, "twitter.com")
+            || HostMatches(query, "x.com")
         )
         {
             return PlatformType.Twitter;
         }
 
         // Check if it looks like a URL (contains protocol or domain pattern)
-        if (query.Contains("://") || query.Contains("www."))
+        if (query.Contains("://") || query.Contains("www.") || LooksLikeBareUrl(query))
         {
             return PlatformType.Generic;
         }
 
         // Not a recognized URL pattern
         return PlatformType.Unknown;
+    }
+
+    /// <summary>
+    /// "vimeo.com/123" or "dailymotion.com/video/x" typed without a scheme: a host with a
+    /// dot followed by a path, and no spaces. These used to fall through to a YouTube search.
+    /// </summary>
+    private static bool LooksLikeBareUrl(string query)
+    {
+        if (query.Contains(' ') || !query.Contains('/'))
+            return false;
+
+        return Uri.TryCreate("https://" + query, UriKind.Absolute, out var uri)
+            && uri.Host.Contains('.')
+            && !uri.Host.StartsWith('.')
+            && !uri.Host.EndsWith('.');
+    }
+
+    /// <summary>Adds https:// when a URL was pasted without a scheme.</summary>
+    private static string EnsureScheme(string query) =>
+        query.Contains("://", StringComparison.Ordinal) ? query : "https://" + query;
+
+    /// <summary>
+    /// Auto-generated mixes (RD…), Watch Later (WL) and Liked (LL) can't be fetched as public
+    /// playlists; when the URL also names a video, download that video instead.
+    /// </summary>
+    private static bool IsUnfetchablePlaylist(string playlistId) =>
+        playlistId.StartsWith("RD", StringComparison.Ordinal)
+        || playlistId is "WL" or "LL" or "LM";
+
+    /// <summary>
+    /// True when the URL's host is <paramref name="domain"/> or a subdomain of it.
+    /// A plain substring check misfiled netflix.com and dropbox.com as x.com.
+    /// </summary>
+    private static bool HostMatches(string query, string domain)
+    {
+        var candidate = query.Contains("://", StringComparison.Ordinal) ? query : "https://" + query;
+        if (!Uri.TryCreate(candidate, UriKind.Absolute, out var uri))
+            return false;
+
+        var host = uri.Host;
+        return host.Equals(domain, StringComparison.OrdinalIgnoreCase)
+            || host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase);
     }
 
     public string? ExtractVideoId(string url)

@@ -46,41 +46,46 @@ public class App : Application, IDisposable
 
         _settingsService = _host.Services.GetRequiredService<SettingsService>();
 
-        // Ensure AutoStartDownload is enabled (fixes issue where it was persisted as false)
-        TraceLog.Write(
-            $"[APP] Initial AutoStartDownload value: {_settingsService.AutoStartDownload}"
-        );
-        if (!_settingsService.AutoStartDownload)
+        // Load settings BEFORE resolving anything that reads them (cache path, parallel
+        // limit, theme). Previously Load() ran later, so those services saw defaults.
+        _settingsService.Load();
+
+        // One-time repair: older builds persisted AutoStartDownload=false by mistake, which
+        // left every new download sitting in "Queued". Users can still turn it off afterwards.
+        if (!_settingsService.AutoStartMigrationDone)
         {
-            TraceLog.Write("[APP] AutoStartDownload is false, setting to true");
             _settingsService.AutoStartDownload = true;
+            _settingsService.AutoStartMigrationDone = true;
             _settingsService.Save();
-            TraceLog.Write("[APP] AutoStartDownload reset to true and saved");
-        }
-        else
-        {
-            TraceLog.Write("[APP] AutoStartDownload is already true");
+            TraceLog.Write("[APP] AutoStartDownload repaired to true (one-time)");
         }
 
         _mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
 
         // Re-initialize the theme when the user changes it
-        _eventRoot.Add(
-            _settingsService.WatchProperty(
-                o => o.Theme,
-                () =>
-                {
-                    RequestedThemeVariant = _settingsService.Theme switch
-                    {
-                        ThemeVariant.Light => Avalonia.Styling.ThemeVariant.Light,
-                        ThemeVariant.Dark => Avalonia.Styling.ThemeVariant.Dark,
-                        _ => Avalonia.Styling.ThemeVariant.Default,
-                    };
+        _eventRoot.Add(_settingsService.WatchProperty(o => o.Theme, ApplyTheme));
+    }
 
-                    InitializeTheme();
-                }
-            )
-        );
+    /// <summary>
+    /// Applies the saved theme: sets Avalonia's variant and rebuilds the Material palette.
+    /// </summary>
+    private void ApplyTheme()
+    {
+        RequestedThemeVariant = _settingsService.Theme switch
+        {
+            ThemeVariant.Light => Avalonia.Styling.ThemeVariant.Light,
+            ThemeVariant.Dark => Avalonia.Styling.ThemeVariant.Dark,
+            _ => Avalonia.Styling.ThemeVariant.Default,
+        };
+
+        InitializeTheme();
+    }
+
+    private void OnPlatformColorValuesChanged(object? sender, PlatformColorValues e)
+    {
+        // "Auto (System)" follows Windows when the user flips light/dark mode
+        if (_settingsService.Theme == ThemeVariant.Auto)
+            Avalonia.Threading.Dispatcher.UIThread.Post(InitializeTheme);
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -119,7 +124,13 @@ public class App : Application, IDisposable
         {
             var subtitleService = sp.GetRequiredService<ISubtitleBurnInService>();
             var settings = sp.GetRequiredService<SettingsService>();
-            return new YtDlpDownloadService(subtitleService, settings);
+            return new YtDlpDownloadService(
+                subtitleService,
+                settings,
+                settings.ParallelLimit,
+                sp.GetRequiredService<ISubtitleGenerationService>(),
+                sp.GetRequiredService<DownloadStateRepository>()
+            );
         });
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IQueryResolver, QueryResolver>();
@@ -135,7 +146,6 @@ public class App : Application, IDisposable
         services.AddTransient<MainViewModel>();
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<DownloadViewModel>();
-        services.AddTransient<AuthSetupViewModel>();
         services.AddTransient<DownloadMultipleSetupViewModel>();
         services.AddTransient<DownloadSingleSetupViewModel>();
         services.AddTransient<MessageBoxViewModel>();
@@ -167,9 +177,11 @@ public class App : Application, IDisposable
             _ => PlatformSettings?.GetColorValues().ThemeVariant ?? PlatformThemeVariant.Light,
         };
 
+        // Light mode needs a dark primary: #FAFAFA made selected tabs, links and toggles
+        // invisible on the white background.
         this.LocateMaterialTheme<MaterialThemeBase>().CurrentTheme =
             actualTheme == PlatformThemeVariant.Light
-                ? Theme.Create(Theme.Light, Color.Parse("#FAFAFA"), Color.Parse("#F9A825"))
+                ? Theme.Create(Theme.Light, Color.Parse("#343838"), Color.Parse("#F9A825"))
                 : Theme.Create(Theme.Dark, Color.Parse("#E8E8E8"), Color.Parse("#F9A825"));
     }
 
@@ -180,11 +192,14 @@ public class App : Application, IDisposable
 
         base.OnFrameworkInitializationCompleted();
 
-        // Set up custom theme colors
-        InitializeTheme();
+        // Settings were loaded in the constructor; apply the saved theme
+        ApplyTheme();
 
-        // Load settings
-        _settingsService.Load();
+        // Right-click Copy / Select All on all selectable text (titles, errors, dialogs)
+        SelectableTextContextMenu.Register();
+
+        if (PlatformSettings is { } platformSettings)
+            platformSettings.ColorValuesChanged += OnPlatformColorValuesChanged;
 
         // Validate dependencies asynchronously (don't block startup)
         _ = ValidateDependenciesAsync();

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -24,18 +26,127 @@ public partial class SettingsViewModel : DialogViewModelBase
     private SettingsService _settings;
 
     // Snapshot for rollback on Cancel
-    private string? _originalDownloadPath;
-    private string? _originalCachePath;
-    private ThemeVariant _originalTheme;
-    private bool _originalAutoUpdate;
-    private int _originalParallelLimit;
-    private int _originalQuality;
-    private int _originalFormat;
-    private bool _originalSubtitles;
-    private bool _originalTags;
-    private bool _originalAutoStart;
-    private bool _originalOpenFolder;
-    private bool _originalLanguageAudio;
+    // Snapshot of every persisted setting, restored on Cancel. Reflection-based so a newly
+    // added setting can never be forgotten here again.
+    private readonly Dictionary<PropertyInfo, object?> _snapshot = new();
+    private readonly string _originalCachePath;
+
+    // Order must match the ComboBoxItems in SettingsDialog.axaml
+    private static readonly string[] BrowserOptions =
+    [
+        "chrome",
+        "firefox",
+        "edge",
+        "opera",
+        "brave",
+        "chromium",
+    ];
+
+    private static readonly string[] AiLanguageOptions =
+    [
+        "auto",
+        "en",
+        "es",
+        "fr",
+        "de",
+        "it",
+        "pt",
+        "ja",
+        "ko",
+        "zh",
+    ];
+
+    /// <summary>
+    /// ComboBox index for <see cref="SettingsService.BrowserForCookies"/>. The dialog's items are
+    /// ComboBoxItems, so binding SelectedValue straight to the string never stored a browser name.
+    /// </summary>
+    public int BrowserIndex
+    {
+        get =>
+            Math.Max(
+                0,
+                Array.IndexOf(BrowserOptions, Settings.BrowserForCookies?.ToLowerInvariant())
+            );
+        set
+        {
+            if (value < 0 || value >= BrowserOptions.Length)
+                return;
+            Settings.BrowserForCookies = BrowserOptions[value];
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Maps the Theme ComboBox (Auto, Light, Dark) to <see cref="ThemeVariant"/>
+    /// (Light=0, Dark=1, Auto=2). Binding SelectedIndex straight to the enum made
+    /// "Auto" pick Light and "Light" pick Dark.
+    /// </summary>
+    public int ThemeIndex
+    {
+        get => ThemeToIndex(Settings.Theme);
+        set
+        {
+            Settings.Theme = IndexToTheme(value);
+            OnPropertyChanged();
+        }
+    }
+
+    internal static int ThemeToIndex(ThemeVariant theme) =>
+        theme switch
+        {
+            ThemeVariant.Light => 1,
+            ThemeVariant.Dark => 2,
+            _ => 0,
+        };
+
+    internal static ThemeVariant IndexToTheme(int index) =>
+        index switch
+        {
+            1 => ThemeVariant.Light,
+            2 => ThemeVariant.Dark,
+            _ => ThemeVariant.Auto,
+        };
+
+    // Order must match the Subtitle Language ComboBoxItems in SettingsDialog.axaml
+    private static readonly string[] SubtitleLanguageOptions =
+    [
+        "en",
+        "es",
+        "fr",
+        "de",
+        "it",
+        "pt",
+        "ja",
+        "ko",
+        "zh",
+        "all",
+    ];
+
+    /// <summary>ComboBox index for <see cref="SettingsService.SubtitleLanguage"/>.</summary>
+    public int SubtitleLanguageIndex
+    {
+        get => Math.Max(0, Array.IndexOf(SubtitleLanguageOptions, Settings.SubtitleLanguage));
+        set
+        {
+            if (value < 0 || value >= SubtitleLanguageOptions.Length)
+                return;
+            Settings.SubtitleLanguage = SubtitleLanguageOptions[value];
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>ComboBox index for <see cref="SettingsService.AISubtitleLanguage"/>.</summary>
+    public int AiSubtitleLanguageIndex
+    {
+        get => Math.Max(0, Array.IndexOf(AiLanguageOptions, Settings.AISubtitleLanguage));
+        set
+        {
+            if (value < 0 || value >= AiLanguageOptions.Length)
+                return;
+            Settings.AISubtitleLanguage = AiLanguageOptions[value];
+            OnPropertyChanged();
+        }
+    }
 
     [ObservableProperty]
     private string _cacheSize = "Calculating...";
@@ -84,18 +195,9 @@ public partial class SettingsViewModel : DialogViewModelBase
         _updateService = updateService;
 
         // Snapshot current settings for rollback on Cancel
-        _originalDownloadPath = Settings.DefaultDownloadPath;
         _originalCachePath = Settings.DefaultCachePath;
-        _originalTheme = Settings.Theme;
-        _originalAutoUpdate = Settings.IsAutoUpdateEnabled;
-        _originalParallelLimit = Settings.ParallelLimit;
-        _originalQuality = Settings.DefaultQuality;
-        _originalFormat = Settings.DefaultFormat;
-        _originalSubtitles = Settings.ShouldInjectSubtitles;
-        _originalTags = Settings.ShouldInjectTags;
-        _originalAutoStart = Settings.AutoStartDownload;
-        _originalOpenFolder = Settings.OpenFolderAfterDownload;
-        _originalLanguageAudio = Settings.ShouldInjectLanguageSpecificAudioStreams;
+        foreach (var property in PersistedSettings)
+            _snapshot[property] = property.GetValue(Settings);
 
         TraceLog.Write($"[SETTINGS] Settings dialog initialized. Current values snapshot taken.");
 
@@ -117,20 +219,7 @@ public partial class SettingsViewModel : DialogViewModelBase
     {
         TraceLog.Write($"[SETTINGS] Cancel clicked. Rolling back changes to original values.");
 
-        // Rollback all settings to original snapshot values
-        Settings.DefaultDownloadPath = _originalDownloadPath ?? string.Empty;
-        Settings.DefaultCachePath = _originalCachePath ?? string.Empty;
-        Settings.Theme = _originalTheme;
-        Settings.IsAutoUpdateEnabled = _originalAutoUpdate;
-        Settings.ParallelLimit = _originalParallelLimit;
-        Settings.DefaultQuality = _originalQuality;
-        Settings.DefaultFormat = _originalFormat;
-        Settings.ShouldInjectSubtitles = _originalSubtitles;
-        Settings.ShouldInjectTags = _originalTags;
-        Settings.AutoStartDownload = _originalAutoStart;
-        Settings.OpenFolderAfterDownload = _originalOpenFolder;
-        Settings.ShouldInjectLanguageSpecificAudioStreams = _originalLanguageAudio;
-
+        RestoreSnapshot();
         TraceLog.Write($"[SETTINGS] All settings rolled back to original state.");
 
         Close(false);
@@ -149,6 +238,7 @@ public partial class SettingsViewModel : DialogViewModelBase
         {
             TraceLog.Write($"[SETTINGS] Default download path set to: {selectedPath}");
             Settings.DefaultDownloadPath = selectedPath;
+            OnPropertyChanged(nameof(ActualDownloadPath));
         }
         else
         {
@@ -169,11 +259,36 @@ public partial class SettingsViewModel : DialogViewModelBase
         {
             TraceLog.Write($"[SETTINGS] Cache path set to: {selectedPath}");
             Settings.DefaultCachePath = selectedPath;
+            OnPropertyChanged(nameof(ActualCachePath));
         }
         else
         {
             TraceLog.Write($"[SETTINGS] Browse canceled, no path selected.");
         }
+    }
+
+    [RelayCommand]
+    private async Task BrowseCookiesFileAsync()
+    {
+        var path = await _dialogManager.PromptOpenFilePathAsync(
+            "Choose cookies.txt",
+            "Cookies file",
+            "*.txt"
+        );
+
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            // Never log the file's contents; the path alone is enough to debug
+            TraceLog.Write($"[SETTINGS] Cookies file set: {path}");
+            Settings.CookiesFilePath = path;
+        }
+    }
+
+    [RelayCommand]
+    private void ClearCookiesFile()
+    {
+        TraceLog.Write("[SETTINGS] Cookies file cleared");
+        Settings.CookiesFilePath = string.Empty;
     }
 
     [RelayCommand]
@@ -197,45 +312,51 @@ public partial class SettingsViewModel : DialogViewModelBase
             SecondaryButtonText = "No",
         };
 
+        // DialogManager shows one dialog at a time: asking for confirmation while Settings is
+        // open waited forever. Discard unsaved edits, close, confirm, then reopen Settings.
+        RestoreSnapshot();
+        var tab = SelectedTabIndex;
+        Close(false);
+
         var result = await _dialogManager.ShowDialogAsync(messageBox);
 
         if (result == true)
         {
-            TraceLog.Write(
-                $"[SETTINGS] Reset All Settings confirmed. Resetting to default values."
-            );
+            TraceLog.Write("[SETTINGS] Reset All Settings confirmed. Resetting to defaults.");
 
-            // Reset all settings to defaults
-            Settings.Theme = ThemeVariant.Auto;
-            Settings.IsAutoUpdateEnabled = true;
-            Settings.ParallelLimit = 3;
-            Settings.DefaultQuality = 0; // Best Quality
-            Settings.DefaultFormat = 0; // MP4
-            Settings.ShouldInjectSubtitles = true; // FIXED: Changed from false to true
-            Settings.ShouldInjectTags = true;
-            Settings.AutoStartDownload = true;
-            Settings.OpenFolderAfterDownload = false;
-            Settings.DefaultDownloadPath = string.Empty;
-            Settings.DefaultCachePath = string.Empty;
-            Settings.ShouldInjectLanguageSpecificAudioStreams = true; // FIXED: Changed from false to true
-
-            TraceLog.Write($"[SETTINGS] All settings reset to defaults.");
-
-            // Save settings
+            // Cogwheel resets every property to its default; keep the one-time migration flag
+            Settings.Reset();
+            Settings.AutoStartMigrationDone = true;
             Settings.Save();
-            TraceLog.Write($"[SETTINGS] Reset settings saved to disk.");
-
-            // Update computed properties
-            OnPropertyChanged(nameof(ActualDownloadPath));
-            OnPropertyChanged(nameof(ActualCachePath));
-
-            // Recalculate cache size
-            await CalculateCacheSizeAsync();
+            TraceLog.Write("[SETTINGS] Reset settings saved to disk.");
         }
         else
         {
             TraceLog.Write($"[SETTINGS] Reset All Settings canceled by user.");
         }
+
+        await ReopenSettingsAsync(tab);
+    }
+
+    /// <summary>
+    /// Every persisted setting: public, read/write, declared on SettingsService.
+    /// </summary>
+    private static readonly PropertyInfo[] PersistedSettings = typeof(SettingsService)
+        .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+        .Where(p => p.CanRead && p.CanWrite)
+        .ToArray();
+
+    private void RestoreSnapshot()
+    {
+        foreach (var (property, value) in _snapshot)
+            property.SetValue(Settings, value);
+
+        OnPropertyChanged(nameof(ThemeIndex));
+        OnPropertyChanged(nameof(BrowserIndex));
+        OnPropertyChanged(nameof(AiSubtitleLanguageIndex));
+        OnPropertyChanged(nameof(SubtitleLanguageIndex));
+        OnPropertyChanged(nameof(ActualDownloadPath));
+        OnPropertyChanged(nameof(ActualCachePath));
     }
 
     [RelayCommand]
@@ -253,9 +374,15 @@ public partial class SettingsViewModel : DialogViewModelBase
     {
         try
         {
-            // Get the cache database path
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var cacheDbPath = Path.Combine(appDataPath, "EnhancedYoutubeDownloader", "cache.db");
+            // The cache service opened its database at startup from the then-saved
+            // cache location (changes need a restart), so measure that file.
+            var cacheDir = string.IsNullOrWhiteSpace(_originalCachePath)
+                ? Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "EnhancedYoutubeDownloader"
+                )
+                : _originalCachePath;
+            var cacheDbPath = Path.Combine(cacheDir, "cache.db");
 
             if (File.Exists(cacheDbPath))
             {
@@ -399,10 +526,10 @@ public partial class SettingsViewModel : DialogViewModelBase
         }
     }
 
-    private async Task ReopenSettingsAsync()
+    private async Task ReopenSettingsAsync(int tabIndex = 2)
     {
         var settings = _viewModelManager.CreateSettingsViewModel();
-        settings.SelectedTabIndex = 2;
+        settings.SelectedTabIndex = tabIndex;
         await _dialogManager.ShowDialogAsync(settings);
     }
 

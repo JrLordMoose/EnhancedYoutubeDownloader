@@ -14,11 +14,13 @@ public class SubtitleGenerationService : ISubtitleGenerationService, IDisposable
 {
     private const string ModelName = "ggml-base.bin"; // 74MB base model
     private readonly string _modelDirectory;
+    private readonly ISubtitleBurnInService _ffmpeg;
     private WhisperFactory? _whisperFactory;
     private bool _disposed;
 
-    public SubtitleGenerationService()
+    public SubtitleGenerationService(ISubtitleBurnInService ffmpeg)
     {
+        _ffmpeg = ffmpeg;
         // Store models in AppData
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         _modelDirectory = Path.Combine(appDataPath, "EnhancedYoutubeDownloader", "WhisperModels");
@@ -56,7 +58,7 @@ public class SubtitleGenerationService : ISubtitleGenerationService, IDisposable
 
             // Create processor with language settings
             using var processor = _whisperFactory.CreateBuilder()
-                .WithLanguage(language == "auto" ? "en" : language) // Whisper.net auto-detect not directly supported, default to English
+                .WithLanguage(string.IsNullOrWhiteSpace(language) ? "auto" : language)
                 .Build();
 
             progress?.Report(0.3);
@@ -65,28 +67,49 @@ public class SubtitleGenerationService : ISubtitleGenerationService, IDisposable
             var totalSegments = 0;
             var processedSegments = 0;
 
-            // Process audio from video file
-            await using var fileStream = File.OpenRead(videoFilePath);
-            await foreach (var segment in processor.ProcessAsync(fileStream, cancellationToken))
+            // Whisper only accepts 16 kHz mono PCM WAV, so extract that from the video first
+            var wavPath = Path.Combine(Path.GetTempPath(), $"eyd-whisper-{Guid.NewGuid():N}.wav");
+            if (!await _ffmpeg.ExtractWavAudioAsync(videoFilePath, wavPath, cancellationToken))
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                TraceLog.Write("[AI-SUBS] Audio extraction failed");
+                return false;
+            }
 
-                subtitles.Add(new SubtitleSegment
+            try
+            {
+                await using var fileStream = File.OpenRead(wavPath);
+                await foreach (var segment in processor.ProcessAsync(fileStream, cancellationToken))
                 {
-                    Index = ++totalSegments,
-                    StartTime = segment.Start,
-                    EndTime = segment.End,
-                    Text = segment.Text.Trim()
-                });
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                processedSegments++;
+                    subtitles.Add(new SubtitleSegment
+                    {
+                        Index = ++totalSegments,
+                        StartTime = segment.Start,
+                        EndTime = segment.End,
+                        Text = segment.Text.Trim()
+                    });
 
-                // Report progress (30% to 90% during processing)
-                var processingProgress = 0.3 + (processedSegments * 0.6 / Math.Max(totalSegments, 1));
-                progress?.Report(Math.Min(processingProgress, 0.9));
+                    processedSegments++;
+
+                    // Report progress (30% to 90% during processing)
+                    var processingProgress = 0.3 + (processedSegments * 0.6 / Math.Max(totalSegments, 1));
+                    progress?.Report(Math.Min(processingProgress, 0.9));
+                }
+            }
+            finally
+            {
+                if (File.Exists(wavPath))
+                    File.Delete(wavPath);
             }
 
             progress?.Report(0.9);
+
+            if (subtitles.Count == 0)
+            {
+                TraceLog.Write("[AI-SUBS] Whisper produced no speech segments");
+                return false;
+            }
 
             // Write SRT file
             await WriteSrtFileAsync(outputSubtitlePath, subtitles, cancellationToken);
@@ -136,25 +159,29 @@ public class SubtitleGenerationService : ISubtitleGenerationService, IDisposable
             var downloadedBytes = 0L;
 
             await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            await using var fileStream = new FileStream(modelPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-
-            var buffer = new byte[8192];
-            int bytesRead;
-
-            while ((bytesRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
+            // Download to a temp file so an interrupted download never leaves a corrupt model
+            var tempModelPath = modelPath + ".download";
+            await using (var fileStream = new FileStream(tempModelPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+                var buffer = new byte[8192];
+                int bytesRead;
 
-                downloadedBytes += bytesRead;
-
-                if (totalBytes > 0)
+                while ((bytesRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
                 {
-                    var downloadProgress = (double)downloadedBytes / totalBytes;
-                    progress?.Report(downloadProgress);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+
+                    downloadedBytes += bytesRead;
+
+                    if (totalBytes > 0)
+                    {
+                        var downloadProgress = (double)downloadedBytes / totalBytes;
+                        progress?.Report(downloadProgress);
+                    }
                 }
             }
 
+            File.Move(tempModelPath, modelPath, overwrite: true);
             progress?.Report(1.0);
         }
         catch (OperationCanceledException)

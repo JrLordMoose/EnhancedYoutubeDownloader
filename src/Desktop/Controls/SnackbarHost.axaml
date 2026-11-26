@@ -7,7 +7,8 @@
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
              x:Class="EnhancedYoutubeDownloader.Controls.SnackbarHost"
-             x:DataType="controls:SnackbarHost">
+             x:DataType="framework:SnackbarManager">
+    <!-- DataContext is the SnackbarManager (set by MainView) -->
 
     <UserControl.Resources>
         <!-- Severity to Color Converters -->
@@ -18,8 +19,7 @@
     </UserControl.Resources>
 
     <!-- Snackbar Container (Bottom Center) -->
-    <ItemsControl ItemsSource="{Binding SnackbarQueue}"
-                  x:DataType="controls:SnackbarHost">
+    <ItemsControl ItemsSource="{Binding SnackbarQueue}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <StackPanel VerticalAlignment="Bottom"
@@ -91,20 +91,24 @@
                                    x:DataType="framework:SnackbarItem">
 
                             <!-- Custom Action Button -->
+                            <!-- Severity colours fail contrast as text on the light card; use the theme-aware accent text -->
                             <Button Content="{Binding ActionText}"
-                                    Command="{Binding Action}"
+                                    Command="{Binding $parent[ItemsControl].((framework:SnackbarManager)DataContext).InvokeActionCommand}"
+                                    CommandParameter="{Binding}"
                                     Theme="{DynamicResource MaterialFlatButton}"
                                     IsVisible="{Binding ActionText, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    Foreground="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"
+                                    Foreground="{DynamicResource AppAccentTextBrush}"
                                     x:DataType="framework:SnackbarItem"/>
 
                             <!-- Close Button -->
-                            <Button Command="{Binding $parent[ItemsControl].((controls:SnackbarHost)DataContext).DismissCurrentCommand, FallbackValue={x:Null}}"
+                            <Button Command="{Binding $parent[ItemsControl].((framework:SnackbarManager)DataContext).DismissCommand}"
+                                    CommandParameter="{Binding}"
                                     Classes="Flat"
                                     Width="28"
                                     Height="28"
                                     Padding="4"
-                                    x:CompileBindings="False">
+                                    ToolTip.Tip="Dismiss"
+                                    AutomationProperties.Name="Dismiss notification">
                                 <materialIcons:MaterialIcon Kind="Close" Width="16" Height="16"/>
                             </Button>
                         </StackPanel>

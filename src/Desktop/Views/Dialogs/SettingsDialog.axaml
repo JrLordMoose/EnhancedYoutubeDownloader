@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.SettingsDialog"
              x:DataType="vm:SettingsViewModel"
-             Width="600" Height="700">
+             Width="600" MaxHeight="700">
 
     <Design.DataContext>
         <vm:SettingsViewModel />
@@ -32,13 +32,12 @@
             </Border>
 
             <!-- Content -->
-            <ScrollViewer Grid.Row="1"
-                         VerticalScrollBarVisibility="Auto"
-                         HorizontalScrollBarVisibility="Disabled">
-                <TabControl Margin="0" Padding="0" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+            <!-- Each tab scrolls on its own so the tab headers stay pinned -->
+                <TabControl Grid.Row="1" Margin="0" Padding="0" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
 
                 <!-- General Tab -->
                 <TabItem Header="General">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Border Padding="20,16">
                         <StackPanel Spacing="20">
 
@@ -53,10 +52,11 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Choose your preferred color scheme"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Spacing="4">
-                                        <ComboBox SelectedIndex="{Binding Settings.Theme, Mode=TwoWay}"
+                                        <!-- Bound through ThemeIndex: item order differs from the ThemeVariant enum -->
+                                        <ComboBox SelectedIndex="{Binding ThemeIndex, Mode=TwoWay}"
                                                  HorizontalAlignment="Stretch"
                                                  VerticalAlignment="Center"
                                                  Theme="{DynamicResource MaterialFilledComboBox}">
@@ -64,11 +64,6 @@
                                             <ComboBoxItem Content="Light"/>
                                             <ComboBoxItem Content="Dark"/>
                                         </ComboBox>
-                                        <TextBlock Text="(Light Mode Coming Soon)"
-                                                  FontSize="11"
-                                                  FontStyle="Italic"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                                  HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
@@ -83,7 +78,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Check for updates on startup"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.IsAutoUpdateEnabled, Mode=TwoWay}"
@@ -91,21 +86,22 @@
                                 </Grid>
 
                                 <!-- Link to Check for Updates -->
-                                <TextBlock FontSize="12"
-                                          Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                          Cursor="Hand"
-                                          PointerPressed="UpdateLinkPressed">
-                                    <Run Text="→ "/>
-                                    <Run Text="Check for updates now" TextDecorations="Underline"/>
-                                </TextBlock>
+                                <Button Content="Check for updates now"
+                                        Command="{Binding GoToUpdateCheckCommand}"
+                                        Theme="{DynamicResource MaterialFlatButton}"
+                                        HorizontalAlignment="Left"
+                                        Padding="8,4"
+                                        FontSize="12"/>
                             </StackPanel>
 
                         </StackPanel>
                     </Border>
+                    </ScrollViewer>
                 </TabItem>
 
                 <!-- Downloads Tab -->
                 <TabItem Header="Downloads">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Border Padding="20,16">
                         <StackPanel Spacing="16">
 
@@ -120,7 +116,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Maximum number of simultaneous downloads"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <TextBlock Grid.Column="1"
                                               Text="{Binding Settings.ParallelLimit}"
@@ -143,14 +139,14 @@
                                 <TextBlock Text="Default Settings"
                                           FontSize="14"
                                           FontWeight="Medium"/>
-                                <Grid ColumnDefinitions="*,200" RowDefinitions="Auto,Auto" RowSpacing="16">
+                                <Grid ColumnDefinitions="*,200" RowDefinitions="Auto,Auto,Auto" RowSpacing="16">
                                     <!-- Quality -->
                                     <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
                                         <TextBlock Text="Default Quality"
                                                   FontSize="14"/>
                                         <TextBlock Text="Preferred video quality"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ComboBox Grid.Row="0" Grid.Column="1"
                                              SelectedIndex="{Binding Settings.DefaultQuality, Mode=TwoWay}"
@@ -161,6 +157,8 @@
                                         <ComboBoxItem Content="1080p"/>
                                         <ComboBoxItem Content="720p"/>
                                         <ComboBoxItem Content="480p"/>
+                                        <ComboBoxItem Content="360p"/>
+                                        <ComboBoxItem Content="Audio Only"/>
                                     </ComboBox>
 
                                     <!-- Format -->
@@ -169,7 +167,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Preferred video format"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ComboBox Grid.Row="1" Grid.Column="1"
                                              SelectedIndex="{Binding Settings.DefaultFormat, Mode=TwoWay}"
@@ -179,6 +177,25 @@
                                         <ComboBoxItem Content="MP4"/>
                                         <ComboBoxItem Content="WebM"/>
                                         <ComboBoxItem Content="MP3"/>
+                                    </ComboBox>
+
+                                    <!-- MP3 quality -->
+                                    <StackPanel Grid.Row="2" Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="MP3 Quality"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Audio bitrate when downloading MP3"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+                                    </StackPanel>
+                                    <ComboBox Grid.Row="2" Grid.Column="1"
+                                             SelectedIndex="{Binding Settings.AudioQuality, Mode=TwoWay}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Theme="{DynamicResource MaterialFilledComboBox}">
+                                        <ComboBoxItem Content="Best (VBR)"/>
+                                        <ComboBoxItem Content="320 kbps"/>
+                                        <ComboBoxItem Content="192 kbps"/>
+                                        <ComboBoxItem Content="128 kbps"/>
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
@@ -198,11 +215,39 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Include subtitle tracks by default"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.ShouldInjectSubtitles, Mode=TwoWay}"
                                                  VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Subtitle Language -->
+                                <Grid ColumnDefinitions="*,200" IsVisible="{Binding Settings.ShouldInjectSubtitles}">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Subtitle Language"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Which subtitle track to download (manual or auto-generated)"
+                                                  FontSize="12"
+                                                  TextWrapping="Wrap"
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1"
+                                             SelectedIndex="{Binding SubtitleLanguageIndex, Mode=TwoWay}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Theme="{DynamicResource MaterialFilledComboBox}">
+                                        <ComboBoxItem Content="English"/>
+                                        <ComboBoxItem Content="Spanish"/>
+                                        <ComboBoxItem Content="French"/>
+                                        <ComboBoxItem Content="German"/>
+                                        <ComboBoxItem Content="Italian"/>
+                                        <ComboBoxItem Content="Portuguese"/>
+                                        <ComboBoxItem Content="Japanese"/>
+                                        <ComboBoxItem Content="Korean"/>
+                                        <ComboBoxItem Content="Chinese"/>
+                                        <ComboBoxItem Content="All available"/>
+                                    </ComboBox>
                                 </Grid>
 
                                 <!-- Subtitle Style -->
@@ -213,7 +258,7 @@
                                                       FontSize="14"/>
                                             <TextBlock Text="How subtitles are displayed in videos"
                                                       FontSize="12"
-                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                      Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                         </StackPanel>
                                         <ComboBox Grid.Column="1"
                                                  SelectedIndex="{Binding Settings.SubtitleStyle, Mode=TwoWay}"
@@ -222,7 +267,7 @@
                                                  Theme="{DynamicResource MaterialFilledComboBox}">
                                             <ComboBoxItem Content="Embedded (Basic)" Tag="0"/>
                                             <ComboBoxItem Content="Burned-In (Styled)" Tag="1"/>
-                                            <ComboBoxItem Content="External File (.ass)" Tag="2"/>
+                                            <ComboBoxItem Content="External File (.srt)" Tag="2"/>
                                         </ComboBox>
                                     </Grid>
                                 </StackPanel>
@@ -234,7 +279,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Generate subtitles using AI when not available"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.EnableAISubtitles, Mode=TwoWay}"
@@ -249,10 +294,10 @@
                                                       FontSize="14"/>
                                             <TextBlock Text="Language for AI-generated subtitles"
                                                       FontSize="12"
-                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                      Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                         </StackPanel>
                                         <ComboBox Grid.Column="1"
-                                                 SelectedIndex="0"
+                                                 SelectedIndex="{Binding AiSubtitleLanguageIndex, Mode=TwoWay}"
                                                  HorizontalAlignment="Stretch"
                                                  VerticalAlignment="Center"
                                                  Theme="{DynamicResource MaterialFilledComboBox}">
@@ -277,7 +322,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Add title, author, and thumbnail to files"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.ShouldInjectTags, Mode=TwoWay}"
@@ -300,7 +345,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Start downloads immediately after adding to queue"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.AutoStartDownload, Mode=TwoWay}"
@@ -314,10 +359,24 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Open containing folder when download completes"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.OpenFolderAfterDownload, Mode=TwoWay}"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Notify on complete -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <TextBlock Text="Notify When Done"
+                                                  FontSize="14"/>
+                                        <TextBlock Text="Show a notification when each download finishes"
+                                                  FontSize="12"
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1"
+                                                 IsChecked="{Binding Settings.NotifyOnComplete, Mode=TwoWay}"
                                                  VerticalAlignment="Center"/>
                                 </Grid>
                             </StackPanel>
@@ -337,7 +396,7 @@
                                                 x:Name="DownloadLocationTextBox"
                                                 Text="{Binding Settings.DefaultDownloadPath, Mode=TwoWay}"
                                                 Watermark="Select default download folder..."
-                                                Theme="{DynamicResource MaterialFilledTextBox}"
+                                                Theme="{DynamicResource FilledTextBox}"
                                                 Margin="0,0,8,0"/>
                                         <Button Grid.Column="1"
                                                x:Name="BrowseLocationButton"
@@ -348,7 +407,7 @@
                                     </Grid>
                                     <TextBlock Text="{Binding ActualDownloadPath, StringFormat='Current: {0}'}"
                                               FontSize="11"
-                                              Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                              Foreground="{DynamicResource AppSecondaryTextBrush}"
                                               TextWrapping="Wrap"
                                               Margin="0,4,0,0"/>
                                 </StackPanel>
@@ -361,7 +420,7 @@
                                                 x:Name="CacheLocationTextBox"
                                                 Text="{Binding Settings.DefaultCachePath, Mode=TwoWay}"
                                                 Watermark="Select cache folder (empty = default)..."
-                                                Theme="{DynamicResource MaterialFilledTextBox}"
+                                                Theme="{DynamicResource FilledTextBox}"
                                                 Margin="0,0,8,0"/>
                                         <Button Grid.Column="1"
                                                x:Name="BrowseCacheLocationButton"
@@ -379,12 +438,12 @@
                                     </Grid>
                                     <TextBlock Text="{Binding ActualCachePath, StringFormat='Current: {0}'}"
                                               FontSize="11"
-                                              Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                              Foreground="{DynamicResource AppSecondaryTextBrush}"
                                               TextWrapping="Wrap"
                                               Margin="0,4,0,0"/>
                                     <TextBlock Text="⚠️ Application restart required for cache location changes to take effect"
                                               FontSize="11"
-                                              Foreground="#F9A825"
+                                              Foreground="{DynamicResource AppAccentTextBrush}"
                                               TextWrapping="Wrap"
                                               Margin="0,4,0,0"/>
                                 </StackPanel>
@@ -392,34 +451,52 @@
 
                         </StackPanel>
                     </Border>
+                    </ScrollViewer>
                 </TabItem>
 
                 <!-- Advanced Tab -->
                 <TabItem Header="Advanced">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Border Padding="20,16">
                         <StackPanel Spacing="16">
-
-                            <!-- Language Specific Audio -->
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Grid.Column="0" Spacing="4">
-                                    <TextBlock Text="Language-Specific Audio Streams"
-                                              FontSize="14"/>
-                                    <TextBlock Text="Download audio in specific languages when available"
-                                              FontSize="12"
-                                              Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                </StackPanel>
-                                <ToggleSwitch Grid.Column="1"
-                                             IsChecked="{Binding Settings.ShouldInjectLanguageSpecificAudioStreams, Mode=TwoWay}"
-                                             VerticalAlignment="Center"/>
-                            </Grid>
-
-                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
 
                             <!-- Browser Cookies Authentication -->
                             <StackPanel Spacing="12">
                                 <TextBlock Text="Authentication"
                                           FontSize="14"
                                           FontWeight="Medium"/>
+                                <TextBlock Text="Needed when a site says &quot;Sign in to confirm you're not a bot&quot; or asks you to log in (YouTube, Instagram, Reddit)."
+                                          FontSize="12"
+                                          TextWrapping="Wrap"
+                                          Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+
+                                <!-- Cookies file (works with every browser) -->
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Cookies File (recommended)"
+                                              FontSize="14"/>
+                                    <TextBlock Text="A cookies.txt exported from a browser where you're signed in. Takes priority over browser cookies."
+                                              FontSize="12"
+                                              TextWrapping="Wrap"
+                                              Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <TextBox Grid.Column="0"
+                                                Text="{Binding Settings.CookiesFilePath, Mode=TwoWay}"
+                                                Watermark="No cookies file selected"
+                                                Theme="{DynamicResource FilledTextBox}"
+                                                Margin="0,0,8,0"/>
+                                        <Button Grid.Column="1"
+                                               Content="Browse"
+                                               Command="{Binding BrowseCookiesFileCommand}"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               VerticalAlignment="Stretch"
+                                               Margin="0,0,8,0"/>
+                                        <Button Grid.Column="2"
+                                               Content="Clear"
+                                               Command="{Binding ClearCookiesFileCommand}"
+                                               Theme="{DynamicResource MaterialOutlineButton}"
+                                               VerticalAlignment="Stretch"/>
+                                    </Grid>
+                                </StackPanel>
 
                                 <!-- Use Browser Cookies Toggle -->
                                 <Grid ColumnDefinitions="*,Auto">
@@ -428,7 +505,7 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Access private/age-restricted videos using browser login"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ToggleSwitch Grid.Column="1"
                                                  IsChecked="{Binding Settings.UseBrowserCookies, Mode=TwoWay}"
@@ -442,10 +519,10 @@
                                                   FontSize="14"/>
                                         <TextBlock Text="Select which browser to import cookies from"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                     </StackPanel>
                                     <ComboBox Grid.Column="1"
-                                             SelectedValue="{Binding Settings.BrowserForCookies, Mode=TwoWay}"
+                                             SelectedIndex="{Binding BrowserIndex, Mode=TwoWay}"
                                              HorizontalAlignment="Stretch"
                                              VerticalAlignment="Center"
                                              Theme="{DynamicResource MaterialFilledComboBox}">
@@ -459,8 +536,8 @@
                                 </Grid>
 
                                 <!-- Info Box -->
-                                <Border Background="#F9A82520"
-                                        BorderBrush="#F9A825"
+                                <Border Background="{DynamicResource AppAccentSubtleBrush}"
+                                        BorderBrush="{DynamicResource AppAccentBrush}"
                                         BorderThickness="1"
                                         CornerRadius="4"
                                         Padding="12"
@@ -469,17 +546,17 @@
                                         <TextBlock Text="ℹ️ How it works:"
                                                   FontSize="12"
                                                   FontWeight="SemiBold"
-                                                  Foreground="#F9A825"/>
+                                                  Foreground="{DynamicResource AppAccentTextBrush}"/>
                                         <TextBlock TextWrapping="Wrap"
                                                   FontSize="11"
                                                   Foreground="{DynamicResource MaterialDesignBody}">
-                                            <Run Text="• Make sure you're logged into YouTube in your selected browser"/>
+                                            <Run Text="• Make sure you're logged into the site in your selected browser"/>
                                             <LineBreak/>
                                             <Run Text="• Close all browser windows before downloading"/>
                                             <LineBreak/>
-                                            <Run Text="• This enables access to private, unlisted, and age-restricted videos"/>
+                                            <Run Text="• On Windows, Chrome, Edge and Brave lock their cookies; use Firefox or a cookies file instead"/>
                                             <LineBreak/>
-                                            <Run Text="• Also helps prevent 403 Forbidden errors"/>
+                                            <Run Text="• Enables private, unlisted, age-restricted and bot-checked videos"/>
                                         </TextBlock>
                                     </StackPanel>
                                 </Border>
@@ -504,7 +581,7 @@
                                         <TextBlock Grid.Row="1"
                                                   Text="Cached video metadata helps improve performance"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"
                                                   TextWrapping="Wrap"/>
                                         <Button Grid.Row="2"
                                                x:Name="ClearCacheButton"
@@ -531,7 +608,7 @@
                                     <StackPanel Spacing="12">
                                         <TextBlock Text="Reset all settings to their default values"
                                                   FontSize="12"
-                                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                  Foreground="{DynamicResource AppSecondaryTextBrush}"
                                                   TextWrapping="Wrap"/>
                                         <Button x:Name="ResetAllSettingsButton"
                                                Content="Reset All Settings to Default"
@@ -562,10 +639,10 @@
                                                       FontWeight="Medium"/>
                                             <TextBlock Text="{Binding CurrentVersion, StringFormat='Version {0}'}"
                                                       FontSize="13"
-                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                      Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                             <TextBlock Text="Built with .NET 9.0 and Avalonia UI"
                                                       FontSize="12"
-                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                      Foreground="{DynamicResource AppSecondaryTextBrush}"/>
                                         </StackPanel>
 
                                         <Separator Background="{DynamicResource MaterialDesignDivider}"/>
@@ -579,7 +656,7 @@
                                             <!-- Update Status -->
                                             <TextBlock Text="{Binding UpdateStatus}"
                                                       FontSize="12"
-                                                      Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                                      Foreground="{DynamicResource AppSecondaryTextBrush}"/>
 
                                             <!-- Check for Updates Button -->
                                             <Button x:Name="CheckForUpdatesButton"
@@ -596,10 +673,10 @@
 
                         </StackPanel>
                     </Border>
+                    </ScrollViewer>
                 </TabItem>
 
             </TabControl>
-            </ScrollViewer>
 
             <!-- Action Buttons -->
             <Border Grid.Row="2"
@@ -611,10 +688,12 @@
                            HorizontalAlignment="Right"
                            Spacing="12">
                     <Button Content="Cancel"
+                           IsCancel="True"
                            Command="{Binding CancelCommand}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>
                     <Button Content="Save"
+                           IsDefault="True"
                            Command="{Binding SaveCommand}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>

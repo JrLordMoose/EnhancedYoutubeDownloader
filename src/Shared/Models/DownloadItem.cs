@@ -54,6 +54,11 @@ public partial class DownloadItem : ObservableObject
     [ObservableProperty]
     private DateTime? _completedAt;
 
+    /// <summary>True while a started download waits for a free slot (Parallel downloads limit).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FormattedProgressInfo))]
+    private bool _isWaitingForSlot;
+
     [ObservableProperty]
     private bool _canStart;
 
@@ -129,8 +134,14 @@ public partial class DownloadItem : ObservableObject
                 ? "Paused"
                 : Status == DownloadStatus.Completed
                     ? $"100.0% • {FormattedDuration} • {FormatBytes(TotalBytes > 0 ? TotalBytes : BytesDownloaded)}"
+                    : Status == DownloadStatus.Queued
+                        ? "Queued: press Start to download"
+                    : Status == DownloadStatus.Canceled
+                        ? "Canceled"
+                    : Status == DownloadStatus.Started && IsWaitingForSlot
+                        ? "Waiting for a free download slot..."
                     : Status == DownloadStatus.Started && Progress <= 0 && TotalBytes == 0
-                        ? "Loading..."
+                        ? "Starting download..."
                         : $"{Progress:F1}% • {FormattedSpeed} • {FormattedEta} • {FormattedBytes}";
 
     // Helper methods

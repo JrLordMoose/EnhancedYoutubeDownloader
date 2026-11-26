@@ -74,6 +74,41 @@ public class DialogManager : IDisposable
     }
 
     /// <summary>
+    /// Prompts the user to pick an existing file using the native file picker.
+    /// </summary>
+    /// <param name="title">Picker title</param>
+    /// <param name="fileTypeName">Display name for the filter, e.g. "Cookies file"</param>
+    /// <param name="patterns">Glob patterns, e.g. "*.txt"</param>
+    public async Task<string?> PromptOpenFilePathAsync(
+        string title,
+        string fileTypeName,
+        params string[] patterns
+    )
+    {
+        if (!AvaloniaExtensions.TryGetMainWindow(out var mainWindow))
+            return null;
+
+        var storageProvider = mainWindow.StorageProvider;
+        if (storageProvider == null)
+            return null;
+
+        var files = await storageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                Title = title,
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType(fileTypeName) { Patterns = patterns },
+                    FilePickerFileTypes.All,
+                ],
+            }
+        );
+
+        return files.Count > 0 ? files[0].TryGetLocalPath() : null;
+    }
+
+    /// <summary>
     /// Prompts the user to select a folder using the native folder picker.
     /// </summary>
     /// <param name="title">Title of the folder picker dialog</param>

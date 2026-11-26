@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="EnhancedYoutubeDownloader.Views.Dialogs.DownloadSingleSetupDialog"
              x:DataType="vm:DownloadSingleSetupViewModel"
-             Width="600" Height="550">
+             Width="600" MaxHeight="550">
 
     <Design.DataContext>
         <vm:DownloadSingleSetupViewModel />
@@ -18,7 +18,8 @@
             Padding="0"
             BoxShadow="0 8 16 0 #40000000">
 
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+        <!-- Header and action buttons stay pinned; the options scroll when the window is small -->
+        <Grid RowDefinitions="Auto,*,Auto">
 
             <!-- Header -->
             <Border Grid.Row="0"
@@ -31,8 +32,13 @@
                           FontWeight="SemiBold"/>
             </Border>
 
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+
             <!-- Video Info (Compact) -->
-            <Border Grid.Row="1"
+            <Border
                     Padding="20,16"
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     Margin="16,12,16,0"
@@ -53,12 +59,12 @@
 
                     <!-- Info -->
                     <StackPanel Grid.Column="1" Spacing="4">
-                        <TextBlock Text="{Binding Video.Title}"
+                        <SelectableTextBlock Text="{Binding Video.Title}"
                                   FontSize="14"
                                   FontWeight="Medium"
                                   TextWrapping="Wrap"
                                   MaxLines="2"/>
-                        <TextBlock FontSize="12" Opacity="0.7">
+                        <TextBlock FontSize="12" Opacity="0.85">
                             <Run Text="{Binding Video.Author.ChannelTitle}"/>
                             <Run Text=" • "/>
                             <Run Text="{Binding Video.Duration}"/>
@@ -68,9 +74,9 @@
             </Border>
 
             <!-- Quality -->
-            <Border Grid.Row="2" Padding="20,12">
+            <Border Padding="20,12">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="Quality" FontSize="12" Opacity="0.7"/>
+                    <TextBlock Text="Quality" FontSize="12" Opacity="0.85"/>
                     <ComboBox ItemsSource="{Binding QualityOptions}"
                              SelectedItem="{Binding SelectedQuality}"
                              HorizontalAlignment="Stretch"
@@ -79,9 +85,9 @@
             </Border>
 
             <!-- Format -->
-            <Border Grid.Row="3" Padding="20,0,20,12">
+            <Border Padding="20,0,20,12">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="Format" FontSize="12" Opacity="0.7"/>
+                    <TextBlock Text="Format" FontSize="12" Opacity="0.85"/>
                     <ComboBox ItemsSource="{Binding FormatOptions}"
                              SelectedItem="{Binding SelectedFormat}"
                              HorizontalAlignment="Stretch"
@@ -90,7 +96,7 @@
             </Border>
 
             <!-- Options (Compact) -->
-            <Border Grid.Row="4" Padding="20,0,20,12">
+            <Border Padding="20,0,20,12">
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Grid.Column="0" Text="Download Subtitles" FontSize="13" VerticalAlignment="Center"/>
@@ -104,14 +110,14 @@
             </Border>
 
             <!-- Save Location -->
-            <Border Grid.Row="5" Padding="20,0,20,16">
+            <Border Padding="20,0,20,16">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="Save Location" FontSize="12" Opacity="0.7"/>
+                    <TextBlock Text="Save Location" FontSize="12" Opacity="0.85"/>
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBox Grid.Column="0"
                                 Text="{Binding FilePath, Mode=TwoWay}"
                                 Watermark="Select download location..."
-                                Theme="{DynamicResource MaterialFilledTextBox}"
+                                Theme="{DynamicResource FilledTextBox}"
                                 Margin="0,0,8,0"/>
                         <Button Grid.Column="1"
                                x:Name="BrowseButton"
@@ -123,8 +129,11 @@
                 </StackPanel>
             </Border>
 
+            </StackPanel>
+            </ScrollViewer>
+
             <!-- Action Buttons -->
-            <Border Grid.Row="6"
+            <Border Grid.Row="2"
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,1,0,0"
@@ -134,10 +143,13 @@
                            Spacing="12">
                     <Button x:Name="CancelButton"
                            Content="Cancel"
+                           IsCancel="True"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>
                     <Button x:Name="DownloadButton"
                            Content="Download"
+                           IsDefault="True"
+                           IsEnabled="{Binding FilePath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                            Theme="{DynamicResource MaterialOutlineButton}"
                            MinWidth="100"/>
                 </StackPanel>

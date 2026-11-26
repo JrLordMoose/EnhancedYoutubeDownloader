@@ -1,6 +1,6 @@
 # Context Learning Index
 
-**Last Updated**: 2026-09-02 15:35 · **Total**: 3 · **Critical**: 1
+**Last Updated**: 2026-11-25 20:25 · **Total**: 4 · **Critical**: 2
 
 ---
 
@@ -8,6 +8,7 @@
 
 | Date | Title | Category | Key Takeaway |
 |---|---|---|---|
+| 2026-11-25 | [Sign-in Walls, Settings Load Order, One Dialog at a Time](November%202026/2026-11-25_Context_Session_39.md) | auth/config/ui | YouTube bot check needs cookies.txt (Chromium cookies unreadable on Windows). Load settings before services read them. Never nest DialogManager dialogs. Marshal DownloadStatusChanged to the UI thread. |
 | 2026-09-02 | [Visible Dialog, Broken Data Handoff](September%202026/2026-09-02_Context_Session_38.md) | ui | Test the full state transition, not merely whether a dialog opens. Wire required data, commands, selected subset, and downstream settings. |
 | 2026-08-22 | [yt-dlp Requires a Bundled JavaScript Runtime](August%202026/2026-08-22_Context_Session_37.md) | build | A yt-dlp `403` is a **missing JS runtime** until proven otherwise. Run the bundled `yt-dlp.exe` manually and read stderr before touching C# code. Ship QuickJS alongside it. |
 
