@@ -48,6 +48,18 @@ public class UpdateCoordinator
     /// <summary>Asks "Update now?". Returns true when the user chose to update now.</summary>
     public async Task<bool> PromptAsync(Version version)
     {
+        // Unattended update testing (monthly health check): auto-click "Update Now", but ONLY
+        // when a local test package folder is configured, so real GitHub updates always ask.
+        if (
+            Environment.GetEnvironmentVariable("EYD_UPDATE_AUTOACCEPT") == "1"
+            && !string.IsNullOrWhiteSpace(
+                Environment.GetEnvironmentVariable(UpdateService.LocalSourceVariable)
+            )
+        )
+        {
+            return true;
+        }
+
         var prompt = new MessageBoxViewModel
         {
             Title = "Update Available",

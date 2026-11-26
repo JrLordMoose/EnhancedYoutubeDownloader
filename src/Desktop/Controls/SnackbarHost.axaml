@@ -58,13 +58,11 @@
                                                   Margin="0,0,12,0"
                                                   VerticalAlignment="Center"
                                                   Foreground="{Binding Severity, Converter={StaticResource SeverityToBrushConverter}}"
-                                                  x:DataType="framework:SnackbarItem">
-                            <materialIcons:MaterialIcon.Kind>
-                                <MultiBinding Converter="{StaticResource SeverityToIconConverter}">
-                                    <Binding Path="Severity"/>
-                                </MultiBinding>
-                            </materialIcons:MaterialIcon.Kind>
-                        </materialIcons:MaterialIcon>
+                                                  Kind="{Binding Severity, Converter={StaticResource SeverityToIconConverter}}"
+                                                  x:DataType="framework:SnackbarItem"/>
+                        <!-- SeverityToIconConverter is an IValueConverter: a MultiBinding here threw
+                             InvalidCastException and crashed the app the first time a notification rendered. -->
+
 
                         <!-- Message Content -->
                         <StackPanel Grid.Column="1" Spacing="4"
