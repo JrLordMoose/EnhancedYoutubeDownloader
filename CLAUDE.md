@@ -135,6 +135,24 @@ EnhancedYoutubeDownloader-X.X.X.zip
 
 ---
 
+## ✅ Pending Deploy / Approvals (scheduled tasks)
+
+**No release ships without the owner's approval.** The scheduled tasks `eyd-monthly-health-check` and `eyd-feedback-and-updates` prepare fixes on a LOCAL branch `fix/YYYY-MM-DD` and record them in
+`C:\Users\leore\.claude\scheduled-tasks\eyd-feedback-and-updates\state.json` → `pendingDeploy {version, branch, threadId, createdAt}`.
+
+When the owner says **"deploy"** or **"approve"** in Claude (or replies `deploy`/`Deploy`/`approve`/`Approve` to the approval email, which the task checks):
+1. Read `pendingDeploy` from that state file. If it's empty, say there's nothing pending.
+2. Merge the branch into `main`, then run the full release checklist above:
+   - version bump in every location;
+   - `build-installer.ps1`;
+   - push and `gh release create` with BOTH the EXE and the ZIP, as JrLordMoose;
+   - verify, then switch gh back to ThiinkMG.
+3. Clear `pendingDeploy` in the state file, and add a line to the session log and `Scheduled Logs/INDEX.md`.
+
+Test updates ("pseudo updates") are local-only with version **99.0.0** and are never published (see learning 39c).
+
+---
+
 ## 🤖 Release Version Manager Agent
 
 **NEW:** Automate the entire release process with the specialized Release Version Manager Agent!

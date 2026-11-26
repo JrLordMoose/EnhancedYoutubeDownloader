@@ -1,5 +1,11 @@
 # Enhanced YouTube Downloader
 
+> **🎉 Automatic updates are fixed (v0.4.10 and newer).** Versions **v0.4.8 and older** can't update themselves because of bugs. Please download the [latest installer](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/releases/latest) once; after that the app updates itself.
+>
+> 📬 **Get notified of new releases:** [Sign up for update emails](https://docs.google.com/forms/d/e/1FAIpQLSdkOHoyhYYekLvWVZDa5oYiTyP32EwcaqBqki8dIvO77KEKew/viewform). We'll email you directly from **Thiink Media Graphics** whenever a new version is out.
+>
+> 🐞 **Found a bug or have an idea?** Tell us on the [Bug Report & Suggestion Form](https://docs.google.com/forms/d/e/1FAIpQLSfgvSuqvusqpGBs6UUbUImzUB10YzROqomsvGFZhnp41VTeRg/viewform). Your reports shape the next release.
+
 An enhanced, production-ready version of YouTube Downloader that surpasses the original in functionality, user experience, and code quality.
 
 ## 🌐 [View Landing Page](https://jrlordmoose.github.io/EnhancedYoutubeDownloader/)

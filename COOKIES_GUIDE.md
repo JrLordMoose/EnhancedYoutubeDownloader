@@ -52,4 +52,4 @@ On Windows, **Chrome, Edge, Brave, Opera and other Chromium browsers encrypt the
 
 ---
 
-*Questions or problems? [Report an issue](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/issues).*
+*Questions or problems? Use the [Bug Report & Suggestion Form](https://docs.google.com/forms/d/e/1FAIpQLSfgvSuqvusqpGBs6UUbUImzUB10YzROqomsvGFZhnp41VTeRg/viewform) or [open an issue](https://github.com/JrLordMoose/EnhancedYoutubeDownloader/issues). Want to hear about new versions? [Sign up for update emails](https://docs.google.com/forms/d/e/1FAIpQLSdkOHoyhYYekLvWVZDa5oYiTyP32EwcaqBqki8dIvO77KEKew/viewform).*
