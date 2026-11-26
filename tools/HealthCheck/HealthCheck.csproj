@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Download health check used by the monthly scheduled task (see Scheduled Logs/README.md).
+    Deliberately NOT part of EnhancedYoutubeDownloader.sln so it never affects the app build.
+    How to run it: see tools/HealthCheck/README.md (XML comments can't contain double dashes).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Core\EnhancedYoutubeDownloader.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\Desktop\yt-dlp.exe" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\src\Desktop\yt-dlp.exe')" />
+    <None Include="..\..\src\Desktop\ffmpeg.exe" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\src\Desktop\ffmpeg.exe')" />
+    <None Include="..\..\src\Desktop\qjs.exe" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\src\Desktop\qjs.exe')" />
+    <None Include="platforms.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

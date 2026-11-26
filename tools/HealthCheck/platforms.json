@@ -1,0 +1,17 @@
+{
+  "_comment": "Platforms checked by the monthly health check. expected = 'pass' (must work; a failure is an app problem to fix) or 'site-limited' (login wall, DRM or geo block: reported, never 'fixed'). If a URL disappears, replace it with another public video from the same platform and note it in the findings.",
+  "platforms": [
+    { "id": "youtube", "name": "YouTube (watch)", "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "youtube-short", "name": "YouTube Short", "url": "https://www.youtube.com/shorts/tPEE9ZwTmy0", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "tiktok", "name": "TikTok", "url": "https://www.tiktok.com/@scout2015/video/6718335390845095173", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "twitter", "name": "X / Twitter", "url": "https://x.com/SpaceX/status/1732824684683784516", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "facebook", "name": "Facebook", "url": "https://www.facebook.com/watch/?v=10153231379946729", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "dailymotion", "name": "Dailymotion", "url": "https://www.dailymotion.com/video/x7tgad0", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "soundcloud", "name": "SoundCloud", "url": "https://soundcloud.com/forss/flickermood", "mp4": false, "mp3": true, "expected": "pass" },
+    { "id": "twitch-clip", "name": "Twitch clip", "url": "https://clips.twitch.tv/FaintLightGullWholeWheat", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "direct-mp4", "name": "Direct .mp4 URL", "url": "https://download.samplelib.com/mp4/sample-5s.mp4", "mp4": true, "mp3": true, "expected": "pass" },
+    { "id": "instagram", "name": "Instagram reel", "url": "https://www.instagram.com/reel/C6RMGmOMRBT/", "mp4": true, "mp3": false, "expected": "site-limited" },
+    { "id": "reddit", "name": "Reddit", "url": "https://www.reddit.com/r/videos/comments/6rrwyj/", "mp4": true, "mp3": false, "expected": "site-limited" },
+    { "id": "vimeo", "name": "Vimeo", "url": "https://vimeo.com/76979871", "mp4": true, "mp3": false, "expected": "site-limited" }
+  ]
+}
