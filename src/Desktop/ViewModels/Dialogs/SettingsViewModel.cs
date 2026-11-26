@@ -20,7 +20,7 @@ public partial class SettingsViewModel : DialogViewModelBase
     private readonly DialogManager _dialogManager;
     private readonly ViewModelManager _viewModelManager;
     private readonly ICacheService _cacheService;
-    private readonly UpdateService? _updateService;
+    private readonly UpdateCoordinator _updateCoordinator;
 
     [ObservableProperty]
     private SettingsService _settings;
@@ -185,14 +185,14 @@ public partial class SettingsViewModel : DialogViewModelBase
         DialogManager dialogManager,
         ViewModelManager viewModelManager,
         ICacheService cacheService,
-        UpdateService? updateService = null
+        UpdateCoordinator updateCoordinator
     )
     {
         _settings = settingsService;
         _dialogManager = dialogManager;
         _viewModelManager = viewModelManager;
         _cacheService = cacheService;
-        _updateService = updateService;
+        _updateCoordinator = updateCoordinator;
 
         // Snapshot current settings for rollback on Cancel
         _originalCachePath = Settings.DefaultCachePath;
@@ -265,6 +265,74 @@ public partial class SettingsViewModel : DialogViewModelBase
         {
             TraceLog.Write($"[SETTINGS] Browse canceled, no path selected.");
         }
+    }
+
+    /// <summary>The folder the app runs from; updates are installed here.</summary>
+    public string InstallLocation { get; } =
+        Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
+
+    // Inno Setup puts the uninstaller next to the app (UninstallFilesDir={app}, renamed
+    // to uninstall.exe). Dev builds have none, so the button is hidden there.
+    private string UninstallerPath => Path.Combine(InstallLocation, "uninstall.exe");
+
+    public bool CanUninstall => OperatingSystem.IsWindows() && File.Exists(UninstallerPath);
+
+    [RelayCommand]
+    private void OpenInstallFolder()
+    {
+        try
+        {
+            if (OperatingSystem.IsWindows())
+                System.Diagnostics.Process.Start("explorer.exe", $"\"{InstallLocation}\"");
+            else if (OperatingSystem.IsMacOS())
+                System.Diagnostics.Process.Start("open", $"\"{InstallLocation}\"");
+            else
+                System.Diagnostics.Process.Start("xdg-open", $"\"{InstallLocation}\"");
+        }
+        catch (Exception ex)
+        {
+            TraceLog.Write($"[SETTINGS] Could not open install folder: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task UninstallAsync()
+    {
+        if (!CanUninstall)
+            return;
+
+        // One dialog at a time: close Settings before asking
+        Close(false);
+
+        var confirm = new MessageBoxViewModel
+        {
+            Title = "Uninstall Enhanced YouTube Downloader?",
+            Message =
+                "The uninstaller will open and this app will close.\n\n"
+                + "Your downloaded videos are not deleted. The uninstaller asks whether to "
+                + "also remove your settings and cache.",
+            PrimaryButtonText = "Uninstall",
+            SecondaryButtonText = "Cancel",
+        };
+
+        if (await _dialogManager.ShowDialogAsync(confirm) != true)
+        {
+            await ReopenSettingsAsync(2);
+            return;
+        }
+
+        System.Diagnostics.Process.Start(
+            new System.Diagnostics.ProcessStartInfo(UninstallerPath) { UseShellExecute = true }
+        );
+
+        // The uninstaller can't remove files while the app is running
+        if (
+            Avalonia.Application.Current?.ApplicationLifetime
+            is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+        )
+            desktop.Shutdown(0);
+        else
+            Environment.Exit(0);
     }
 
     [RelayCommand]
@@ -424,7 +492,7 @@ public partial class SettingsViewModel : DialogViewModelBase
     [SupportedOSPlatform("windows")]
     private async Task CheckForUpdatesAsync()
     {
-        if (_updateService == null)
+        if (!_updateCoordinator.IsSupported)
         {
             UpdateStatus = "Update service not available";
             TraceLog.Write("[SETTINGS] Update service is not available (Windows-only)");
@@ -437,7 +505,7 @@ public partial class SettingsViewModel : DialogViewModelBase
 
         try
         {
-            var newVersion = await _updateService.CheckForUpdatesAsync();
+            var newVersion = await _updateCoordinator.CheckForUpdatesAsync();
 
             if (newVersion == null)
             {
@@ -465,40 +533,19 @@ public partial class SettingsViewModel : DialogViewModelBase
                 // Close Settings dialog first to avoid deadlock (DialogManager uses SemaphoreSlim)
                 Close(false);
 
-                // Show update prompt
-                var updatePrompt = new MessageBoxViewModel
+                // Same flow as the startup check. v0.4.7 launched the updater here but never
+                // exited, so the updater timed out after ~15s and nothing was installed.
+                if (await _updateCoordinator.PromptAsync(newVersion))
                 {
-                    Title = "Update Available",
-                    Message =
-                        $"A new version is available!\n\nCurrent version: {CurrentVersion}\nNew version: {newVersion}\n\nWould you like to download and install the update? The application will restart.",
-                    PrimaryButtonText = "Yes, Update",
-                    SecondaryButtonText = "Not Now",
-                };
-
-                var result = await _dialogManager.ShowDialogAsync(updatePrompt);
-
-                if (result == true)
-                {
-                    TraceLog.Write(
-                        $"[SETTINGS] User accepted update. Preparing update v{newVersion}..."
-                    );
-                    UpdateStatus = "Downloading update...";
-
-                    // Download the update package
-                    await _updateService.PrepareUpdateAsync(newVersion);
-
-                    TraceLog.Write(
-                        "[SETTINGS] Update downloaded. Launching updater and restarting..."
-                    );
-                    UpdateStatus = "Restarting...";
-
-                    // Launch updater and restart
-                    _updateService.FinalizeUpdate(newVersion, restart: true);
+                    TraceLog.Write($"[SETTINGS] User accepted update v{newVersion}");
+                    await _updateCoordinator.InstallNowAsync(newVersion);
                 }
                 else
                 {
-                    TraceLog.Write("[SETTINGS] User declined update.");
-                    UpdateStatus = $"Update available: v{newVersion}";
+                    TraceLog.Write("[SETTINGS] User chose Later.");
+                    UpdateStatus =
+                        $"Update v{newVersion.ToString(3)} will install when you close the app";
+                    _ = _updateCoordinator.ScheduleInstallOnExitAsync(newVersion);
                     await ReopenSettingsAsync();
                 }
             }
@@ -533,7 +580,7 @@ public partial class SettingsViewModel : DialogViewModelBase
         await _dialogManager.ShowDialogAsync(settings);
     }
 
-    private bool CanCheckForUpdates() => !IsCheckingForUpdates && _updateService != null;
+    private bool CanCheckForUpdates() => !IsCheckingForUpdates && _updateCoordinator.IsSupported;
 
     [RelayCommand]
     private void GoToUpdateCheck()

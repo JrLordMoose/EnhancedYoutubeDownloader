@@ -50,93 +50,120 @@
 
                     <!-- Quick Start Steps -->
                     <StackPanel Spacing="12">
+                        <TextBlock Text="Quick Start" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppAccentTextBrush}"/>
+
                         <!-- Step 1 -->
-                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
-                                BorderBrush="{DynamicResource MaterialDividerBrush}"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="16">
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border Background="{DynamicResource AppAccentBrush}"
-                                            Width="32" Height="32"
-                                            CornerRadius="16">
-                                        <TextBlock Text="1"
-                                                  FontSize="16"
-                                                  FontWeight="Bold"
-                                                  Foreground="{DynamicResource AppOnAccentBrush}"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
+                                    <Border Background="{DynamicResource AppAccentBrush}" Width="32" Height="32" CornerRadius="16">
+                                        <TextBlock Text="1" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppOnAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <TextBlock Text="Enter URL or Search"
-                                              FontSize="16"
-                                              FontWeight="SemiBold"
-                                              VerticalAlignment="Center"/>
+                                    <TextBlock Text="Paste a link (or search)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="Paste any YouTube video, playlist, or channel URL, or enter a search query. Press Enter or click Download."
-                                          TextWrapping="Wrap"
-                                          Foreground="{DynamicResource MaterialBodyBrush}"
-                                          Margin="44,0,0,0"/>
+                                <TextBlock Text="Paste a video, Short, playlist or channel link from any supported site (see below), or type words to search YouTube. Press Enter or click Download. The app fetches the real title and thumbnail first."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}" Margin="44,0,0,0"/>
                             </StackPanel>
                         </Border>
 
                         <!-- Step 2 -->
-                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
-                                BorderBrush="{DynamicResource MaterialDividerBrush}"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="16">
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border Background="{DynamicResource AppAccentBrush}"
-                                            Width="32" Height="32"
-                                            CornerRadius="16">
-                                        <TextBlock Text="2"
-                                                  FontSize="16"
-                                                  FontWeight="Bold"
-                                                  Foreground="{DynamicResource AppOnAccentBrush}"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
+                                    <Border Background="{DynamicResource AppAccentBrush}" Width="32" Height="32" CornerRadius="16">
+                                        <TextBlock Text="2" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppOnAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <TextBlock Text="Configure Download Settings"
-                                              FontSize="16"
-                                              FontWeight="SemiBold"
-                                              VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pick quality, format and where to save" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="Choose quality (Best, 1080p, 720p, etc.), select format (MP4, WebM, MP3), and enable/disable subtitles and metadata."
-                                          TextWrapping="Wrap"
-                                          Foreground="{DynamicResource MaterialBodyBrush}"
-                                          Margin="44,0,0,0"/>
+                                <TextBlock Text="MP4 = video that plays everywhere. WebM = smaller video. MP3 = audio only. Choose a quality (Best, 1080p, 720p, 480p, 360p or Audio Only), subtitles and tags, and the save location. Your defaults come from Settings › Downloads. For playlists, tick the videos you want."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}" Margin="44,0,0,0"/>
                             </StackPanel>
                         </Border>
 
                         <!-- Step 3 -->
-                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
-                                BorderBrush="{DynamicResource MaterialDividerBrush}"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="16">
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border Background="{DynamicResource AppAccentBrush}"
-                                            Width="32" Height="32"
-                                            CornerRadius="16">
-                                        <TextBlock Text="3"
-                                                  FontSize="16"
-                                                  FontWeight="Bold"
-                                                  Foreground="{DynamicResource AppOnAccentBrush}"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
+                                    <Border Background="{DynamicResource AppAccentBrush}" Width="32" Height="32" CornerRadius="16">
+                                        <TextBlock Text="3" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppOnAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <TextBlock Text="Manage Downloads"
-                                              FontSize="16"
-                                              FontWeight="SemiBold"
-                                              VerticalAlignment="Center"/>
+                                    <TextBlock Text="Manage your downloads" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="Pause, resume, or cancel downloads as needed. Open completed files directly from the dashboard."
-                                          TextWrapping="Wrap"
-                                          Foreground="{DynamicResource MaterialBodyBrush}"
-                                          Margin="44,0,0,0"/>
+                                <TextBlock Text="Each download shows progress, speed and time left. Pause, Resume (restarts that download), Cancel, Restart, Delete, or Open the finished file in its folder. Select any title or error and right-click › Copy."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}" Margin="44,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Step 4 -->
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Background="{DynamicResource AppAccentBrush}" Width="32" Height="32" CornerRadius="16">
+                                        <TextBlock Text="4" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppOnAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="If a site asks you to sign in" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Some videos need a signed-in session (YouTube's &quot;confirm you're not a bot&quot;, private or age-restricted videos, Instagram, Reddit). The app asks automatically. Choose a cookies.txt exported from a browser where you're signed in (for example with the &quot;Get cookies.txt LOCALLY&quot; extension, ideally from a private window). Your cookies stay on this computer."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}" Margin="44,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Supported platforms -->
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Supported Platforms" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppAccentTextBrush}"/>
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="10">
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}">
+                                    <Run Text="Works out of the box: " FontWeight="SemiBold"/>
+                                    <Run Text="YouTube (videos, Shorts, playlists, channels, youtu.be and m.youtube.com links), TikTok, X / Twitter, Facebook, Dailymotion, Twitch clips, SoundCloud (audio) and direct video file links (.mp4)."/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}">
+                                    <Run Text="Needs sign-in (cookies.txt): " FontWeight="SemiBold"/>
+                                    <Run Text="Instagram, Reddit and Vimeo, plus YouTube videos that are private, age-restricted or blocked by the bot check."/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}">
+                                    <Run Text="Also: " FontWeight="SemiBold"/>
+                                    <Run Text="1,800+ other sites supported by yt-dlp. Paste the link and try it. DRM-protected videos (e.g. paid streaming) can't be downloaded."/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Settings explained -->
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Settings Explained" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppAccentTextBrush}"/>
+
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="General" FontSize="16" FontWeight="SemiBold"/>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Theme: " FontWeight="SemiBold"/><Run Text="Light, Dark, or Auto (follows Windows)."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Automatic Updates: " FontWeight="SemiBold"/><Run Text="checks for a new version at startup and asks before installing. &quot;Check for updates now&quot; checks any time."/></TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Downloads" FontSize="16" FontWeight="SemiBold"/>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Parallel Downloads: " FontWeight="SemiBold"/><Run Text="how many download at the same time (the rest wait in line)."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Default Quality / Format / MP3 Quality: " FontWeight="SemiBold"/><Run Text="what the download window starts with; MP3 Quality sets the audio bitrate."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Subtitles: " FontWeight="SemiBold"/><Run Text="download subtitles in your language. Style: Embedded (toggle in your player), Burned-In (always visible), or a separate .srt file. AI Subtitles create them with Whisper when a video has none (slower; downloads a ~74 MB model once)."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Tags: " FontWeight="SemiBold"/><Run Text="adds title, artist and cover art to the file."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Auto-start / Open Folder / Notify When Done: " FontWeight="SemiBold"/><Run Text="start downloads right away, open the folder when one finishes, and show a notification."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Storage: " FontWeight="SemiBold"/><Run Text="default download folder, and where the app keeps its cache (restart after changing)."/></TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource MaterialCardBackgroundBrush}" BorderBrush="{DynamicResource MaterialDividerBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Advanced" FontSize="16" FontWeight="SemiBold"/>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Authentication: " FontWeight="SemiBold"/><Run Text="the cookies.txt file used for sites that need you signed in (recommended), or browser cookies (only Firefox works on Windows)."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Cache Management: " FontWeight="SemiBold"/><Run Text="shows the size of saved video info and clears it."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Installation: " FontWeight="SemiBold"/><Run Text="where the app is installed (updates go here). Open it in Explorer or run the uninstaller."/></TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MaterialBodyBrush}"><Run Text="Reset / About: " FontWeight="SemiBold"/><Run Text="restore every setting to its default, see your version, and check for updates."/></TextBlock>
                             </StackPanel>
                         </Border>
                     </StackPanel>

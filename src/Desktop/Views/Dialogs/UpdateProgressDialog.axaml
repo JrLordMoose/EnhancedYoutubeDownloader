@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:EnhancedYoutubeDownloader.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="460" d:DesignHeight="240"
+             x:Class="EnhancedYoutubeDownloader.Views.Dialogs.UpdateProgressDialog"
+             x:DataType="vm:UpdateProgressViewModel"
+             Width="460">
+
+    <Design.DataContext>
+        <vm:UpdateProgressViewModel />
+    </Design.DataContext>
+
+    <Border Background="{DynamicResource MaterialDesignPaper}"
+            CornerRadius="8"
+            BoxShadow="0 8 16 0 #40000000">
+        <Grid RowDefinitions="Auto,Auto,Auto">
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,0,0,1"
+                    Padding="24,20">
+                <TextBlock Text="{Binding Title}"
+                           FontSize="19"
+                           FontWeight="SemiBold"/>
+            </Border>
+
+            <!-- Progress -->
+            <StackPanel Grid.Row="1" Margin="24,20" Spacing="10">
+                <TextBlock Text="{Binding Status}"
+                           FontSize="14"
+                           TextWrapping="Wrap"/>
+                <ProgressBar Minimum="0"
+                             Maximum="100"
+                             Height="8"
+                             CornerRadius="4"
+                             Value="{Binding Progress}"
+                             IsIndeterminate="{Binding IsIndeterminate}"
+                             Foreground="{DynamicResource AppAccentBrush}"/>
+                <SelectableTextBlock FontSize="12"
+                                     TextWrapping="Wrap"
+                                     Foreground="{DynamicResource AppSecondaryTextBrush}">
+                    <Run Text="Installing to: " FontWeight="SemiBold"/>
+                    <Run Text="{Binding InstallLocation}"/>
+                </SelectableTextBlock>
+                <TextBlock FontSize="12"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppSecondaryTextBrush}">
+                    <Run Text="Tip: " FontWeight="SemiBold"/>
+                    <Run Text="you can find this folder any time in Settings › Advanced › Installation (Open in Explorer)."/>
+                </TextBlock>
+                <TextBlock Text="{Binding Detail}"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppSecondaryTextBrush}"
+                           IsVisible="{Binding Detail, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            </StackPanel>
+
+            <!-- Cancel (download phase only) -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="0,1,0,0"
+                    Padding="24,14"
+                    IsVisible="{Binding CanCancel}">
+                <Button Content="Cancel"
+                        HorizontalAlignment="Right"
+                        MinWidth="100"
+                        IsCancel="True"
+                        Command="{Binding CancelCommand}"
+                        Theme="{DynamicResource MaterialOutlineButton}"/>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

@@ -595,6 +595,45 @@
 
                             <Separator Background="{DynamicResource MaterialDesignDivider}"/>
 
+                            <!-- Installation: where the app lives (updates install here too) -->
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Installation"
+                                          FontSize="14"
+                                          FontWeight="Medium"/>
+                                <Border Background="{DynamicResource MaterialDesignCardBackground}"
+                                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="16">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="Install Location"
+                                                      FontSize="14"/>
+                                            <SelectableTextBlock Text="{Binding InstallLocation}"
+                                                                 FontSize="12"
+                                                                 TextWrapping="Wrap"
+                                                                 Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+                                            <TextBlock Text="Updates are installed into this folder. To move the app, uninstall it and reinstall to a new folder."
+                                                      FontSize="12"
+                                                      TextWrapping="Wrap"
+                                                      Foreground="{DynamicResource AppSecondaryTextBrush}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Button Content="Open in Explorer"
+                                                   Command="{Binding OpenInstallFolderCommand}"
+                                                   Theme="{DynamicResource MaterialOutlineButton}"/>
+                                            <Button Content="Uninstall..."
+                                                   Command="{Binding UninstallCommand}"
+                                                   IsVisible="{Binding CanUninstall}"
+                                                   ToolTip.Tip="Runs the uninstaller in the install folder (the app will close)"
+                                                   Theme="{DynamicResource MaterialOutlineButton}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <Separator Background="{DynamicResource MaterialDesignDivider}"/>
+
                             <!-- Reset Settings Section -->
                             <StackPanel Spacing="8">
                                 <TextBlock Text="Reset"

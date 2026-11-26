@@ -142,6 +142,12 @@ public class App : Application, IDisposable
             services.AddSingleton<UpdateService>();
         }
 
+        // The single user-facing update flow (startup check + Settings button)
+        services.AddSingleton(sp => new UpdateCoordinator(
+            sp.GetRequiredService<DialogManager>(),
+            OperatingSystem.IsWindows() ? sp.GetService<UpdateService>() : null
+        ));
+
         // View models
         services.AddTransient<MainViewModel>();
         services.AddTransient<DashboardViewModel>();

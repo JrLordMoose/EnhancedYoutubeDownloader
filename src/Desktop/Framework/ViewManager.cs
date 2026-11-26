@@ -20,6 +20,7 @@ public partial class ViewManager
             MessageBoxViewModel => new MessageBoxDialog(),
             SettingsViewModel => new SettingsDialog(),
             TutorialViewModel => new TutorialDialog(),
+            UpdateProgressViewModel => new UpdateProgressDialog(),
             ErrorDialogViewModel => new ErrorDialog(),
             _ => null,
         };

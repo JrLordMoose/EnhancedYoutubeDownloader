@@ -1,6 +1,6 @@
 # Context Learning Index
 
-**Last Updated**: 2026-11-25 20:25 · **Total**: 4 · **Critical**: 2
+**Last Updated**: 2026-11-25 21:00 · **Total**: 5 · **Critical**: 3
 
 ---
 
@@ -8,6 +8,7 @@
 
 | Date | Title | Category | Key Takeaway |
 |---|---|---|---|
+| 2026-11-25 | [Auto-Update Must Prompt, Show Progress and Exit in 15s](November%202026/2026-11-25_Context_Session_39b.md) | build/ui | Onova LaunchUpdater waits ~15s for the app to exit, then installs nothing. Use UpdateCoordinator; test vN→vN+1 locally with EYD_UPDATE_SOURCE before every release. |
 | 2026-11-25 | [Sign-in Walls, Settings Load Order, One Dialog at a Time](November%202026/2026-11-25_Context_Session_39.md) | auth/config/ui | YouTube bot check needs cookies.txt (Chromium cookies unreadable on Windows). Load settings before services read them. Never nest DialogManager dialogs. Marshal DownloadStatusChanged to the UI thread. |
 | 2026-09-02 | [Visible Dialog, Broken Data Handoff](September%202026/2026-09-02_Context_Session_38.md) | ui | Test the full state transition, not merely whether a dialog opens. Wire required data, commands, selected subset, and downstream settings. |
 | 2026-08-22 | [yt-dlp Requires a Bundled JavaScript Runtime](August%202026/2026-08-22_Context_Session_37.md) | build | A yt-dlp `403` is a **missing JS runtime** until proven otherwise. Run the bundled `yt-dlp.exe` manually and read stderr before touching C# code. Ship QuickJS alongside it. |

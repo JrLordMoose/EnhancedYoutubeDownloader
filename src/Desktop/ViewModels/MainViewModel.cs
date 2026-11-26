@@ -1,8 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.Input;
 using EnhancedYoutubeDownloader.Framework;
 using EnhancedYoutubeDownloader.Services;
@@ -17,7 +15,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly ViewModelManager _viewModelManager;
     private readonly DialogManager _dialogManager;
     private readonly SettingsService _settingsService;
-    private readonly UpdateService? _updateService;
+    private readonly UpdateCoordinator _updateCoordinator;
 
     public string Title { get; } = $"Enhanced YouTube Downloader v{Program.VersionString}";
 
@@ -30,14 +28,14 @@ public partial class MainViewModel : ViewModelBase
         SnackbarManager snackbarManager,
         SettingsService settingsService,
         DialogManager dialogManager,
-        UpdateService? updateService = null
+        UpdateCoordinator updateCoordinator
     )
     {
         _dialogManager = dialogManager;
         _viewModelManager = viewModelManager;
         SnackbarManager = snackbarManager;
         _settingsService = settingsService;
-        _updateService = updateService;
+        _updateCoordinator = updateCoordinator;
         Dashboard = viewModelManager.CreateDashboardViewModel();
     }
 
@@ -65,8 +63,7 @@ public partial class MainViewModel : ViewModelBase
 
     private async Task CheckForUpdatesAsync()
     {
-        // Updates are only supported on Windows
-        if (_updateService == null || !OperatingSystem.IsWindows())
+        if (!_updateCoordinator.IsSupported)
             return;
 
         // Respect Settings > General > "Automatic updates"; manual checks still work
@@ -75,84 +72,27 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            var updateVersion = await _updateService.CheckForUpdatesAsync();
+            var updateVersion = await _updateCoordinator.CheckForUpdatesAsync();
             if (updateVersion is null)
                 return;
 
-            // Ask with a real dialog. Older builds only showed a toast whose "INSTALL NOW"
-            // button couldn't be clicked, and nothing installed the update on exit.
-            var prompt = _viewModelManager.CreateMessageBoxViewModel();
-            prompt.Title = "Update Available";
-            prompt.Message =
-                $"Version {updateVersion.ToString(3)} is available (you have {Program.VersionString}).\n\n"
-                + "Update now? The app will close, install the update and reopen.\n"
-                + "Choose Later to install it automatically the next time you close the app.";
-            prompt.PrimaryButtonText = "Update Now";
-            prompt.SecondaryButtonText = "Later";
-
-            var updateNow = await _dialogManager.ShowDialogAsync(prompt) == true;
-
-            SnackbarManager.Notify($"Downloading update v{updateVersion.ToString(3)}...");
-            await _updateService.PrepareUpdateAsync(updateVersion);
-
-            if (updateNow)
+            if (await _updateCoordinator.PromptAsync(updateVersion))
             {
-                _updateService.FinalizeUpdate(updateVersion, restart: true);
-                ShutdownForUpdate();
+                // Progress dialog -> install -> restart (the app exits inside this call)
+                await _updateCoordinator.InstallNowAsync(updateVersion);
                 return;
             }
 
-            // Install on exit (no restart)
-            _pendingUpdate = updateVersion;
-            if (
-                Application.Current?.ApplicationLifetime
-                is IClassicDesktopStyleApplicationLifetime lifetime
-            )
-            {
-                lifetime.Exit += (_, _) => ApplyPendingUpdateOnExit();
-            }
-
             SnackbarManager.Notify(
-                $"Update v{updateVersion.ToString(3)} is ready and will install when you close the app"
+                $"Update v{updateVersion.ToString(3)} will install when you close the app"
             );
+            await _updateCoordinator.ScheduleInstallOnExitAsync(updateVersion);
         }
         catch
         {
             // Failure to update shouldn't crash the application
-            SnackbarManager.Notify("Failed to perform application update");
+            SnackbarManager.Notify("Couldn't check for updates");
         }
-    }
-
-    private Version? _pendingUpdate;
-
-    private void ApplyPendingUpdateOnExit()
-    {
-        if (_pendingUpdate is null || _updateService is null || !OperatingSystem.IsWindows())
-            return;
-
-        try
-        {
-            _updateService.FinalizeUpdate(_pendingUpdate, restart: false);
-        }
-        catch
-        {
-            // Never block exit; the update will be offered again next launch
-        }
-        finally
-        {
-            _pendingUpdate = null;
-        }
-    }
-
-    private static void ShutdownForUpdate()
-    {
-        if (
-            Application.Current?.ApplicationLifetime
-            is IClassicDesktopStyleApplicationLifetime desktop
-        )
-            desktop.Shutdown(2);
-        else
-            Environment.Exit(2);
     }
 
     [RelayCommand]
